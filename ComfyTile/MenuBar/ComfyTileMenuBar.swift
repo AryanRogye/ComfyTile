@@ -44,10 +44,10 @@ struct ComfyTileMenuBarContent: View {
             .padding(.leading, 8)
         
         Section {
-            ShortcutRecorder(label: "Right Half", type: .RightHalf)
-            ShortcutRecorder(label: "Left Half",  type: .LeftHalf)
-            ShortcutRecorder(label: "Center",     type: .Center)
-            ShortcutRecorder(label: "Maximize",   type: .Maximize)
+            ShortcutRecorder(label: "Right Half", type: .RightHalf, tileShape: .right)
+            ShortcutRecorder(label: "Left Half",  type: .LeftHalf, tileShape: .left)
+            ShortcutRecorder(label: "Center",     type: .Center, tileShape: .center)
+            ShortcutRecorder(label: "Maximize",   type: .Maximize, tileShape: .full)
         }
         .sectionBackground()
         
@@ -70,10 +70,10 @@ struct ComfyTileMenuBarContent: View {
         }
         
         Section {
-            ShortcutRecorder(label: "Nudge Bottom Down", type: .NudgeBottomDown)
-            ShortcutRecorder(label: "Nudge Bottom Up",   type: .NudgeBottomUp)
-            ShortcutRecorder(label: "Nudge Top Up",      type: .NudgeTopUp)
-            ShortcutRecorder(label: "Nudge Top Down",    type: .NudgeTopDown)
+            ShortcutRecorder(label: "Nudge Bottom Down", type: .NudgeBottomDown, tileShape: .nudgeBottomDown)
+            ShortcutRecorder(label: "Nudge Bottom Up",   type: .NudgeBottomUp, tileShape: .nudgeBottomUp)
+            ShortcutRecorder(label: "Nudge Top Up",      type: .NudgeTopUp, tileShape: .nudgeTopUp)
+            ShortcutRecorder(label: "Nudge Top Down",    type: .NudgeTopDown, tileShape: .nudgeTopDown)
         }
         .sectionBackground()
     }
