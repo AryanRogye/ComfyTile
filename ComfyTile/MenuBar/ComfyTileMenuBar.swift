@@ -8,12 +8,21 @@
 import SwiftUI
 
 struct ComfyTileMenuBar: Scene {
+    
+    @ObservedObject var defaultsManager: DefaultsManager
+    
+    init(_ defaultsManager: DefaultsManager) {
+        self.defaultsManager = defaultsManager
+    }
+    
+    
     var body: some Scene {
         
         MenuBarExtra("Menu", systemImage: "menubar.dock.rectangle") {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading) {
                     ComfyTileMenuBarContent()
+                        .environmentObject(defaultsManager)
                 }
                 .padding()
                 .environment(\.controlSize, .small)
@@ -26,6 +35,9 @@ struct ComfyTileMenuBar: Scene {
 }
 
 struct ComfyTileMenuBarContent: View {
+    
+    @EnvironmentObject var defaultsManager: DefaultsManager
+    
     var body: some View {
         Text("Basic")
             .font(.caption).foregroundStyle(.secondary)
@@ -39,9 +51,23 @@ struct ComfyTileMenuBarContent: View {
         }
         .sectionBackground()
         
-        Text("Nudging")
-            .font(.caption).foregroundStyle(.secondary)
-            .padding([.leading, .top], 8)
+        HStack(alignment: .center) {
+            Text("Nudging")
+                .font(.caption).foregroundStyle(.secondary)
+                .padding([.leading, .top], 8)
+            Spacer()
+            
+            TextField("Nudge Amount", value: $defaultsManager.nudgeStep, format: .number)
+                .frame(width: 80)
+                .textFieldStyle(.roundedBorder)
+                .padding([.trailing, .top], 8)
+                .onChange(of: defaultsManager.nudgeStep) { _, value in
+                    if value < 2 {
+                        defaultsManager.nudgeStep = 2
+                    }
+                    defaultsManager.saveNudgeStep()
+                }
+        }
         
         Section {
             ShortcutRecorder(label: "Nudge Bottom Down", type: .NudgeBottomDown)

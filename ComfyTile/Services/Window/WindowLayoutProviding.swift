@@ -7,11 +7,10 @@
 
 protocol WindowLayoutProviding {
     
-    func nudgeTopUp()
-    func nudgeTopDown()
-    
-    func nudgeBottomDown()
-    func nudgeBottomUp()
+    func nudgeTopUp(with step: Int)
+    func nudgeTopDown(with step: Int)
+    func nudgeBottomDown(with step: Int)
+    func nudgeBottomUp(with step: Int)
     
     func fullScreen()
     func center()

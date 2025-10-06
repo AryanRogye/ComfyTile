@@ -13,6 +13,7 @@ class AppCoordinator {
     
     private var hotKeyCoordinator: HotKeyCoordinator?
     private var permissionManager: PermissionService
+    var defaultsManager  : DefaultsManager
     
     let appEnv : AppEnv
     
@@ -21,6 +22,7 @@ class AppCoordinator {
     init(appEnv: AppEnv) {
         permissionManager = PermissionService()
         self.appEnv = appEnv
+        self.defaultsManager = DefaultsManager()
         
         permissionManager.$isAccessibilityEnabled
             .sink { [weak self] _ in
@@ -40,16 +42,24 @@ class AppCoordinator {
                             self.appEnv.windowLayoutService.fullScreen()
                         },
                         onNudgeBottomDownDown: {
-                            self.appEnv.windowLayoutService.nudgeBottomDown()
+                            self.appEnv.windowLayoutService.nudgeBottomDown(
+                                with: self.defaultsManager.nudgeStep
+                            )
                         },
                         onNudgeBottomUpDown: {
-                            self.appEnv.windowLayoutService.nudgeBottomUp()
+                            self.appEnv.windowLayoutService.nudgeBottomUp(
+                                with: self.defaultsManager.nudgeStep
+                            )
                         },
                         onNudgeTopUpDown: {
-                            self.appEnv.windowLayoutService.nudgeTopUp()
+                            self.appEnv.windowLayoutService.nudgeTopUp(
+                                with: self.defaultsManager.nudgeStep
+                            )
                         },
                         onNudgeTopDownDown: {
-                            self.appEnv.windowLayoutService.nudgeTopDown()
+                            self.appEnv.windowLayoutService.nudgeTopDown(
+                                with: self.defaultsManager.nudgeStep
+                            )
                         }
                     )
                 } else {

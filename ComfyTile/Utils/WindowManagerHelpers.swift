@@ -7,13 +7,8 @@
 
 import Cocoa
 
+@MainActor
 struct WindowManagerHelpers {
-    
-    struct FocusedWindow {
-        var element: AXUIElement
-        var screen: NSScreen
-    }
-    
     /// Find the focused window and the screen under your mouse.
     ///
     /// - Returns: `FocusedWindow` if both the screen and focused window are found.

@@ -9,12 +9,14 @@ import Cocoa
 
 class WindowLayoutService: WindowLayoutProviding {
     
+    let animator = WindowAnimator()
+    
     /// Keep Window Where it is, but its top point is moved up
-    func nudgeTopUp() {
+    func nudgeTopUp(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow(),
               var frame = WindowManagerHelpers.windowFrame(f.element) else { return }
         
-        let delta: CGFloat = 2
+        let delta: CGFloat = CGFloat(step)
         frame.origin.y -= delta
         frame.size.height += delta
         
@@ -22,47 +24,47 @@ class WindowLayoutService: WindowLayoutProviding {
         WindowManagerHelpers.setWindowSize(f.element, size: frame.size)
     }
     
-    func nudgeTopDown() {
+    func nudgeTopDown(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow(),
               var frame = WindowManagerHelpers.windowFrame(f.element) else { return }
         
-        let delta: CGFloat = 2
+        let delta: CGFloat = CGFloat(step)
         frame.origin.y += delta
         frame.size.height -= delta
         
         WindowManagerHelpers.setWindowPosition(f.element, position: frame.origin)
         WindowManagerHelpers.setWindowSize(f.element, size: frame.size)
     }
-
-
-    func nudgeBottomDown() {
+    
+    
+    func nudgeBottomDown(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow() else { return }
         let el = f.element
         
         // current frame
         guard var frame = WindowManagerHelpers.windowFrame(el) else { return }
         
-        let delta: CGFloat = 2 // pixels to grow upward
+        let delta: CGFloat = CGFloat(step)
         frame.size.height += delta
         
         // apply
         WindowManagerHelpers.setWindowSize(el, size: frame.size)
     }
     
-    func nudgeBottomUp() {
+    func nudgeBottomUp(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow() else { return }
         let el = f.element
         
         // current frame
         guard var frame = WindowManagerHelpers.windowFrame(el) else { return }
         
-        let delta: CGFloat = 2 // pixels to grow upward
+        let delta: CGFloat = CGFloat(step)
         frame.size.height -= delta
         
         // apply
         WindowManagerHelpers.setWindowSize(el, size: frame.size)
     }
-
+    
     
     func fullScreen() {
         guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return }
@@ -72,17 +74,15 @@ class WindowLayoutService: WindowLayoutProviding {
         
         let frame = screen.visibleFrame
         
-        WindowManagerHelpers.setWindowPosition(
-            window,
-            position: frame.origin
-        )
-        WindowManagerHelpers.setWindowSize(
-            window,
-            size: CGSize(
-                width: frame.width,
-                height: frame.height
+        animator.animate(el: window, to: frame.origin, duration: 0.13) {
+            WindowManagerHelpers.setWindowSize(
+                window,
+                size: CGSize(
+                    width: frame.width,
+                    height: frame.height
+                )
             )
-        )
+        }
     }
     
     func center() {
@@ -107,14 +107,12 @@ class WindowLayoutService: WindowLayoutProviding {
             y: frame.origin.y + (padding + menuBarHeight)
         )
         
-        WindowManagerHelpers.setWindowPosition(
-            window,
-            position: centeredOrigin
-        )
-        WindowManagerHelpers.setWindowSize(
-            window,
-            size: centeredSize
-        )
+        animator.animate(el: window, to: centeredOrigin, duration: 0.13) {
+            WindowManagerHelpers.setWindowSize(
+                window,
+                size: centeredSize
+            )
+        }
     }
     
     // MARK: - Move Left
@@ -127,17 +125,20 @@ class WindowLayoutService: WindowLayoutProviding {
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
         
-        WindowManagerHelpers.setWindowPosition(
-            window,
-            position: frame.origin
+        let leftOrigin = CGPoint(
+            x: frame.origin.x,
+            y: frame.origin.y
         )
-        WindowManagerHelpers.setWindowSize(
-            window,
-            size: CGSize(
-                width: halfWidth,
-                height: frame.height
+        
+        animator.animate(el: window, to: leftOrigin, duration: 0.13) {
+            WindowManagerHelpers.setWindowSize(
+                window,
+                size: CGSize(
+                    width: halfWidth,
+                    height: frame.height
+                )
             )
-        )
+        }
     }
     
     // MARK: - Move Right
@@ -156,16 +157,14 @@ class WindowLayoutService: WindowLayoutProviding {
             y: frame.origin.y
         )
         
-        WindowManagerHelpers.setWindowPosition(
-            window,
-            position: rightOrigin
-        )
-        WindowManagerHelpers.setWindowSize(
-            window,
-            size: CGSize(
-                width: halfWidth,
-                height: frame.height
+        animator.animate(el: window, to: rightOrigin, duration: 0.13) {
+            WindowManagerHelpers.setWindowSize(
+                window,
+                size: CGSize(
+                    width: halfWidth,
+                    height: frame.height
+                )
             )
-        )
+        }
     }
 }
