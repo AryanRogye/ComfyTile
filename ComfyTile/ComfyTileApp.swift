@@ -14,6 +14,12 @@ struct ComfyTileApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     var body: some Scene {
+        
+        WindowGroup{EmptyView().destroyViewWindow()}
+        
         ComfyTileMenuBar(appDelegate.appCoordinator.defaultsManager)
+        
+        Settings { SettingsView() }
+        
     }
 }

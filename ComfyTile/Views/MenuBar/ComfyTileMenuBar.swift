@@ -76,5 +76,14 @@ struct ComfyTileMenuBarContent: View {
             ShortcutRecorder(label: "Nudge Top Down",    type: .NudgeTopDown, tileShape: .nudgeTopDown)
         }
         .sectionBackground()
+        
+        Button(action: {
+            NSApplication.shared.terminate(self)
+        }) {
+            Text("Quit Comfy Tile")
+                .foregroundStyle(.primary)
+                .frame(maxWidth: .infinity)
+                .padding(4)
+        }
     }
 }
