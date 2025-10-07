@@ -19,7 +19,12 @@ final class WindowAnimator {
     private var startTime: CFTimeInterval = 0
     private var duration: TimeInterval = 0.12
     
-    func animate(el: AXUIElement, to target: CGPoint, duration: TimeInterval = 0.12, completion: @escaping () -> Void = {}) {
+    func animate(
+        el: AXUIElement,
+        to target: CGPoint,
+        duration: TimeInterval = 0.12,
+        completion: @escaping () -> Void = {}
+    ) {
         timer?.invalidate()
         self.duration = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? 0 : duration
         

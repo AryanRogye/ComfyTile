@@ -92,7 +92,6 @@ struct WindowManagerHelpers {
         return NSScreen.screens.first { NSMouseInRect(loc, $0.frame, false) }
     }
     
-    
     public static func setWindowSize(_ element: AXUIElement, size: CGSize) {
         var mutableSize = size
         guard let axValue = AXValueCreate(.cgSize, &mutableSize) else {
@@ -138,7 +137,7 @@ struct WindowManagerHelpers {
         }
         
         /// If no screen is selected or height is 0, return fallback height
-        let fallbackHeight = getMenuBarHeight()
+        let fallbackHeight : CGFloat = 40
         /// Make sure fallback height is greater than 0 or go to the fallback 40
         return fallbackHeight > 0 ? fallbackHeight : 40
     }
@@ -153,6 +152,22 @@ struct WindowManagerHelpers {
         // The difference between the full screen height and the visible height
         // is the menu bar height (plus maybe the dock if it's on top).
         return screenFrame.height - visibleFrame.height
+    }
+    
+    static func axPosition(for rect: NSRect, on screen: NSScreen) -> CGPoint {
+        // global frames are all in AppKit coords (bottom-left)
+        let screenFrame = screen.frame
+        let x = rect.origin.x
+        let y = screenFrame.origin.y + screenFrame.height - (rect.origin.y + rect.height)
+        return CGPoint(x: x, y: y)
+    }
+    
+    static func toAXCoordinates(_ point: CGPoint, on screen: NSScreen) -> CGPoint {
+        let frame = screen.frame
+        return CGPoint(
+            x: point.x,
+            y: frame.origin.y + frame.height - point.y
+        )
     }
     
 }

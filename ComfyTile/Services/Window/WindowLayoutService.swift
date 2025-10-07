@@ -20,6 +20,7 @@ class WindowLayoutService: WindowLayoutProviding {
         frame.origin.y -= delta
         frame.size.height += delta
         
+        
         WindowManagerHelpers.setWindowPosition(f.element, position: frame.origin)
         WindowManagerHelpers.setWindowSize(f.element, size: frame.size)
     }
@@ -74,7 +75,9 @@ class WindowLayoutService: WindowLayoutProviding {
         
         let frame = screen.visibleFrame
         
-        animator.animate(el: window, to: frame.origin, duration: 0.13) {
+        let pos = WindowManagerHelpers.axPosition(for: frame, on: screen)
+        
+        animator.animate(el: window, to: pos, duration: 0.13) {
             WindowManagerHelpers.setWindowSize(
                 window,
                 size: CGSize(
@@ -94,7 +97,6 @@ class WindowLayoutService: WindowLayoutProviding {
         /// This is padding around all sides of the window
         let padding : CGFloat = 40
         
-        let menuBarHeight = WindowManagerHelpers.getMenuBarHeight()
         let frame = screen.visibleFrame
         
         let centeredSize = CGSize(
@@ -104,10 +106,14 @@ class WindowLayoutService: WindowLayoutProviding {
         
         let centeredOrigin = CGPoint(
             x: frame.origin.x + padding,
-            y: frame.origin.y + (padding + menuBarHeight)
+            y: frame.origin.y + (padding)
         )
         
-        animator.animate(el: window, to: centeredOrigin, duration: 0.13) {
+        /// Creating Target Rect
+        let rect = NSRect(x: centeredOrigin.x, y: centeredOrigin.y, width: centeredSize.width, height: centeredSize.height)
+        let pos =  WindowManagerHelpers.axPosition(for: rect, on: screen)
+        
+        animator.animate(el: window, to: pos, duration: 0.13) {
             WindowManagerHelpers.setWindowSize(
                 window,
                 size: centeredSize
@@ -125,18 +131,19 @@ class WindowLayoutService: WindowLayoutProviding {
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
         
-        let leftOrigin = CGPoint(
+        let rect = NSRect(
             x: frame.origin.x,
-            y: frame.origin.y
+            y: frame.origin.y,
+            width: halfWidth,
+            height: frame.height
         )
         
-        animator.animate(el: window, to: leftOrigin, duration: 0.13) {
+        let pos = WindowManagerHelpers.axPosition(for: rect, on: screen)
+        
+        animator.animate(el: window, to: pos, duration: 0.13) {
             WindowManagerHelpers.setWindowSize(
                 window,
-                size: CGSize(
-                    width: halfWidth,
-                    height: frame.height
-                )
+                size: rect.size
             )
         }
     }
@@ -152,18 +159,19 @@ class WindowLayoutService: WindowLayoutProviding {
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
         
-        let rightOrigin = CGPoint(
+        let rect = NSRect(
             x: frame.origin.x + halfWidth,
-            y: frame.origin.y
+            y: frame.origin.y,
+            width: halfWidth,
+            height: frame.height
         )
         
-        animator.animate(el: window, to: rightOrigin, duration: 0.13) {
+        let pos = WindowManagerHelpers.axPosition(for: rect, on: screen)
+        
+        animator.animate(el: window, to: pos, duration: 0.13) {
             WindowManagerHelpers.setWindowSize(
                 window,
-                size: CGSize(
-                    width: halfWidth,
-                    height: frame.height
-                )
+                size: rect.size
             )
         }
     }
