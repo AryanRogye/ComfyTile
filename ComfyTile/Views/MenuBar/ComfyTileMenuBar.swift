@@ -17,7 +17,6 @@ struct ComfyTileMenuBar: Scene {
     
     
     var body: some Scene {
-        
         MenuBarExtra("Menu", systemImage: "menubar.dock.rectangle") {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading) {
@@ -39,6 +38,17 @@ struct ComfyTileMenuBarContent: View {
     @EnvironmentObject var defaultsManager: DefaultsManager
     
     var body: some View {
+        /// Have User Select Modifier Key
+        Picker("Select Modifier Key", selection: $defaultsManager.modiferKey) {
+            ForEach(ModifierGroup.allCases, id: \.self) { group in
+                Text(group.rawValue).tag(group)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .onChange(of: defaultsManager.modiferKey) { _, value in
+            defaultsManager.saveModiferKey()
+        }
+        
         Text("Basic")
             .font(.caption).foregroundStyle(.secondary)
             .padding(.leading, 8)

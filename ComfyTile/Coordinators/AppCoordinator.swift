@@ -29,12 +29,35 @@ class AppCoordinator {
         self.defaultsManager = DefaultsManager()
         self.tilingCoverCoordinator = TilingCoverCoordinator()
         
+        defaultsManager.$modiferKey
+            .removeDuplicates()
+            .sink { [weak self] key in
+                guard let self = self else { return }
+                guard let hC = hotKeyCoordinator else { return }
+                hC.start(with: key)
+            }
+            .store(in: &cancellables)
+            
         
         permissionManager.$isAccessibilityEnabled
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 if self.permissionManager.isAccessibilityEnabled {
                     hotKeyCoordinator = HotKeyCoordinator(
+                        onOptDoubleTapDown: {
+                            print("Double Tap Option Down")
+                        },
+                        onOptDoubleTapUp: {
+                            
+                        },
+                        onCtrlDoubleTapDown: {
+                            print("Double Control Option Down")
+                        },
+                        onCtrlDoubleTapUp: {
+                            
+                        },
+                        
+                        
                         // MARK: - Right Half
                         onRightHalfDown: {
                             if let rect = self.appEnv.windowLayoutService.getRightDimensions() {
@@ -109,8 +132,10 @@ class AppCoordinator {
                             )
                         }
                     )
+                    
+                    self.hotKeyCoordinator?.start(with: defaultsManager.modiferKey)
+                    
                 } else {
-                    print("DISABELD")
                     hotKeyCoordinator = nil
                 }
             }
