@@ -12,6 +12,8 @@ import Combine
 class AppCoordinator {
     
     private var hotKeyCoordinator: HotKeyCoordinator?
+    private var tilingCoverCoordinator : TilingCoverCoordinator
+    
     private var permissionManager: PermissionService
     var defaultsManager  : DefaultsManager
     
@@ -19,28 +21,73 @@ class AppCoordinator {
     
     var cancellables: Set<AnyCancellable> = []
     
+    var numKeysHeld = 0
+    
     init(appEnv: AppEnv) {
         permissionManager = PermissionService()
         self.appEnv = appEnv
         self.defaultsManager = DefaultsManager()
+        self.tilingCoverCoordinator = TilingCoverCoordinator()
+        
         
         permissionManager.$isAccessibilityEnabled
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 if self.permissionManager.isAccessibilityEnabled {
                     hotKeyCoordinator = HotKeyCoordinator(
+                        // MARK: - Right Half
                         onRightHalfDown: {
-                            self.appEnv.windowLayoutService.moveRight()
+                            if let rect = self.appEnv.windowLayoutService.getRightDimensions() {
+                                self.tilingCoverCoordinator.show(with: rect)
+                            }
+                            self.numKeysHeld += 1
                         },
+                        onRightHalfUp: {
+                            self.shouldCloseWith {
+                                self.appEnv.windowLayoutService.moveRight()
+                            }
+                        },
+                        // MARK: - Left Half
                         onLeftHalfDown: {
-                            self.appEnv.windowLayoutService.moveLeft()
+                            if let rect = self.appEnv.windowLayoutService.getLeftDimensions() {
+                                self.tilingCoverCoordinator.show(with: rect)
+                            }
+                            self.numKeysHeld += 1
                         },
+                        onLeftHalfUp: {
+                            self.shouldCloseWith {
+                                self.appEnv.windowLayoutService.moveLeft()
+                            }
+                        },
+                        
+                        // MARK: - Center
                         onCenterDown: {
-                            self.appEnv.windowLayoutService.center()
+                            if let rect = self.appEnv.windowLayoutService.getCenterDimensions() {
+                                self.tilingCoverCoordinator.show(with: rect)
+                            }
+                            self.numKeysHeld += 1
                         },
+                        onCenterUp: {
+                            self.shouldCloseWith {
+                                self.appEnv.windowLayoutService.center()
+                            }
+                        },
+                        
+                        // MARK: - Full Screen
                         onMaximizeDown: {
-                            self.appEnv.windowLayoutService.fullScreen()
+                            if let rect = self.appEnv.windowLayoutService.getFullScreenDimensions() {
+                                self.tilingCoverCoordinator.show(with: rect)
+                            }
+                            self.numKeysHeld += 1
+
                         },
+                        onMaximizeUp: {
+                            self.shouldCloseWith {
+                                self.appEnv.windowLayoutService.fullScreen()
+                            }
+                        },
+                        
+                        
                         onNudgeBottomDownDown: {
                             self.appEnv.windowLayoutService.nudgeBottomDown(
                                 with: self.defaultsManager.nudgeStep
@@ -68,5 +115,13 @@ class AppCoordinator {
                 }
             }
             .store(in: &cancellables)
+    }
+    
+    private func shouldCloseWith(completion: @escaping () -> Void) {
+        self.numKeysHeld -= 1
+        if self.numKeysHeld == 0 {
+            self.tilingCoverCoordinator.hide()
+            completion()
+        }
     }
 }

@@ -66,7 +66,6 @@ class WindowLayoutService: WindowLayoutProviding {
         WindowManagerHelpers.setWindowSize(el, size: frame.size)
     }
     
-    
     func fullScreen() {
         guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return }
         
@@ -174,5 +173,87 @@ class WindowLayoutService: WindowLayoutProviding {
                 size: rect.size
             )
         }
+    }
+    
+    
+    func getFullScreenDimensions() -> CGRect? {
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return nil }
+        
+        let screen = focusedWindow.screen
+        
+        let frame = screen.visibleFrame
+        
+        return CGRect(
+            x : frame.minX,
+            y : frame.minY,
+            width : frame.width,
+            height : frame.height
+        )
+    }
+    func getLeftDimensions() -> CGRect? {
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return nil }
+        
+        let screen = focusedWindow.screen
+        
+        let frame = screen.visibleFrame
+        let halfWidth = frame.width / 2
+        
+        let rect = NSRect(
+            x: frame.origin.x,
+            y: frame.origin.y,
+            width: halfWidth,
+            height: frame.height
+        )
+        
+        return rect
+        
+    }
+    func getRightDimensions() -> CGRect? {
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return nil }
+        
+        let screen = focusedWindow.screen
+        
+        let frame = screen.visibleFrame
+        let halfWidth = frame.width / 2
+        
+        let rect = NSRect(
+            x: frame.origin.x + halfWidth,
+            y: frame.origin.y,
+            width: halfWidth,
+            height: frame.height
+        )
+        
+        return rect
+    }
+    
+    func getCenterDimensions() -> CGRect? {
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return nil }
+        
+        let screen = focusedWindow.screen
+        
+        /// This is padding around all sides of the window
+        let padding : CGFloat = 40
+        
+        let frame = screen.visibleFrame
+        
+        let centeredSize = CGSize(
+            width: frame.width - (padding * 2),
+            height: frame.height - (padding * 2)
+        )
+        
+        let centeredOrigin = CGPoint(
+            x: frame.origin.x + padding,
+            y: frame.origin.y + (padding)
+        )
+        
+        /// Creating Target Rect
+        let rect = NSRect(
+            x: centeredOrigin.x,
+            y: centeredOrigin.y,
+            width: centeredSize.width,
+            height: centeredSize.height
+        )
+        
+        return rect
     }
 }
