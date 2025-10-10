@@ -13,6 +13,7 @@ class AppCoordinator {
     
     private var hotKeyCoordinator: HotKeyCoordinator?
     private var tilingCoverCoordinator : TilingCoverCoordinator
+    private var tilingCoverVM          : TilingCoverViewModel
     
     private var permissionManager: PermissionService
     var defaultsManager  : DefaultsManager
@@ -23,18 +24,24 @@ class AppCoordinator {
     
     var numKeysHeld = 0
     
+    deinit {
+    }
+    
     init(appEnv: AppEnv) {
         permissionManager = PermissionService()
         self.appEnv = appEnv
         self.defaultsManager = DefaultsManager()
-        self.tilingCoverCoordinator = TilingCoverCoordinator()
+        self.tilingCoverVM = TilingCoverViewModel()
+        self.tilingCoverCoordinator = TilingCoverCoordinator(
+            tilingCoverVM: tilingCoverVM
+        )
         
         defaultsManager.$modiferKey
             .removeDuplicates()
             .sink { [weak self] key in
                 guard let self = self else { return }
                 guard let hC = hotKeyCoordinator else { return }
-                hC.start(with: key)
+                hC.startModifier(with: key)
             }
             .store(in: &cancellables)
             
@@ -133,7 +140,10 @@ class AppCoordinator {
                         }
                     )
                     
-                    self.hotKeyCoordinator?.start(with: defaultsManager.modiferKey)
+                    self.hotKeyCoordinator?.startModifier(with: defaultsManager.modiferKey)
+//                    self.hotKeyCoordinator?.startGlobalClickMonitor {
+//                        print("Clicked")
+//                    }
                     
                 } else {
                     hotKeyCoordinator = nil

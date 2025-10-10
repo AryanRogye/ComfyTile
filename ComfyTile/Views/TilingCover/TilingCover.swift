@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct TilingCover : View {
+    
+    @EnvironmentObject var tilingCoverVM : TilingCoverViewModel
+    
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 22, style: .continuous)
@@ -22,6 +25,10 @@ struct TilingCover : View {
                 // content
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .offset(y: tilingCoverVM.isShown ? 0 : 200)
+            .scaleEffect(tilingCoverVM.isShown ? 1 : 0.95)
+            .shadow(color: .black, radius: tilingCoverVM.isShown ? 10 : 0)
+            .animation(.spring, value: tilingCoverVM.isShown)
         }
     }
 }

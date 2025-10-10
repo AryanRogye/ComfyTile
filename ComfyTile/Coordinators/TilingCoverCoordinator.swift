@@ -7,13 +7,19 @@
 
 import AppKit
 import SwiftUI
+import Combine
+
+class TilingCoverViewModel: ObservableObject {
+    @Published var isShown : Bool = false
+}
 
 class TilingCoverCoordinator : NSObject {
     
     var panel : NSPanel!
-    var isShown: Bool = false
+    var tilingCoverVM : TilingCoverViewModel
     
-    override init() {
+    init(tilingCoverVM : TilingCoverViewModel) {
+        self.tilingCoverVM = tilingCoverVM
         super.init()
     }
     
@@ -44,6 +50,7 @@ class TilingCoverCoordinator : NSObject {
         
         let view: NSView = NSHostingView(
             rootView: TilingCover()
+                .environmentObject(tilingCoverVM)
         )
         
         /// Allow hosting view to overflow
@@ -64,7 +71,7 @@ class TilingCoverCoordinator : NSObject {
             return
         }
         panel.setFrame(rect, display: true, animate: true)
-        isShown = true
+        tilingCoverVM.isShown = true
         panel.orderFrontRegardless()
     }
     
@@ -75,10 +82,10 @@ class TilingCoverCoordinator : NSObject {
         }
         
         if panel.isVisible {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
                 guard let self = self else { return }
                 self.panel?.orderOut(nil)
-                isShown = false
+                tilingCoverVM.isShown = false
             }
         }
     }
