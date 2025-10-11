@@ -61,11 +61,12 @@ struct ShortcutHUD: View {
             .animation(.spring, value: shortcutHUDVM.isShown)
             .focusable(false)
             .onMoveCommand { _ in }
-            .onAppear {
-                keyboardManager.startMonitoring()
-            }
-            .onDisappear {
-                keyboardManager.stopMonitoring()
+            .onChange(of: shortcutHUDVM.isShown) { _, value in
+                if value {
+                    keyboardManager.startMonitoring()
+                } else {
+                    keyboardManager.stopMonitoring()
+                }
             }
         }
     }
