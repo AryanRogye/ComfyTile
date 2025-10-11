@@ -19,6 +19,21 @@ extension KeyboardShortcuts.Name {
     static let NudgeTopDown = Self("NudgeTopDown")
 }
 
+extension KeyboardShortcuts.Name {
+    static var allForHUD: [KeyboardShortcuts.Name] {
+        [
+            .LeftHalf,
+            .RightHalf,
+            .Maximize,
+            .Center,
+            .NudgeBottomDown,
+            .NudgeBottomUp,
+            .NudgeTopUp,
+            .NudgeTopDown
+        ]
+    }
+}
+
 @MainActor
 final class HotKeyCoordinator {
     
@@ -44,6 +59,7 @@ final class HotKeyCoordinator {
     
     public func startGlobalClickMonitor(onClick: @escaping () -> Void) {
         globalClickMonitor.start {
+            onClick()
         }
     }
     public func stopGlobalClickMonitor() {
@@ -377,11 +393,11 @@ extension HotKeyCoordinator {
             
             switch type {
             case .leftMouseDown:
-                print("🖱️ CGEventTap: Left Mouse Down")
+//                print("🖱️ CGEventTap: Left Mouse Down")
                 isLocallyPressingModifier = true
                 onClick?() // Call the stored closure
             case .leftMouseUp:
-                print("🖱️ CGEventTap: Left Mouse Up")
+//                print("🖱️ CGEventTap: Left Mouse Up")
                 isLocallyPressingModifier = false
             default:
                 break

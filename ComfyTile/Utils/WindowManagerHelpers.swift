@@ -9,6 +9,11 @@ import Cocoa
 
 @MainActor
 struct WindowManagerHelpers {
+    
+    static let ignore_list = [
+        "com.aryanrogye.ComfyTile"
+    ]
+    
     /// Find the focused window and the screen under your mouse.
     ///
     /// - Returns: `FocusedWindow` if both the screen and focused window are found.
@@ -23,8 +28,11 @@ struct WindowManagerHelpers {
         
         // Get the frontmost app.
         guard let app = NSWorkspace.shared.frontmostApplication else { return nil }
-        
+        guard let bundle = app.bundleIdentifier else { return nil }
         let pid = app.processIdentifier
+        
+        if ignore_list.contains(bundle) { return nil }
+        
         let appElement = AXUIElementCreateApplication(pid)
         
         // Ask Accessibility for the app's focused window.

@@ -11,9 +11,14 @@ import Combine
 @MainActor
 class AppCoordinator {
     
+    /// Coordinators
     private var hotKeyCoordinator: HotKeyCoordinator?
     private var tilingCoverCoordinator : TilingCoverCoordinator
+    private var shortcutHUDCoordinator : ShortcutHUDCoordinator
+    
+    /// View Models
     private var tilingCoverVM          : TilingCoverViewModel
+    private var shortcutHUDVM          : ShortcutHUDViewModel
     
     private var permissionManager: PermissionService
     var defaultsManager  : DefaultsManager
@@ -23,6 +28,7 @@ class AppCoordinator {
     var cancellables: Set<AnyCancellable> = []
     
     var numKeysHeld = 0
+    var isHoldingModifier = false
     
     deinit {
     }
@@ -31,9 +37,16 @@ class AppCoordinator {
         permissionManager = PermissionService()
         self.appEnv = appEnv
         self.defaultsManager = DefaultsManager()
+        
         self.tilingCoverVM = TilingCoverViewModel()
+        self.shortcutHUDVM = ShortcutHUDViewModel()
+        
         self.tilingCoverCoordinator = TilingCoverCoordinator(
             tilingCoverVM: tilingCoverVM
+        )
+        
+        self.shortcutHUDCoordinator = ShortcutHUDCoordinator(
+            shortcutHUDVM: shortcutHUDVM
         )
         
         defaultsManager.$modiferKey
@@ -51,17 +64,23 @@ class AppCoordinator {
                 guard let self = self else { return }
                 if self.permissionManager.isAccessibilityEnabled {
                     hotKeyCoordinator = HotKeyCoordinator(
+                        
+                        // MARK: - Modifier Key
                         onOptDoubleTapDown: {
-                            print("Double Tap Option Down")
+                            self.isHoldingModifier = true
+                            self.shortcutHUDCoordinator.show()
                         },
                         onOptDoubleTapUp: {
-                            
+                            self.isHoldingModifier = false
+//                            self.shortcutHUDCoordinator.hide()
                         },
                         onCtrlDoubleTapDown: {
-                            print("Double Control Option Down")
+                            self.isHoldingModifier = true
+                            self.shortcutHUDCoordinator.show()
                         },
                         onCtrlDoubleTapUp: {
-                            
+                            self.isHoldingModifier = false
+//                            self.shortcutHUDCoordinator.hide()
                         },
                         
                         
@@ -118,6 +137,7 @@ class AppCoordinator {
                         },
                         
                         
+                        // MARK: - Nudge From Bottom
                         onNudgeBottomDownDown: {
                             self.appEnv.windowLayoutService.nudgeBottomDown(
                                 with: self.defaultsManager.nudgeStep
@@ -128,6 +148,9 @@ class AppCoordinator {
                                 with: self.defaultsManager.nudgeStep
                             )
                         },
+                        
+                        
+                        // MARK: - Nudge From Top
                         onNudgeTopUpDown: {
                             self.appEnv.windowLayoutService.nudgeTopUp(
                                 with: self.defaultsManager.nudgeStep
@@ -142,7 +165,9 @@ class AppCoordinator {
                     
                     self.hotKeyCoordinator?.startModifier(with: defaultsManager.modiferKey)
 //                    self.hotKeyCoordinator?.startGlobalClickMonitor {
-//                        print("Clicked")
+//                        if self.isHoldingModifier {
+//                            print("IS HOLDING MODIFIER")
+//                        }
 //                    }
                     
                 } else {
