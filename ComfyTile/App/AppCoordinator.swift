@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Observation
 
 
 @MainActor
@@ -15,13 +16,17 @@ class AppCoordinator {
     private var hotKeyCoordinator: HotKeyCoordinator?
     private var tilingCoverCoordinator : TilingCoverCoordinator
     private var shortcutHUDCoordinator : ShortcutHUDCoordinator
+    private var windowViewerCoordinator : WindowViewerCoordinator
     
     /// View Models
     private var tilingCoverVM          : TilingCoverViewModel
     private var shortcutHUDVM          : ShortcutHUDViewModel
+    private var windowViewerVM         : WindowViewerViewModel
+    
     
     private var permissionManager: PermissionService
     var defaultsManager  : DefaultsManager
+    var fetchedWindowManager : FetchedWindowManager
     
     let appEnv : AppEnv
     
@@ -37,10 +42,12 @@ class AppCoordinator {
         permissionManager = PermissionService()
         self.appEnv = appEnv
         self.defaultsManager = DefaultsManager()
-        
+        self.fetchedWindowManager = FetchedWindowManager()
+
         self.tilingCoverVM = TilingCoverViewModel()
         self.shortcutHUDVM = ShortcutHUDViewModel()
-        
+        self.windowViewerVM = WindowViewerViewModel()
+
         self.tilingCoverCoordinator = TilingCoverCoordinator(
             tilingCoverVM: tilingCoverVM
         )
@@ -48,23 +55,36 @@ class AppCoordinator {
         self.shortcutHUDCoordinator = ShortcutHUDCoordinator(
             shortcutHUDVM: shortcutHUDVM
         )
+        self.windowViewerCoordinator = WindowViewerCoordinator(
+            windowViewerVM: windowViewerVM,
+            fetchedWindowManager: fetchedWindowManager
+        )
         
-        defaultsManager.$modiferKey
-            .removeDuplicates()
-            .sink { [weak self] key in
-                guard let self = self else { return }
-                guard let hC = hotKeyCoordinator else { return }
-                hC.startModifier(with: key)
+        
+        withObservationTracking { [weak self] in
+            guard let self = self else { return }
+            _ = self.defaultsManager.modiferKey
+        } onChange: { [weak self] in
+            guard let self = self else { return }
+            Task { @MainActor in
+                self.hotKeyCoordinator?.startModifier(with: self.defaultsManager.modiferKey)
             }
-            .store(in: &cancellables)
-            
+        }
         
         permissionManager.$isAccessibilityEnabled
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 if self.permissionManager.isAccessibilityEnabled {
                     hotKeyCoordinator = HotKeyCoordinator(
-                        
+//                        onWindowViewer: {
+//                            Task {
+//                                await self.fetchedWindowManager.loadWindows()
+//                                self.windowViewerCoordinator.show()
+//                            }
+//                        },
+//                        onAutoTile: {
+//                            self.appEnv.windowLayoutService.autoTile()
+//                        },
                         // MARK: - Modifier Key
                         onOptDoubleTapDown: {
                             self.isHoldingModifier = true

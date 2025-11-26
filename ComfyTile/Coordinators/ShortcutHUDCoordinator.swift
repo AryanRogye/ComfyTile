@@ -46,7 +46,7 @@ class ShortcutHUDCoordinator: NSObject {
         panel.contentView?.wantsLayer = true
         
         panel.registerForDraggedTypes([.fileURL])
-        panel.title = "ComfyNotch"
+        panel.title = "SS"
         panel.acceptsMouseMovedEvents = true
         
         let overlayRaw = CGWindowLevelForKey(.overlayWindow)

@@ -17,6 +17,7 @@ class PermissionService: ObservableObject {
     
     init() {
         self.isAccessibilityEnabled = permissionService.getAccessibilityPermissions()
+        self.requestPermission()
     }
     
     public func requestPermission() {

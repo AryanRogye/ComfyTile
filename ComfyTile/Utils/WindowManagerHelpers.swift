@@ -6,6 +6,9 @@
 //
 
 import Cocoa
+import ScreenCaptureKit
+import ApplicationServices
+import CoreGraphics
 
 @MainActor
 struct WindowManagerHelpers {
@@ -13,6 +16,68 @@ struct WindowManagerHelpers {
     static let ignore_list = [
         "com.aryanrogye.ComfyTile"
     ]
+    
+    /// Gets ALL User Windows
+    public static func getUserWindows() async -> [FetchedWindow]? {
+        do {
+            let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
+            let allOnScreenWindows = content.windows
+            var focusedWindows: [FetchedWindow] = []
+            
+            /// Loop Through all screens for windows
+            for window in allOnScreenWindows {
+                guard let app = window.owningApplication,
+                      window.windowLayer == 0,
+                      window.frame.size.width > 100
+                else {
+                    // Skip junk like "Cursor", "Menubar", etc.
+                    continue
+                }
+                
+                guard let windowInfo = CGWindowListCopyWindowInfo([.optionIncludingWindow], window.windowID) as? [[String: Any]],
+                      let firstWindow = windowInfo.first,
+                      let windowTitle = firstWindow["kCGWindowName"] as? String,
+                      let pid = firstWindow["kCGWindowOwnerPID"] as? pid_t,
+                      let boundsDict = firstWindow["kCGWindowBounds"] as? [String: CGFloat],
+                      let x = boundsDict["X"],
+                      let y = boundsDict["Y"],
+                      let width = boundsDict["Width"],
+                      let height = boundsDict["Height"]
+                else { continue }
+                
+                /// Calulate Bounds
+                let bounds = CGRect(x: x, y: y, width: width, height: height)
+                
+                /// Get AXElement, Doesnt matter if nil
+                let axElement = AXUtils.findMatchingAXWindow(
+                    pid: pid,
+                    targetCGSWindowID: window.windowID,
+                    targetCGSFrame: bounds,
+                    targetCGSTitle: windowTitle
+                )
+                
+                
+                var screenshot: CGImage? = nil
+                do {
+                    screenshot = try await ScreenshotHelper.capture(windowID: window.windowID)
+                } catch {
+                    print("Coudlnt get screenshot: \(error)")
+                }
+                
+                focusedWindows.append(FetchedWindow(
+                    windowID: window.windowID,
+                    windowTitle: windowTitle,
+                    pid: pid,
+                    axElement: axElement,
+                    bundleIdentifier: app.bundleIdentifier,
+                    screenshot: screenshot
+                ))
+            }
+            return focusedWindows
+        } catch {
+            return nil
+        }
+    }
     
     /// Find the focused window and the screen under your mouse.
     ///
@@ -94,7 +159,6 @@ struct WindowManagerHelpers {
         return CGRect(origin: position, size: size)
     }
     
-    
     public static func screenUnderMouse() -> NSScreen? {
         let loc = NSEvent.mouseLocation
         return NSScreen.screens.first { NSMouseInRect(loc, $0.frame, false) }
@@ -163,19 +227,14 @@ struct WindowManagerHelpers {
     }
     
     static func axPosition(for rect: NSRect, on screen: NSScreen) -> CGPoint {
-        // global frames are all in AppKit coords (bottom-left)
-        let screenFrame = screen.frame
-        let x = rect.origin.x
-        let y = screenFrame.origin.y + screenFrame.height - (rect.origin.y + rect.height)
-        return CGPoint(x: x, y: y)
+        guard let primaryScreenHeight = NSScreen.screens.first?.frame.height else {
+            return rect.origin
+        }
+        
+        let appKitTop = rect.maxY
+        
+        let axY = primaryScreenHeight - appKitTop
+        
+        return CGPoint(x: rect.origin.x, y: axY)
     }
-    
-    static func toAXCoordinates(_ point: CGPoint, on screen: NSScreen) -> CGPoint {
-        let frame = screen.frame
-        return CGPoint(
-            x: point.x,
-            y: frame.origin.y + frame.height - point.y
-        )
-    }
-    
 }

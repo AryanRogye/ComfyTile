@@ -7,15 +7,17 @@
 
 import Defaults
 import Combine
+import Foundation
 
 extension Defaults.Keys {
     static let nudgeStep = Key<Int>("NudgeStep", default: 2)
     static let modiferKey = Key<String>("ModiferKey", default: "Control")
 }
 
-class DefaultsManager : ObservableObject {
-    @Published var nudgeStep: Int = Defaults[.nudgeStep]
-    @Published var modiferKey: ModifierGroup = ModifierGroup(rawValue: Defaults[.modiferKey]) ?? .control
+@Observable @MainActor
+class DefaultsManager {
+    var nudgeStep: Int = Defaults[.nudgeStep]
+    var modiferKey: ModifierGroup = ModifierGroup(rawValue: Defaults[.modiferKey]) ?? .control
     
     public func saveModiferKey() {
         Defaults[.modiferKey] = modiferKey.rawValue

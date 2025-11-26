@@ -175,6 +175,24 @@ class WindowLayoutService: WindowLayoutProviding {
         }
     }
     
+    // MARK: - Auto Tile
+    func autoTile() {
+        /// Get All AXWindowsOnScreen
+        Task {
+            if let fetchedWindows = await WindowManagerHelpers.getUserWindows() {
+                for window in fetchedWindows {
+                    print("===============================================================")
+                    print("\(window.pid) - \(window.bundleIdentifier) - \(window.windowTitle)")
+                    print("Window ID: \(window.windowID)")
+                    print("\(window.axElement != nil ? "Has AX Element" : "No AX Element")")
+                    if window.windowID == 4111 {
+                        window.focusWindow()
+                    }
+                }
+            }
+        }
+    }
+    
     
     func getFullScreenDimensions() -> CGRect? {
         guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return nil }

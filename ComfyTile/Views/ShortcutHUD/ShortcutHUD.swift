@@ -14,7 +14,6 @@ struct ShortcutHUD: View {
     @StateObject var keyboardManager = KeyboardManager()
     
     var filteredShortcuts : [KeyboardShortcuts.Name] {
-        
         let list : [KeyboardShortcuts.Name] = KeyboardShortcuts.Name.allForHUD.filter { (name) -> Bool in
             if let desc = name.shortcut?.description {
                 let split = Array(desc)
@@ -25,7 +24,6 @@ struct ShortcutHUD: View {
                 }
                 return true
             }
-            
             return false
         }
         return list
@@ -35,24 +33,47 @@ struct ShortcutHUD: View {
     var body: some View {
         ZStack {
             
+            Button(action: { shortcutHUDVM.onEscape?() }) {}
+                .buttonStyle(.plain)
+                .keyboardShortcut(.escape, modifiers: [])
 
-            ShortcutHUDBackground()
+//            ShortcutHUDBackground()
             
+
             VStack(alignment: .center) {
-                Button(action: { shortcutHUDVM.onEscape?() }) {}
-                    .buttonStyle(.plain)
-                    .keyboardShortcut(.escape, modifiers: [])
+                Spacer()
                 
-                HStack {
-                    ForEach(keyboardManager.pressedKeys, id: \.self) { order in
-                        Text(order.description)
+                if keyboardManager.pressedKeys.isEmpty {
+                    HStack {
+                        
+                    }
+                    .frame(width: 100, height: 100)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12)
+                    }
+                    
+                } else {
+                    HStack(alignment: .center) {
+                        ForEach(keyboardManager.pressedKeys, id: \.self) { order in
+                            Text(order.description)
+                                .padding()
+                                .background {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(.thinMaterial)
+                                }
+                        }
+                    }
+                    .frame(width: 100, height: 100)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12)
                     }
                 }
                 
-                Text("Shortcuts")
                 ForEach(filteredShortcuts, id: \.self) { name in
                     ShortcutRowView(name: name)
                 }
+                
+                Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .offset(y: shortcutHUDVM.isShown ? 0 : 200)
@@ -74,7 +95,6 @@ struct ShortcutHUD: View {
 
 struct ShortcutRowView: View {
     let name: KeyboardShortcuts.Name
-    
     var body: some View {
         HStack(alignment: .center) {
             // The library's view automatically displays the correct keys (e.g., "⌥H")
@@ -103,4 +123,13 @@ struct ShortcutRowView: View {
         default: return ""
         }
     }
+}
+
+
+#Preview {
+    @Previewable @StateObject var shortcutHUDVM = ShortcutHUDViewModel()
+    
+        ShortcutHUD()
+            .environmentObject(shortcutHUDVM)
+            .frame(width: 300, height: 600)
 }

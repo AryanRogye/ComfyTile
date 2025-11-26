@@ -18,7 +18,6 @@ struct ShortcutHUDBackground: View {
                     .stroke(Color.white.opacity(0.4), lineWidth: 1)
             )
             .ignoresSafeArea()
-            .offset(y: shortcutHUDVM.isShown ? 0 : 10)
             .scaleEffect(shortcutHUDVM.isShown ? 1 : 0.95)
             .shadow(color: .black, radius: shortcutHUDVM.isShown ? 10 : 0)
             .animation(.spring, value: shortcutHUDVM.isShown)

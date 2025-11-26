@@ -17,6 +17,8 @@ extension KeyboardShortcuts.Name {
     static let NudgeBottomUp = Self("NudgeBottomUp")
     static let NudgeTopUp = Self("NudgeTopUp")
     static let NudgeTopDown = Self("NudgeTopDown")
+    static let AutoTile     = Self("AutoTile")
+    static let windowViewer = Self("WindowViewer")
 }
 
 extension KeyboardShortcuts.Name {
@@ -29,7 +31,8 @@ extension KeyboardShortcuts.Name {
             .NudgeBottomDown,
             .NudgeBottomUp,
             .NudgeTopUp,
-            .NudgeTopDown
+            .NudgeTopDown,
+            .AutoTile
         ]
     }
 }
@@ -46,6 +49,10 @@ final class HotKeyCoordinator {
     private(set) var nudgeBottomUp   : KeyboardShortcuts.Name
     private(set) var nudgeTopUp      : KeyboardShortcuts.Name
     private(set) var nudgeTopDown    : KeyboardShortcuts.Name
+    
+    private(set) var autoTile        : KeyboardShortcuts.Name
+    
+    private(set) var windowViewer    : KeyboardShortcuts.Name
     
     private let modifierDetector   = ModifierDoubleTapDetector()
     private let globalClickMonitor = GlobalClickMonitor()
@@ -67,6 +74,8 @@ final class HotKeyCoordinator {
     }
     
     init(
+        onWindowViewer      : @escaping () -> Void = {},
+        onAutoTile          : @escaping () -> Void = {},
         /// On Down's and on Up's do the same thing
         onOptDoubleTapDown: @escaping () -> Void = {},
         onOptDoubleTapUp:   @escaping () -> Void = {},
@@ -91,6 +100,8 @@ final class HotKeyCoordinator {
         onNudgeTopDownDown: @escaping () -> Void = {},
         
     ) {
+        self.windowViewer = .windowViewer
+        self.autoTile   = .AutoTile
         self.rightHalf  = .RightHalf
         self.leftHalf   = .LeftHalf
         self.center     = .Center
@@ -105,6 +116,14 @@ final class HotKeyCoordinator {
         modifierDetector.onDoubleTapOptionRelease = onOptDoubleTapUp
         modifierDetector.onDoubleTapControl = onCtrlDoubleTapDown
         modifierDetector.onDoubleTapControlRelease = onCtrlDoubleTapUp
+        
+        KeyboardShortcuts.onKeyDown(for: .windowViewer) {
+            onWindowViewer()
+        }
+        
+        KeyboardShortcuts.onKeyDown(for: self.autoTile) {
+//            onAutoTile()
+        }
         
         // MARK: - Right Half
         KeyboardShortcuts.onKeyDown(for: self.rightHalf) {

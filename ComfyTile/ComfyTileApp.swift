@@ -17,7 +17,10 @@ struct ComfyTileApp: App {
         
         WindowGroup{EmptyView().destroyViewWindow()}
         
-        ComfyTileMenuBar(appDelegate.appCoordinator.defaultsManager)
+        ComfyTileMenuBar(
+            defaultsManager: appDelegate.appCoordinator.defaultsManager,
+            fetchedWindowManager: appDelegate.appCoordinator.fetchedWindowManager
+        )
         
         Settings { SettingsView() }
         

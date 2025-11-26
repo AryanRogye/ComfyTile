@@ -9,19 +9,16 @@ import SwiftUI
 
 struct ComfyTileMenuBar: Scene {
     
-    @ObservedObject var defaultsManager: DefaultsManager
-    
-    init(_ defaultsManager: DefaultsManager) {
-        self.defaultsManager = defaultsManager
-    }
-    
+    @Bindable var defaultsManager: DefaultsManager
+    @Bindable var fetchedWindowManager : FetchedWindowManager
     
     var body: some Scene {
         MenuBarExtra("Menu", systemImage: "menubar.dock.rectangle") {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading) {
                     ComfyTileMenuBarContent()
-                        .environmentObject(defaultsManager)
+                        .environment(defaultsManager)
+                        .environment(fetchedWindowManager)
                 }
                 .padding()
                 .environment(\.controlSize, .small)
@@ -35,9 +32,38 @@ struct ComfyTileMenuBar: Scene {
 
 struct ComfyTileMenuBarContent: View {
     
-    @EnvironmentObject var defaultsManager: DefaultsManager
-    
+    @Environment(DefaultsManager.self) var defaultsManager
+    @Environment(FetchedWindowManager.self) var fetchedWindowManager
+    @Environment(\.openSettings) var openSettings
+
     var body: some View {
+        @Bindable var defaultsManager = defaultsManager
+        @Bindable var fetchedWindowManager = fetchedWindowManager
+        
+        Button(action: {
+            Task {
+                await fetchedWindowManager.loadWindows()
+            }
+        }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            
+        }
+        
+        ShortcutRecorder(label: "Window Viewer", type: .windowViewer)
+        
+        ForEach(fetchedWindowManager.fetchedWindows, id: \.self) { window in
+            HStack {
+                Text(window.windowTitle)
+                Spacer()
+                Button(action: {
+                    fetchedWindowManager.toggle(window)
+                }) {
+                    Image(systemName: fetchedWindowManager.favoriteWindows.contains(window) ? "star.fill" : "star")
+                        .foregroundColor(fetchedWindowManager.favoriteWindows.contains(window) ? .yellow : .gray)
+                }
+            }
+            .padding(8)
+        }
         /// Have User Select Modifier Key
         Picker("Select Modifier Key", selection: $defaultsManager.modiferKey) {
             ForEach(ModifierGroup.allCases, id: \.self) { group in
@@ -54,6 +80,7 @@ struct ComfyTileMenuBarContent: View {
             .padding(.leading, 8)
         
         Section {
+            ShortcutRecorder(label: "Auto Tile", type: .AutoTile)
             ShortcutRecorder(label: "Right Half", type: .RightHalf, tileShape: .right)
             ShortcutRecorder(label: "Left Half",  type: .LeftHalf, tileShape: .left)
             ShortcutRecorder(label: "Center",     type: .Center, tileShape: .center)
@@ -86,6 +113,15 @@ struct ComfyTileMenuBarContent: View {
             ShortcutRecorder(label: "Nudge Top Down",    type: .NudgeTopDown, tileShape: .nudgeTopDown)
         }
         .sectionBackground()
+        
+        Button(action: {
+            openSettings()
+        }) {
+            Label("Settings", systemImage: "gear")
+                .foregroundStyle(.primary)
+                .frame(maxWidth: .infinity)
+                .padding(4)
+        }
         
         Button(action: {
             NSApplication.shared.terminate(self)
