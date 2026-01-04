@@ -58,10 +58,10 @@ final class HotKeyCoordinator {
     private let globalClickMonitor = GlobalClickMonitor()
     
     public func startModifier(with group: ModifierGroup) {
-        modifierDetector.start(with: group)
+//        modifierDetector.start(with: group)
     }
     public func stopModifier() {
-        modifierDetector.stop()
+//        modifierDetector.stop()
     }
     
     public func startGlobalClickMonitor(onClick: @escaping () -> Void) {

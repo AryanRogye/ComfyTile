@@ -31,6 +31,7 @@ final class FetchedWindowManager {
     
     public func loadWindows() async {
         if let fw = await WindowManagerHelpers.getUserWindows() {
+            print("FetchedWindow Count: \(fw.count)")
             fetchedWindows = fw
             print("Loaded Fetched Windows")
         }

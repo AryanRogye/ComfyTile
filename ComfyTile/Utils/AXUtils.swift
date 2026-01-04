@@ -18,8 +18,7 @@ struct AXUtils {
         let appAX = AXUIElementCreateApplication(pid)
         
         var windowsRef: AnyObject?
-        guard AXUIElementCopyAttributeValue(appAX, kAXWindowsAttribute as CFString, &windowsRef) == .success,
-              let axWindowsAll = windowsRef as? [AXUIElement]
+        guard AXUIElementCopyAttributeValue(appAX, kAXWindowsAttribute as CFString, &windowsRef) == .success
         else { return nil }
         
         let axTargetRect = AXUtils().cgToAXRect(targetCGSFrame)

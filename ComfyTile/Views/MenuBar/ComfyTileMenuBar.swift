@@ -13,7 +13,7 @@ struct ComfyTileMenuBar: Scene {
     @Bindable var fetchedWindowManager : FetchedWindowManager
     
     var body: some Scene {
-        MenuBarExtra("Menu", systemImage: "menubar.dock.rectangle") {
+        MenuBarExtra {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading) {
                     ComfyTileMenuBarContent()
@@ -24,6 +24,9 @@ struct ComfyTileMenuBar: Scene {
                 .environment(\.controlSize, .small)
             }
             .frame(minWidth: 400, minHeight: 300)
+        } label: {
+            Image("ComfyTileMenuBar")
+                .renderingMode(.template)
         }
         .menuBarExtraStyle(.window)
         

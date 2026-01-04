@@ -76,12 +76,12 @@ class AppCoordinator {
                 guard let self = self else { return }
                 if self.permissionManager.isAccessibilityEnabled {
                     hotKeyCoordinator = HotKeyCoordinator(
-//                        onWindowViewer: {
-//                            Task {
-//                                await self.fetchedWindowManager.loadWindows()
-//                                self.windowViewerCoordinator.show()
-//                            }
-//                        },
+                        onWindowViewer: {
+                            Task {
+                                await self.fetchedWindowManager.loadWindows()
+                                self.windowViewerCoordinator.show()
+                            }
+                        },
 //                        onAutoTile: {
 //                            self.appEnv.windowLayoutService.autoTile()
 //                        },

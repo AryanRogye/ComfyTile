@@ -34,6 +34,7 @@ struct WindowManagerHelpers {
                     continue
                 }
                 
+                /// Get Window Information
                 guard let windowInfo = CGWindowListCopyWindowInfo([.optionIncludingWindow], window.windowID) as? [[String: Any]],
                       let firstWindow = windowInfo.first,
                       let windowTitle = firstWindow["kCGWindowName"] as? String,
@@ -56,7 +57,7 @@ struct WindowManagerHelpers {
                     targetCGSTitle: windowTitle
                 )
                 
-                
+                /// Get Screenshot
                 var screenshot: CGImage? = nil
                 do {
                     screenshot = try await ScreenshotHelper.capture(windowID: window.windowID)
@@ -64,6 +65,7 @@ struct WindowManagerHelpers {
                     print("Coudlnt get screenshot: \(error)")
                 }
                 
+                /// Add
                 focusedWindows.append(FetchedWindow(
                     windowID: window.windowID,
                     windowTitle: windowTitle,
@@ -78,6 +80,7 @@ struct WindowManagerHelpers {
             return nil
         }
     }
+    
     
     /// Find the focused window and the screen under your mouse.
     ///
