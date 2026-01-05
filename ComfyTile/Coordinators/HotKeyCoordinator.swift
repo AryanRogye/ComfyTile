@@ -75,6 +75,8 @@ final class HotKeyCoordinator {
     
     init(
         onWindowViewer      : @escaping () -> Void = {},
+        onWindowViewerUp    : @escaping () -> Void = {},
+        
         onAutoTile          : @escaping () -> Void = {},
         /// On Down's and on Up's do the same thing
         onOptDoubleTapDown: @escaping () -> Void = {},
@@ -119,6 +121,9 @@ final class HotKeyCoordinator {
         
         KeyboardShortcuts.onKeyDown(for: .windowViewer) {
             onWindowViewer()
+        }
+        KeyboardShortcuts.onKeyUp(for: .windowViewer) {
+            onWindowViewerUp()
         }
         
         KeyboardShortcuts.onKeyDown(for: self.autoTile) {

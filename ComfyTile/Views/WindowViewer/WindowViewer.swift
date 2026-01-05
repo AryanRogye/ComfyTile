@@ -8,37 +8,6 @@
 import SwiftUI
 import LocalShortcuts
 
-
-struct LocalShortcutListener: NSViewRepresentable {
-    func makeNSView(context: Context) -> ListenerView {
-        let v = ListenerView()
-        return v
-    }
-    
-    func updateNSView(_ nsView: ListenerView, context: Context) {
-        
-    }
-    
-    class ListenerView: NSView {
-        
-        override func viewDidMoveToWindow() {
-            print("View Init")
-        }
-        
-        override func keyUp(with event: NSEvent) {
-            let shortcut : LocalShortcuts.Shortcut = LocalShortcuts.Shortcut.getShortcut(event: event)
-            
-            print("Key Up: \(shortcut.modifiers()), \(shortcut.keyValues())")
-        }
-        override func keyDown(with event: NSEvent) {
-            
-            let shortcut : LocalShortcuts.Shortcut = LocalShortcuts.Shortcut.getShortcut(event: event)
-            
-            print("Key Down: \(shortcut.modifiers()), \(shortcut.keyValues())")
-        }
-    }
-}
-
 struct WindowViewer: View {
     
     @Bindable var windowViewerVM : WindowViewerViewModel
@@ -47,7 +16,8 @@ struct WindowViewer: View {
     var body: some View {
         VStack {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 200))], spacing: 16) {
-                ForEach(fetchedWindowManager.fetchedWindows, id: \.self) { window in
+                ForEach(fetchedWindowManager.fetchedWindows.indices, id: \.self) { i in
+                    let window = fetchedWindowManager.fetchedWindows[i]
                     Button(action: {
                         window.focusWindow()
                     }) {
@@ -59,6 +29,12 @@ struct WindowViewer: View {
                                     .frame(width: 200, height: 150)
                             }
                             Text(window.windowTitle)
+                        }
+                        .background {
+                            if i == windowViewerVM.selected {
+                                Rectangle()
+                                    .fill(.ultraThinMaterial)
+                            }
                         }
                     }
                     .buttonStyle(.plain)

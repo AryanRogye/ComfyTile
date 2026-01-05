@@ -77,10 +77,23 @@ class AppCoordinator {
                 if self.permissionManager.isAccessibilityEnabled {
                     hotKeyCoordinator = HotKeyCoordinator(
                         onWindowViewer: {
-                            Task {
-                                await self.fetchedWindowManager.loadWindows()
-                                self.windowViewerCoordinator.show()
+                            if self.windowViewerVM.isShown {
+                                let nextIndex = self.windowViewerVM.selected + 1
+                                guard self.fetchedWindowManager.fetchedWindows.indices.contains(nextIndex) else {
+                                    /// If Next Index Doesnt Exist Start at 0 and return
+                                    self.windowViewerVM.selected = 0
+                                    return
+                                }
+                                self.windowViewerVM.selected = nextIndex
+                            } else {
+                                Task {
+                                    self.windowViewerCoordinator.show()
+                                    self.windowViewerVM.selected = 0
+                                    await self.fetchedWindowManager.loadWindows()
+                                }
                             }
+                        },
+                        onWindowViewerUp: {
                         },
 //                        onAutoTile: {
 //                            self.appEnv.windowLayoutService.autoTile()

@@ -15,6 +15,8 @@ class WindowViewerViewModel {
     var isShown = false
     
     var onEscape: (() -> Void)?
+    
+    var selected: Int = 0
 }
 
 @MainActor
@@ -104,7 +106,7 @@ class WindowViewerCoordinator: NSObject {
         keys: []
     )
     
-    private func installKeyMonitors() {
+    public func installKeyMonitors() {
         // Fires when app is active; can consume the event
         localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged]) { [weak self] e in
             guard let self else { return e }
@@ -113,6 +115,8 @@ class WindowViewerCoordinator: NSObject {
                 let modifier = LocalShortcuts.Modifier.activeModifiers(from: e)
                 /// No Modifier Held
                 if modifier == [] {
+                    let window = fetchedWindowManager.fetchedWindows[windowViewerVM.selected]
+                    window.focusWindow()
                     self.windowViewerVM.onEscape?()
                 }
             } else {
