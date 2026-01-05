@@ -76,13 +76,7 @@ class AppCoordinator {
             windowViewerVM: windowViewerVM,
             fetchedWindowManager: fetchedWindowManager
         )
-        
-        do {
-            try processService.sendOne()
-        } catch {
-            fatalError("Couldnt Send One: \(error.localizedDescription)")
-        }
-        
+        fetchedWindowManager.assignProcessService(processService)
         
         withObservationTracking { [weak self] in
             guard let self = self else { return }

@@ -5,8 +5,12 @@
 //  Created by Aryan Rogye on 11/2/25.
 //
 
+import TilerProcess
+
 @Observable @MainActor
 final class FetchedWindowManager {
+    
+    @ObservationIgnored var processService: ProcessService?
     /// Seed Fetched Windows At Start
     var fetchedWindows : [FetchedWindow] = []
     var favoriteWindows: [FetchedWindow] = []
@@ -15,6 +19,10 @@ final class FetchedWindowManager {
         Task {
             await loadWindows()
         }
+    }
+    
+    public func assignProcessService(_ service: ProcessService) {
+        self.processService = service
     }
     
     public func isFavorite(_ window: FetchedWindow) -> Bool {
@@ -30,7 +38,8 @@ final class FetchedWindowManager {
     }
     
     public func loadWindows() async {
-        if let fw = await WindowManagerHelpers.getUserWindows() {
+        guard let processService else { return }
+        if let fw = await WindowManagerHelpers.getUserWindows(using: processService) {
             print("FetchedWindow Count: \(fw.count)")
             fetchedWindows = fw
             print("Loaded Fetched Windows")

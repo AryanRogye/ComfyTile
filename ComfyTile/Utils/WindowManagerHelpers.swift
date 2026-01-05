@@ -9,6 +9,7 @@ import Cocoa
 import ScreenCaptureKit
 import ApplicationServices
 import CoreGraphics
+import TilerProcess
 
 @MainActor
 struct WindowManagerHelpers {
@@ -18,7 +19,7 @@ struct WindowManagerHelpers {
     ]
     
     /// Gets ALL User Windows
-    public static func getUserWindows() async -> [FetchedWindow]? {
+    public static func getUserWindows(using service: ProcessService) async -> [FetchedWindow]? {
         do {
             let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
             let allOnScreenWindows = content.windows
@@ -49,33 +50,45 @@ struct WindowManagerHelpers {
                 /// Calulate Bounds
                 let bounds = CGRect(x: x, y: y, width: width, height: height)
                 
-                /// Get AXElement, Doesnt matter if nil
-                let axElement = AXUtils.findMatchingAXWindow(
-                    pid: pid,
-                    targetCGSWindowID: window.windowID,
-                    targetCGSFrame: bounds,
-                    targetCGSTitle: windowTitle
-                )
+                //                /// Get AXElement, Doesnt matter if nil
+                //                let axElement = AXUtils.findMatchingAXWindow(
+                //                    pid: pid,
+                //                    targetCGSWindowID: window.windowID,
+                //                    targetCGSFrame: bounds,
+                //                    targetCGSTitle: windowTitle
+                //                )
                 
-                /// Get Screenshot
-                var screenshot: CGImage? = nil
                 do {
-                    screenshot = try await ScreenshotHelper.capture(windowID: window.windowID)
+                    let axElement = try service.findMatchingAXWindow(
+                        pid: pid,
+                        targetCGSWindowID: window.windowID,
+                        targetCGSFrame: bounds,
+                        targetCGSTitle: windowTitle
+                    )
+                    
+                    /// Get Screenshot
+                    var screenshot: CGImage? = nil
+                    do {
+                        screenshot = try await ScreenshotHelper.capture(windowID: window.windowID)
+                    } catch {
+                        print("Coudlnt get screenshot: \(error)")
+                    }
+                    
+                    /// Add
+                    focusedWindows.append(FetchedWindow(
+                        windowID: window.windowID,
+                        windowTitle: windowTitle,
+                        pid: pid,
+                        axElement: axElement,
+                        bundleIdentifier: app.bundleIdentifier,
+                        screenshot: screenshot
+                    ))
                 } catch {
-                    print("Coudlnt get screenshot: \(error)")
+                    print("Coudlnt Get Matching AX Window")
                 }
-                
-                /// Add
-                focusedWindows.append(FetchedWindow(
-                    windowID: window.windowID,
-                    windowTitle: windowTitle,
-                    pid: pid,
-                    axElement: axElement,
-                    bundleIdentifier: app.bundleIdentifier,
-                    screenshot: screenshot
-                ))
             }
             return focusedWindows
+            
         } catch {
             return nil
         }
