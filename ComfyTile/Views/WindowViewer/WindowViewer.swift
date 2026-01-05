@@ -44,5 +44,6 @@ struct WindowViewer: View {
         .padding()
         .background(.ultraThinMaterial)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, 300)
     }
 }

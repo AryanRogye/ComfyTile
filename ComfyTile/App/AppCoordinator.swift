@@ -93,11 +93,12 @@ class AppCoordinator {
                                 }
                             }
                         },
-                        onWindowViewerUp: {
+                        onWindowViewerEscapeEarly: {
+                            if self.windowViewerVM.isShown {
+                                self.windowViewerCoordinator.hide()
+                                print("Called onWindowViewerEscapeEarly")
+                            }
                         },
-//                        onAutoTile: {
-//                            self.appEnv.windowLayoutService.autoTile()
-//                        },
                         // MARK: - Modifier Key
                         onOptDoubleTapDown: {
                             self.isHoldingModifier = true

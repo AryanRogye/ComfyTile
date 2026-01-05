@@ -19,6 +19,10 @@ extension KeyboardShortcuts.Name {
     static let NudgeTopDown = Self("NudgeTopDown")
     static let AutoTile     = Self("AutoTile")
     static let windowViewer = Self("WindowViewer")
+    static let windowViewerEscapeEarly = Self("WindowViewerEscapeEarly", default: Shortcut(
+        .escape,
+        modifiers: .option
+    ))
 }
 
 extension KeyboardShortcuts.Name {
@@ -76,6 +80,7 @@ final class HotKeyCoordinator {
     init(
         onWindowViewer      : @escaping () -> Void = {},
         onWindowViewerUp    : @escaping () -> Void = {},
+        onWindowViewerEscapeEarly : @escaping () -> Void = {},
         
         onAutoTile          : @escaping () -> Void = {},
         /// On Down's and on Up's do the same thing
@@ -121,6 +126,9 @@ final class HotKeyCoordinator {
         
         KeyboardShortcuts.onKeyDown(for: .windowViewer) {
             onWindowViewer()
+        }
+        KeyboardShortcuts.onKeyDown(for: .windowViewerEscapeEarly) {
+            onWindowViewerEscapeEarly()
         }
         KeyboardShortcuts.onKeyUp(for: .windowViewer) {
             onWindowViewerUp()

@@ -37,7 +37,6 @@ class WindowViewerCoordinator: NSObject {
         /// Set Escape
         self.windowViewerVM.onEscape = { [weak self] in
             guard let self = self else { return }
-            print("Calling Hide")
             hide()
         }
     }
@@ -111,10 +110,12 @@ class WindowViewerCoordinator: NSObject {
         localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged]) { [weak self] e in
             guard let self else { return e }
             
-            if e.type == .flagsChanged {
+            if e.type == .flagsChanged && windowViewerVM.isShown {
+                print("Event: \(e)")
                 let modifier = LocalShortcuts.Modifier.activeModifiers(from: e)
                 /// No Modifier Held
                 if modifier == [] {
+                    print("Modifier Exit")
                     let window = fetchedWindowManager.fetchedWindows[windowViewerVM.selected]
                     window.focusWindow()
                     self.windowViewerVM.onEscape?()
@@ -122,30 +123,13 @@ class WindowViewerCoordinator: NSObject {
             } else {
                 let key = LocalShortcuts.Key.activeKeys(event: e)
                 if key == [.escape] {
+                    print("Escape Hide")
                     self.windowViewerVM.onEscape?()
                     return nil // swallow
                 }
             }
             
             return e
-        }
-        
-        // Fires even if app isn’t active; can’t swallow but good backup
-        globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged]) { [weak self] e in
-            guard let self else { return }
-            
-            if e.type == .flagsChanged {
-                let modifier = LocalShortcuts.Modifier.activeModifiers(from: e)
-                /// No Modifier Held
-                if modifier == [] {
-                    self.windowViewerVM.onEscape?()
-                }
-            } else {
-                let key = LocalShortcuts.Key.activeKeys(event: e)
-                if key == [.escape] {
-                    self.windowViewerVM.onEscape?()
-                }
-            }
         }
     }
 
