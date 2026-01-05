@@ -5,7 +5,6 @@
 //  Created by Aryan Rogye on 11/2/25.
 //
 
-
 @MainActor
 struct AXUtils {
     public static func findMatchingAXWindow(

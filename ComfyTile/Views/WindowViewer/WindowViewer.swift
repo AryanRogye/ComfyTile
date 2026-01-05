@@ -6,6 +6,38 @@
 //
 
 import SwiftUI
+import LocalShortcuts
+
+
+struct LocalShortcutListener: NSViewRepresentable {
+    func makeNSView(context: Context) -> ListenerView {
+        let v = ListenerView()
+        return v
+    }
+    
+    func updateNSView(_ nsView: ListenerView, context: Context) {
+        
+    }
+    
+    class ListenerView: NSView {
+        
+        override func viewDidMoveToWindow() {
+            print("View Init")
+        }
+        
+        override func keyUp(with event: NSEvent) {
+            let shortcut : LocalShortcuts.Shortcut = LocalShortcuts.Shortcut.getShortcut(event: event)
+            
+            print("Key Up: \(shortcut.modifiers()), \(shortcut.keyValues())")
+        }
+        override func keyDown(with event: NSEvent) {
+            
+            let shortcut : LocalShortcuts.Shortcut = LocalShortcuts.Shortcut.getShortcut(event: event)
+            
+            print("Key Down: \(shortcut.modifiers()), \(shortcut.keyValues())")
+        }
+    }
+}
 
 struct WindowViewer: View {
     
@@ -32,14 +64,9 @@ struct WindowViewer: View {
                     .buttonStyle(.plain)
                 }
             }
-            
         }
         .padding()
         .background(.ultraThinMaterial)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onExitCommand {
-            windowViewerVM.onEscape?()
-            print("Escape Called")
-        }
     }
 }

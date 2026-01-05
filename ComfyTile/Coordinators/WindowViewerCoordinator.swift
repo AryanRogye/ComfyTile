@@ -8,6 +8,7 @@
 import AppKit
 import Combine
 import SwiftUI
+import LocalShortcuts
 
 @Observable @MainActor
 class WindowViewerViewModel {
@@ -94,19 +95,52 @@ class WindowViewerCoordinator: NSObject {
         installKeyMonitors()
     }
     
+    static let escape = LocalShortcuts.Shortcut(
+        modifier: [],
+        keys: [.escape]
+    )
+    static let option = LocalShortcuts.Shortcut(
+        modifier: [.option],
+        keys: []
+    )
+    
     private func installKeyMonitors() {
         // Fires when app is active; can consume the event
-        localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] e in
-            if e.keyCode == 53 { // ESC
-                self?.windowViewerVM.onEscape?()
-                return nil // swallow
+        localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged]) { [weak self] e in
+            guard let self else { return e }
+            
+            if e.type == .flagsChanged {
+                let modifier = LocalShortcuts.Modifier.activeModifiers(from: e)
+                /// No Modifier Held
+                if modifier == [] {
+                    self.windowViewerVM.onEscape?()
+                }
+            } else {
+                let key = LocalShortcuts.Key.activeKeys(event: e)
+                if key == [.escape] {
+                    self.windowViewerVM.onEscape?()
+                    return nil // swallow
+                }
             }
+            
             return e
         }
+        
         // Fires even if app isn’t active; can’t swallow but good backup
-        globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] e in
-            if e.keyCode == 53 {
-                self?.windowViewerVM.onEscape?()
+        globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged]) { [weak self] e in
+            guard let self else { return }
+            
+            if e.type == .flagsChanged {
+                let modifier = LocalShortcuts.Modifier.activeModifiers(from: e)
+                /// No Modifier Held
+                if modifier == [] {
+                    self.windowViewerVM.onEscape?()
+                }
+            } else {
+                let key = LocalShortcuts.Key.activeKeys(event: e)
+                if key == [.escape] {
+                    self.windowViewerVM.onEscape?()
+                }
             }
         }
     }
