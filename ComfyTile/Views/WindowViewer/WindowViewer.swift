@@ -16,10 +16,13 @@ struct WindowViewer: View {
     var body: some View {
         VStack {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 200))], spacing: 16) {
-                ForEach(fetchedWindowManager.fetchedWindows.indices, id: \.self) { i in
-                    let window = fetchedWindowManager.fetchedWindows[i]
+                ForEach(fetchedWindowManager.fetchedWindows, id: \.self) { window in
                     Button(action: {
-                        window.focusWindow()
+                        let index = windowViewerVM.selected
+                        fetchedWindowManager.fetchedWindows[index].focusWindow()
+                        
+                        let focused = fetchedWindowManager.fetchedWindows.remove(at: index)
+                        fetchedWindowManager.fetchedWindows.insert(focused, at: 0)
                     }) {
                         VStack {
                             if let sc = window.screenshot {
@@ -30,19 +33,21 @@ struct WindowViewer: View {
                             }
                             Text(window.windowTitle)
                         }
+                        .padding()
                         .background {
-                            if i == windowViewerVM.selected {
-                                Rectangle()
-                                    .fill(.ultraThinMaterial)
+                            if window.id == fetchedWindowManager.fetchedWindows[windowViewerVM.selected].id {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.accentColor)
                             }
                         }
                     }
                     .buttonStyle(.plain)
                 }
             }
+            .padding(.horizontal)
         }
         .padding()
-        .background(.ultraThinMaterial)
+        .glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 12))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, 300)
     }

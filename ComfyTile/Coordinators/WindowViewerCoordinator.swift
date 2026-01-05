@@ -111,19 +111,21 @@ class WindowViewerCoordinator: NSObject {
             guard let self else { return e }
             
             if e.type == .flagsChanged && windowViewerVM.isShown {
-                print("Event: \(e)")
                 let modifier = LocalShortcuts.Modifier.activeModifiers(from: e)
                 /// No Modifier Held
+                
                 if modifier == [] {
-                    print("Modifier Exit")
-                    let window = fetchedWindowManager.fetchedWindows[windowViewerVM.selected]
-                    window.focusWindow()
+                    let index = windowViewerVM.selected
+                    fetchedWindowManager.fetchedWindows[index].focusWindow()
+                    
+                    let focused = fetchedWindowManager.fetchedWindows.remove(at: index)
+                    fetchedWindowManager.fetchedWindows.insert(focused, at: 0)
+                    
                     self.windowViewerVM.onEscape?()
                 }
             } else {
                 let key = LocalShortcuts.Key.activeKeys(event: e)
                 if key == [.escape] {
-                    print("Escape Hide")
                     self.windowViewerVM.onEscape?()
                     return nil // swallow
                 }

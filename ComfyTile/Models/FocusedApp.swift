@@ -34,7 +34,6 @@ struct FetchedWindow : Hashable, Identifiable {
     }
     
     func focusWindow() {
-        print("Focus Window For: \(id) | AX: \(axElement != nil ? "Has" : "No")")
         if let axElement = axElement {
             // Precise window focus
             activateApp(pid: pid)

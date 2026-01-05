@@ -23,6 +23,4 @@ protocol WindowLayoutProviding {
     func center()
     func moveRight()
     func moveLeft()
-    
-    func autoTile()
 }

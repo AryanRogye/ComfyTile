@@ -30,10 +30,27 @@ final class FetchedWindowManager {
     }
     
     public func loadWindows() async {
-        if let fw = await WindowManagerHelpers.getUserWindows() {
-            print("FetchedWindow Count: \(fw.count)")
-            fetchedWindows = fw
-            print("Loaded Fetched Windows")
+        guard let fw = await WindowManagerHelpers.getUserWindows() else { return }
+        
+        // fast lookup of the newest snapshot by windowID
+        let newByID = Dictionary(uniqueKeysWithValues: fw.map { ($0.windowID, $0) })
+        
+        var merged: [FetchedWindow] = []
+        merged.reserveCapacity(fw.count)
+        
+        // 1) keep current (rearranged) order, but replace each element with the fresh snapshot
+        for old in fetchedWindows {
+            if let updated = newByID[old.windowID] {
+                merged.append(updated)
+            }
         }
+        
+        // 2) append brand new windows that weren't already in your list
+        let existingIDs = Set(merged.map { $0.windowID })
+        for w in fw where !existingIDs.contains(w.windowID) {
+            merged.append(w)
+        }
+        
+        fetchedWindows = merged
     }
 }
