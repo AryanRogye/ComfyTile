@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		9B436CEE2ED7824E00D79941 /* ComfyTile.icon in Resources */ = {isa = PBXBuildFile; fileRef = 9B436CED2ED7824E00D79941 /* ComfyTile.icon */; };
+		9B490B9E2F0B457600963D05 /* TilerProcess in Frameworks */ = {isa = PBXBuildFile; productRef = 9B490B9D2F0B457600963D05 /* TilerProcess */; };
+		9B490C0B2F0B469400963D05 /* TilerProcess in Frameworks */ = {isa = PBXBuildFile; productRef = 9B490C0A2F0B469400963D05 /* TilerProcess */; };
 		9B4E04B82E934B05001CF411 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9B4E04B72E934B05001CF411 /* Defaults */; };
 		9BF95F0E2E9326AE00776771 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
@@ -44,7 +46,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B4E04B82E934B05001CF411 /* Defaults in Frameworks */,
+				9B490B9E2F0B457600963D05 /* TilerProcess in Frameworks */,
 				9BF95F0E2E9326AE00776771 /* KeyboardShortcuts in Frameworks */,
+				9B490C0B2F0B469400963D05 /* TilerProcess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +94,8 @@
 			packageProductDependencies = (
 				9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */,
 				9B4E04B72E934B05001CF411 /* Defaults */,
+				9B490B9D2F0B457600963D05 /* TilerProcess */,
+				9B490C0A2F0B469400963D05 /* TilerProcess */,
 			);
 			productName = TilingWIndowManager_Test;
 			productReference = 9BF95ECE2E9321E000776771 /* ComfyTile.app */;
@@ -122,6 +128,7 @@
 			packageReferences = (
 				9BF95F0C2E9326AE00776771 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				9B4E04B62E934B05001CF411 /* XCRemoteSwiftPackageReference "Defaults" */,
+				9B490C092F0B469400963D05 /* XCLocalSwiftPackageReference "../Tiler/TilerProcess" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9BF95ECF2E9321E000776771 /* Products */;
@@ -392,6 +399,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		9B490C092F0B469400963D05 /* XCLocalSwiftPackageReference "../Tiler/TilerProcess" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Tiler/TilerProcess;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		9B4E04B62E934B05001CF411 /* XCRemoteSwiftPackageReference "Defaults" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -412,6 +426,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		9B490B9D2F0B457600963D05 /* TilerProcess */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TilerProcess;
+		};
+		9B490C0A2F0B469400963D05 /* TilerProcess */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TilerProcess;
+		};
 		9B4E04B72E934B05001CF411 /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9B4E04B62E934B05001CF411 /* XCRemoteSwiftPackageReference "Defaults" */;

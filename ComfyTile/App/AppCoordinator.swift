@@ -7,10 +7,13 @@
 
 import Combine
 import Observation
-
+import TilerProcess
 
 @MainActor
 class AppCoordinator {
+    
+    /// Services
+    let processService: ProcessService
     
     /// Coordinators
     private var hotKeyCoordinator: HotKeyCoordinator?
@@ -39,6 +42,20 @@ class AppCoordinator {
     }
     
     init(appEnv: AppEnv) {
+        
+        guard let tilerHelper = Bundle.main.url(
+            forResource: "TilerHelper",
+            withExtension: nil
+        ) else {
+            fatalError("Tile Helper Not Found in App")
+        }
+        
+        do {
+            try processService = ProcessService(with: tilerHelper)
+        } catch {
+            fatalError("Error initializing ProcessService: \(error)")
+        }
+        
         permissionManager = PermissionService()
         self.appEnv = appEnv
         self.defaultsManager = DefaultsManager()
@@ -59,6 +76,12 @@ class AppCoordinator {
             windowViewerVM: windowViewerVM,
             fetchedWindowManager: fetchedWindowManager
         )
+        
+        do {
+            try processService.sendOne()
+        } catch {
+            fatalError("Couldnt Send One: \(error.localizedDescription)")
+        }
         
         
         withObservationTracking { [weak self] in
