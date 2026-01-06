@@ -121,83 +121,9 @@ struct WindowManagerHelpers {
         return FocusedWindow(element: windowElement, screen: screen)
     }
     
-    public static func windowFrame(_ element: AXUIElement) -> CGRect? {
-        var positionValue: AnyObject?
-        var sizeValue: AnyObject?
-        
-        let posResult = AXUIElementCopyAttributeValue(
-            element,
-            kAXPositionAttribute as CFString,
-            &positionValue
-        )
-        
-        let sizeResult = AXUIElementCopyAttributeValue(
-            element,
-            kAXSizeAttribute as CFString,
-            &sizeValue
-        )
-        
-        if posResult != .success || sizeResult != .success {
-            print("❌ Failed to get window position or size")
-            return nil
-        }
-        
-        var position = CGPoint.zero
-        var size = CGSize.zero
-        
-        if let posVal = positionValue, AXValueGetType(posVal as! AXValue) == .cgPoint {
-            AXValueGetValue(posVal as! AXValue, .cgPoint, &position)
-        } else {
-            print("❌ Position value is not of type CGPoint")
-            return nil
-        }
-        
-        if let sizeVal = sizeValue, AXValueGetType(sizeVal as! AXValue) == .cgSize {
-            AXValueGetValue(sizeVal as! AXValue, .cgSize, &size)
-        } else {
-            print("❌ Size value is not of type CGSize")
-            return nil
-        }
-        
-        return CGRect(origin: position, size: size)
-    }
-    
     public static func screenUnderMouse() -> NSScreen? {
         let loc = NSEvent.mouseLocation
         return NSScreen.screens.first { NSMouseInRect(loc, $0.frame, false) }
-    }
-    
-    public static func setWindowSize(_ element: AXUIElement, size: CGSize) {
-        var mutableSize = size
-        guard let axValue = AXValueCreate(.cgSize, &mutableSize) else {
-            print("❌ Failed to create AXValue for size")
-            return
-        }
-        
-        let result = AXUIElementSetAttributeValue(
-            element,
-            kAXSizeAttribute as CFString,
-            axValue
-        )
-        
-        if result != .success {
-            print("❌ Failed to set window size: \(result)")
-        }
-    }
-    
-    public static func setWindowPosition(_ element: AXUIElement, position: CGPoint) {
-        var mutablePosition = position
-        guard let axValue = AXValueCreate(.cgPoint, &mutablePosition) else {
-            print("❌ Failed to create AXValue for position")
-            return
-        }
-        
-        let result = AXUIElementSetAttributeValue(element, kAXPositionAttribute as CFString, axValue)
-        if result == AXError.success {
-            // Success - no need to log
-        } else {
-            print("❌ Failed to set window position: \(result)")
-        }
     }
     
     public static func getMenuBarHeight() -> CGFloat {

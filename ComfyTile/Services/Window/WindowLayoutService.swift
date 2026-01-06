@@ -14,75 +14,68 @@ class WindowLayoutService: WindowLayoutProviding {
     /// Keep Window Where it is, but its top point is moved up
     func nudgeTopUp(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow(),
-              var frame = WindowManagerHelpers.windowFrame(f.element) else { return }
-        
+              var frame = f.windowFrame else { return }
+
         let delta: CGFloat = CGFloat(step)
         frame.origin.y -= delta
         frame.size.height += delta
         
         
-        WindowManagerHelpers.setWindowPosition(f.element, position: frame.origin)
-        WindowManagerHelpers.setWindowSize(f.element, size: frame.size)
+        f.setPosition(x: frame.origin.x, y: frame.origin.y)
+        f.setSize(width: frame.width, height: frame.height)
     }
     
     func nudgeTopDown(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow(),
-              var frame = WindowManagerHelpers.windowFrame(f.element) else { return }
-        
+              var frame = f.windowFrame else { return }
+
         let delta: CGFloat = CGFloat(step)
         frame.origin.y += delta
         frame.size.height -= delta
         
-        WindowManagerHelpers.setWindowPosition(f.element, position: frame.origin)
-        WindowManagerHelpers.setWindowSize(f.element, size: frame.size)
+        f.setPosition(x: frame.origin.x, y: frame.origin.y)
+        f.setSize(width: frame.width, height: frame.height)
     }
     
     
     func nudgeBottomDown(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow() else { return }
-        let el = f.element
         
         // current frame
-        guard var frame = WindowManagerHelpers.windowFrame(el) else { return }
-        
+        guard var frame = f.windowFrame else { return }
+
         let delta: CGFloat = CGFloat(step)
         frame.size.height += delta
         
         // apply
-        WindowManagerHelpers.setWindowSize(el, size: frame.size)
+        f.setSize(width: frame.width, height: frame.height)
     }
     
     func nudgeBottomUp(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow() else { return }
-        let el = f.element
         
         // current frame
-        guard var frame = WindowManagerHelpers.windowFrame(el) else { return }
+        guard var frame = f.windowFrame else { return }
         
         let delta: CGFloat = CGFloat(step)
         frame.size.height -= delta
         
         // apply
-        WindowManagerHelpers.setWindowSize(el, size: frame.size)
+        f.setSize(width: frame.width, height: frame.height)
     }
     
     func fullScreen() {
         guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return }
         
         let screen = focusedWindow.screen
-        let window = focusedWindow.element
-        
         let frame = screen.visibleFrame
         
         let pos = WindowManagerHelpers.axPosition(for: frame, on: screen)
         
-        animator.animate(el: window, to: pos, duration: 0.13) {
-            WindowManagerHelpers.setWindowSize(
-                window,
-                size: CGSize(
-                    width: frame.width,
-                    height: frame.height
-                )
+        animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+            focusedWindow.setSize(
+                width: frame.width,
+                height: frame.height
             )
         }
     }
@@ -91,7 +84,6 @@ class WindowLayoutService: WindowLayoutProviding {
         guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return }
         
         let screen = focusedWindow.screen
-        let window = focusedWindow.element
         
         /// This is padding around all sides of the window
         let padding : CGFloat = 40
@@ -112,10 +104,10 @@ class WindowLayoutService: WindowLayoutProviding {
         let rect = NSRect(x: centeredOrigin.x, y: centeredOrigin.y, width: centeredSize.width, height: centeredSize.height)
         let pos =  WindowManagerHelpers.axPosition(for: rect, on: screen)
         
-        animator.animate(el: window, to: pos, duration: 0.13) {
-            WindowManagerHelpers.setWindowSize(
-                window,
-                size: centeredSize
+        animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+            focusedWindow.setSize(
+                width: centeredSize.width,
+                height: centeredSize.height
             )
         }
     }
@@ -125,7 +117,6 @@ class WindowLayoutService: WindowLayoutProviding {
         guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return }
         
         let screen = focusedWindow.screen
-        let window = focusedWindow.element
         
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
@@ -139,10 +130,10 @@ class WindowLayoutService: WindowLayoutProviding {
         
         let pos = WindowManagerHelpers.axPosition(for: rect, on: screen)
         
-        animator.animate(el: window, to: pos, duration: 0.13) {
-            WindowManagerHelpers.setWindowSize(
-                window,
-                size: rect.size
+        animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+            focusedWindow.setSize(
+                width: rect.width,
+                height: rect.height
             )
         }
     }
@@ -153,7 +144,6 @@ class WindowLayoutService: WindowLayoutProviding {
         guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return }
         
         let screen = focusedWindow.screen
-        let window = focusedWindow.element
         
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
@@ -167,10 +157,10 @@ class WindowLayoutService: WindowLayoutProviding {
         
         let pos = WindowManagerHelpers.axPosition(for: rect, on: screen)
         
-        animator.animate(el: window, to: pos, duration: 0.13) {
-            WindowManagerHelpers.setWindowSize(
-                window,
-                size: rect.size
+        animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+            focusedWindow.setSize(
+                width: rect.width,
+                height: rect.height
             )
         }
     }

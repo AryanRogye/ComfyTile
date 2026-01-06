@@ -45,6 +45,24 @@ let kCGSAllSpacesMask: CGSSpaceMask = 0xFFFF_FFFF_FFFF_FFFF
 let kAXFullscreenAttribute = "AXFullScreen"
 let kAXWindowNumberAttribute = "AXWindowNumber" as CFString
 
+extension AXValue {
+    func toValue<T>() -> T? {
+        let pointer = UnsafeMutablePointer<T>.allocate(capacity: 1)
+        let success = AXValueGetValue(self, AXValueGetType(self), pointer)
+        let value = pointer.pointee
+        pointer.deallocate()
+        return success ? value : nil
+    }
+    
+    static func from<T>(value: T, type: AXValueType) -> AXValue? {
+        var value = value
+        return withUnsafePointer(to: &value) { valuePointer in
+            AXValueCreate(type, valuePointer)
+        }
+    }
+}
+
+
 
 /// Stripped out version from DockDoor
 extension AXUIElement {
@@ -56,6 +74,36 @@ extension AXUIElement {
             // for other errors it's pointless to retry
         default: return nil
         }
+    }
+    
+    func getValue(_ attribute: NSAccessibility.Attribute) -> AnyObject? {
+        var value: AnyObject?
+        let result = AXUIElementCopyAttributeValue(self, attribute.rawValue as CFString, &value)
+        guard result == .success else { return nil }
+        return value
+    }
+    
+    private func setWrappedValue<T>(_ attribute: NSAccessibility.Attribute, _ value: T, _ type: AXValueType) {
+        guard let value = AXValue.from(value: value, type: type) else { return }
+        setValue(attribute, value)
+    }
+    
+    func setValue(_ attribute: NSAccessibility.Attribute, _ value: CGPoint) {
+        setWrappedValue(attribute, value, .cgPoint)
+    }
+    
+    func setValue(_ attribute: NSAccessibility.Attribute, _ value: CGSize) {
+        setWrappedValue(attribute, value, .cgSize)
+    }
+    
+    func setValue(_ attribute: NSAccessibility.Attribute, _ value: AnyObject) {
+        AXUIElementSetAttributeValue(self, attribute.rawValue as CFString, value)
+    }
+
+    
+    func getWrappedValue<T>(_ attribute: NSAccessibility.Attribute) -> T? {
+        guard let value = getValue(attribute), CFGetTypeID(value) == AXValueGetTypeID() else { return nil }
+        return (value as! AXValue).toValue()
     }
     
     func attribute<T>(_ key: String, _ _: T.Type) throws -> T? {

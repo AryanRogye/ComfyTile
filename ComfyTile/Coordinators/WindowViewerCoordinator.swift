@@ -116,10 +116,15 @@ class WindowViewerCoordinator: NSObject {
                 
                 if modifier == [] {
                     let index = windowViewerVM.selected
-                    fetchedWindowManager.fetchedWindows[index].focusWindow()
                     
-                    let focused = fetchedWindowManager.fetchedWindows.remove(at: index)
-                    fetchedWindowManager.fetchedWindows.insert(focused, at: 0)
+                    if fetchedWindowManager.fetchedWindows.indices.contains(index) {
+                        let windows = fetchedWindowManager.fetchedWindows
+                        
+                        windows[index].focusWindow()
+                        
+                        let focused = fetchedWindowManager.fetchedWindows.remove(at: index)
+                        fetchedWindowManager.fetchedWindows.insert(focused, at: 0)
+                    }
                     
                     self.windowViewerVM.onEscape?()
                 }

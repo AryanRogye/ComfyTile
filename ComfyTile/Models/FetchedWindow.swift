@@ -1,5 +1,5 @@
 //
-//  FocusedApp.swift
+//  FetchedWindow.swift
 //  ComfyTile
 //
 //  Created by Aryan Rogye on 10/5/25.
@@ -57,9 +57,4 @@ struct FetchedWindow : Hashable, Identifiable {
             app.activate(options: [.activateIgnoringOtherApps])
         }
     }
-}
-
-struct FocusedWindow {
-    var element: AXUIElement
-    var screen: NSScreen
 }

@@ -117,10 +117,12 @@ class AppCoordinator {
             
             // MARK: - Right Half
             onRightHalfDown: {
-                if let rect = self.appEnv.windowLayoutService.getRightDimensions() {
-                    self.tilingCoverCoordinator.show(with: rect)
+                if self.defaultsManager.showTilingAnimations {
+                    if let rect = self.appEnv.windowLayoutService.getRightDimensions() {
+                        self.tilingCoverCoordinator.show(with: rect)
+                    }
+                    self.numKeysHeld += 1
                 }
-                self.numKeysHeld += 1
             },
             onRightHalfUp: {
                 self.shouldCloseWith {
@@ -129,10 +131,13 @@ class AppCoordinator {
             },
             // MARK: - Left Half
             onLeftHalfDown: {
-                if let rect = self.appEnv.windowLayoutService.getLeftDimensions() {
-                    self.tilingCoverCoordinator.show(with: rect)
+                if self.defaultsManager.showTilingAnimations {
+                    
+                    if let rect = self.appEnv.windowLayoutService.getLeftDimensions() {
+                        self.tilingCoverCoordinator.show(with: rect)
+                    }
+                    self.numKeysHeld += 1
                 }
-                self.numKeysHeld += 1
             },
             onLeftHalfUp: {
                 self.shouldCloseWith {
@@ -142,10 +147,13 @@ class AppCoordinator {
             
             // MARK: - Center
             onCenterDown: {
-                if let rect = self.appEnv.windowLayoutService.getCenterDimensions() {
-                    self.tilingCoverCoordinator.show(with: rect)
+                if self.defaultsManager.showTilingAnimations {
+                    
+                    if let rect = self.appEnv.windowLayoutService.getCenterDimensions() {
+                        self.tilingCoverCoordinator.show(with: rect)
+                    }
+                    self.numKeysHeld += 1
                 }
-                self.numKeysHeld += 1
             },
             onCenterUp: {
                 self.shouldCloseWith {
@@ -155,10 +163,13 @@ class AppCoordinator {
             
             // MARK: - Full Screen
             onMaximizeDown: {
-                if let rect = self.appEnv.windowLayoutService.getFullScreenDimensions() {
-                    self.tilingCoverCoordinator.show(with: rect)
+                if self.defaultsManager.showTilingAnimations {
+                    
+                    if let rect = self.appEnv.windowLayoutService.getFullScreenDimensions() {
+                        self.tilingCoverCoordinator.show(with: rect)
+                    }
+                    self.numKeysHeld += 1
                 }
-                self.numKeysHeld += 1
                 
             },
             onMaximizeUp: {
@@ -195,18 +206,17 @@ class AppCoordinator {
         )
         
         self.hotKeyCoordinator?.startModifier(with: defaultsManager.modiferKey)
-        //                    self.hotKeyCoordinator?.startGlobalClickMonitor {
-        //                        if self.isHoldingModifier {
-        //                            print("IS HOLDING MODIFIER")
-        //                        }
-        //                    }
     }
     
     private func shouldCloseWith(completion: @escaping () -> Void) {
-        self.numKeysHeld -= 1
-        if self.numKeysHeld == 0 {
-            self.tilingCoverCoordinator.hide()
+        if !self.defaultsManager.showTilingAnimations {
             completion()
+        } else {
+            self.numKeysHeld -= 1
+            if self.numKeysHeld == 0 {
+                self.tilingCoverCoordinator.hide()
+                completion()
+            }
         }
     }
 }
