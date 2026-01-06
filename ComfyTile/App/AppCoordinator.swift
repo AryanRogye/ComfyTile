@@ -71,144 +71,135 @@ class AppCoordinator {
             }
         }
         
-        permissionManager.$isAccessibilityEnabled
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                if self.permissionManager.isAccessibilityEnabled {
-                    hotKeyCoordinator = HotKeyCoordinator(
-                        onWindowViewer: {
-                            if self.windowViewerVM.isShown {
-                                let nextIndex = self.windowViewerVM.selected + 1
-                                guard self.fetchedWindowManager.fetchedWindows.indices.contains(nextIndex) else {
-                                    /// If Next Index Doesnt Exist Start at 0 and return
-                                    self.windowViewerVM.selected = 0
-                                    return
-                                }
-                                self.windowViewerVM.selected = nextIndex
-                            } else {
-                                Task {
-                                    self.windowViewerCoordinator.show()
-                                    self.windowViewerVM.selected = 0
-                                    await self.fetchedWindowManager.loadWindows()
-                                }
-                            }
-                        },
-                        onWindowViewerEscapeEarly: {
-                            if self.windowViewerVM.isShown {
-                                self.windowViewerCoordinator.hide()
-                                print("Called onWindowViewerEscapeEarly")
-                            }
-                        },
-                        // MARK: - Modifier Key
-                        onOptDoubleTapDown: {
-                            self.isHoldingModifier = true
-                            self.shortcutHUDCoordinator.show()
-                        },
-                        onOptDoubleTapUp: {
-                            self.isHoldingModifier = false
-//                            self.shortcutHUDCoordinator.hide()
-                        },
-                        onCtrlDoubleTapDown: {
-                            self.isHoldingModifier = true
-                            self.shortcutHUDCoordinator.show()
-                        },
-                        onCtrlDoubleTapUp: {
-                            self.isHoldingModifier = false
-//                            self.shortcutHUDCoordinator.hide()
-                        },
-                        
-                        
-                        // MARK: - Right Half
-                        onRightHalfDown: {
-                            if let rect = self.appEnv.windowLayoutService.getRightDimensions() {
-                                self.tilingCoverCoordinator.show(with: rect)
-                            }
-                            self.numKeysHeld += 1
-                        },
-                        onRightHalfUp: {
-                            self.shouldCloseWith {
-                                self.appEnv.windowLayoutService.moveRight()
-                            }
-                        },
-                        // MARK: - Left Half
-                        onLeftHalfDown: {
-                            if let rect = self.appEnv.windowLayoutService.getLeftDimensions() {
-                                self.tilingCoverCoordinator.show(with: rect)
-                            }
-                            self.numKeysHeld += 1
-                        },
-                        onLeftHalfUp: {
-                            self.shouldCloseWith {
-                                self.appEnv.windowLayoutService.moveLeft()
-                            }
-                        },
-                        
-                        // MARK: - Center
-                        onCenterDown: {
-                            if let rect = self.appEnv.windowLayoutService.getCenterDimensions() {
-                                self.tilingCoverCoordinator.show(with: rect)
-                            }
-                            self.numKeysHeld += 1
-                        },
-                        onCenterUp: {
-                            self.shouldCloseWith {
-                                self.appEnv.windowLayoutService.center()
-                            }
-                        },
-                        
-                        // MARK: - Full Screen
-                        onMaximizeDown: {
-                            if let rect = self.appEnv.windowLayoutService.getFullScreenDimensions() {
-                                self.tilingCoverCoordinator.show(with: rect)
-                            }
-                            self.numKeysHeld += 1
-
-                        },
-                        onMaximizeUp: {
-                            self.shouldCloseWith {
-                                self.appEnv.windowLayoutService.fullScreen()
-                            }
-                        },
-                        
-                        
-                        // MARK: - Nudge From Bottom
-                        onNudgeBottomDownDown: {
-                            self.appEnv.windowLayoutService.nudgeBottomDown(
-                                with: self.defaultsManager.nudgeStep
-                            )
-                        },
-                        onNudgeBottomUpDown: {
-                            self.appEnv.windowLayoutService.nudgeBottomUp(
-                                with: self.defaultsManager.nudgeStep
-                            )
-                        },
-                        
-                        
-                        // MARK: - Nudge From Top
-                        onNudgeTopUpDown: {
-                            self.appEnv.windowLayoutService.nudgeTopUp(
-                                with: self.defaultsManager.nudgeStep
-                            )
-                        },
-                        onNudgeTopDownDown: {
-                            self.appEnv.windowLayoutService.nudgeTopDown(
-                                with: self.defaultsManager.nudgeStep
-                            )
-                        }
-                    )
-                    
-                    self.hotKeyCoordinator?.startModifier(with: defaultsManager.modiferKey)
-//                    self.hotKeyCoordinator?.startGlobalClickMonitor {
-//                        if self.isHoldingModifier {
-//                            print("IS HOLDING MODIFIER")
-//                        }
-//                    }
-                    
+        
+        hotKeyCoordinator = HotKeyCoordinator(
+            onWindowViewer: {
+                if self.windowViewerVM.isShown {
+                    let nextIndex = self.windowViewerVM.selected + 1
+                    guard self.fetchedWindowManager.fetchedWindows.indices.contains(nextIndex) else {
+                        /// If Next Index Doesnt Exist Start at 0 and return
+                        self.windowViewerVM.selected = 0
+                        return
+                    }
+                    self.windowViewerVM.selected = nextIndex
                 } else {
-                    hotKeyCoordinator = nil
+                    Task {
+                        self.windowViewerCoordinator.show()
+                        self.windowViewerVM.selected = 0
+                        await self.fetchedWindowManager.loadWindows()
+                    }
                 }
+            },
+            onWindowViewerEscapeEarly: {
+                if self.windowViewerVM.isShown {
+                    self.windowViewerCoordinator.hide()
+                    print("Called onWindowViewerEscapeEarly")
+                }
+            },
+            // MARK: - Modifier Key
+            //                        onOptDoubleTapDown: {
+            //                            self.isHoldingModifier = true
+            //                            self.shortcutHUDCoordinator.show()
+            //                        },
+            //                        onOptDoubleTapUp: {
+            //                            self.isHoldingModifier = false
+            ////                            self.shortcutHUDCoordinator.hide()
+            //                        },
+            //                        onCtrlDoubleTapDown: {
+            //                            self.isHoldingModifier = true
+            //                            self.shortcutHUDCoordinator.show()
+            //                        },
+            //                        onCtrlDoubleTapUp: {
+            //                            self.isHoldingModifier = false
+            ////                            self.shortcutHUDCoordinator.hide()
+            //                        },
+            
+            
+            // MARK: - Right Half
+            onRightHalfDown: {
+                if let rect = self.appEnv.windowLayoutService.getRightDimensions() {
+                    self.tilingCoverCoordinator.show(with: rect)
+                }
+                self.numKeysHeld += 1
+            },
+            onRightHalfUp: {
+                self.shouldCloseWith {
+                    self.appEnv.windowLayoutService.moveRight()
+                }
+            },
+            // MARK: - Left Half
+            onLeftHalfDown: {
+                if let rect = self.appEnv.windowLayoutService.getLeftDimensions() {
+                    self.tilingCoverCoordinator.show(with: rect)
+                }
+                self.numKeysHeld += 1
+            },
+            onLeftHalfUp: {
+                self.shouldCloseWith {
+                    self.appEnv.windowLayoutService.moveLeft()
+                }
+            },
+            
+            // MARK: - Center
+            onCenterDown: {
+                if let rect = self.appEnv.windowLayoutService.getCenterDimensions() {
+                    self.tilingCoverCoordinator.show(with: rect)
+                }
+                self.numKeysHeld += 1
+            },
+            onCenterUp: {
+                self.shouldCloseWith {
+                    self.appEnv.windowLayoutService.center()
+                }
+            },
+            
+            // MARK: - Full Screen
+            onMaximizeDown: {
+                if let rect = self.appEnv.windowLayoutService.getFullScreenDimensions() {
+                    self.tilingCoverCoordinator.show(with: rect)
+                }
+                self.numKeysHeld += 1
+                
+            },
+            onMaximizeUp: {
+                self.shouldCloseWith {
+                    self.appEnv.windowLayoutService.fullScreen()
+                }
+            },
+            
+            
+            // MARK: - Nudge From Bottom
+            onNudgeBottomDownDown: {
+                self.appEnv.windowLayoutService.nudgeBottomDown(
+                    with: self.defaultsManager.nudgeStep
+                )
+            },
+            onNudgeBottomUpDown: {
+                self.appEnv.windowLayoutService.nudgeBottomUp(
+                    with: self.defaultsManager.nudgeStep
+                )
+            },
+            
+            
+            // MARK: - Nudge From Top
+            onNudgeTopUpDown: {
+                self.appEnv.windowLayoutService.nudgeTopUp(
+                    with: self.defaultsManager.nudgeStep
+                )
+            },
+            onNudgeTopDownDown: {
+                self.appEnv.windowLayoutService.nudgeTopDown(
+                    with: self.defaultsManager.nudgeStep
+                )
             }
-            .store(in: &cancellables)
+        )
+        
+        self.hotKeyCoordinator?.startModifier(with: defaultsManager.modiferKey)
+        //                    self.hotKeyCoordinator?.startGlobalClickMonitor {
+        //                        if self.isHoldingModifier {
+        //                            print("IS HOLDING MODIFIER")
+        //                        }
+        //                    }
     }
     
     private func shouldCloseWith(completion: @escaping () -> Void) {

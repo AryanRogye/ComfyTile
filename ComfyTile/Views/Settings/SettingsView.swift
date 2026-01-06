@@ -10,16 +10,16 @@ internal import UniformTypeIdentifiers
 
 struct SettingsView: View {
     
+    @Environment(DefaultsManager.self) var defaultsManager
+    
     var body: some View {
-        VStack {
-//            VStack {
-//                ForEach(tilers) { tiler in
-//                    WindowPiece(tiler)
-//                        .draggable(tiler)
-//                }
-//            }
-//            .frame(width: 100, height: 100)
+        @Bindable var defaultsManager = defaultsManager
+        Form {
+            Section("Animations") {
+                Toggle("Tiling Animations", isOn: $defaultsManager.showTilingAnimations).toggleStyle(.switch)
+            }
         }
+        .formStyle(.grouped)
         .frame(minWidth: 500, minHeight: 500)
     }
 }

@@ -54,19 +54,6 @@ struct ComfyTileMenuBarContent: View {
         
         ShortcutRecorder(label: "Window Viewer", type: .windowViewer)
         
-        ForEach(fetchedWindowManager.fetchedWindows, id: \.self) { window in
-            HStack {
-                Text(window.windowTitle)
-                Spacer()
-                Button(action: {
-                    fetchedWindowManager.toggle(window)
-                }) {
-                    Image(systemName: fetchedWindowManager.favoriteWindows.contains(window) ? "star.fill" : "star")
-                        .foregroundColor(fetchedWindowManager.favoriteWindows.contains(window) ? .yellow : .gray)
-                }
-            }
-            .padding(8)
-        }
         /// Have User Select Modifier Key
         Picker("Select Modifier Key", selection: $defaultsManager.modiferKey) {
             ForEach(ModifierGroup.allCases, id: \.self) { group in

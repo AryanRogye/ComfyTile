@@ -22,7 +22,10 @@ struct ComfyTileApp: App {
             fetchedWindowManager: appDelegate.appCoordinator.fetchedWindowManager
         )
         
-        Settings { SettingsView() }
+        Settings {
+            SettingsView()
+                .environment(appDelegate.appCoordinator.defaultsManager)
+        }
         
     }
 }
