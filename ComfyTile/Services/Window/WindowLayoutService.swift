@@ -162,6 +162,26 @@ class WindowLayoutService: WindowLayoutProviding {
                 width: rect.width,
                 height: rect.height
             )
+            
+            /// Fixing With Over Correction
+            Task {
+                try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+                
+                let applied = focusedWindow.element.frame
+                let appliedWidth = applied.width
+                
+                let targetRect = CGRect(
+                    x: frame.maxX - appliedWidth,   // anchor to right edge
+                    y: frame.origin.y,
+                    width: appliedWidth,
+                    height: frame.height
+                )
+                
+                let targetPos = WindowManagerHelpers.axPosition(for: targetRect, on: screen)
+
+                focusedWindow.element.setPosition(x: targetPos.x, y: targetPos.y)
+                focusedWindow.element.setSize(width: targetRect.width, height: targetRect.height)
+            }
         }
     }
     
