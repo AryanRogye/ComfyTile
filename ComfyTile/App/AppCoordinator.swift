@@ -119,7 +119,7 @@ class AppCoordinator {
             onRightHalfDown: {
                 if self.defaultsManager.showTilingAnimations {
                     if let rect = self.appEnv.windowLayoutService.getRightDimensions() {
-                        self.tilingCoverCoordinator.show(with: rect)
+                        self.showWith(rect: rect)
                     }
                     self.numKeysHeld += 1
                 }
@@ -132,9 +132,8 @@ class AppCoordinator {
             // MARK: - Left Half
             onLeftHalfDown: {
                 if self.defaultsManager.showTilingAnimations {
-                    
                     if let rect = self.appEnv.windowLayoutService.getLeftDimensions() {
-                        self.tilingCoverCoordinator.show(with: rect)
+                        self.showWith(rect: rect)
                     }
                     self.numKeysHeld += 1
                 }
@@ -148,9 +147,8 @@ class AppCoordinator {
             // MARK: - Center
             onCenterDown: {
                 if self.defaultsManager.showTilingAnimations {
-                    
                     if let rect = self.appEnv.windowLayoutService.getCenterDimensions() {
-                        self.tilingCoverCoordinator.show(with: rect)
+                        self.showWith(rect: rect)
                     }
                     self.numKeysHeld += 1
                 }
@@ -164,9 +162,8 @@ class AppCoordinator {
             // MARK: - Full Screen
             onMaximizeDown: {
                 if self.defaultsManager.showTilingAnimations {
-                    
                     if let rect = self.appEnv.windowLayoutService.getFullScreenDimensions() {
-                        self.tilingCoverCoordinator.show(with: rect)
+                        self.showWith(rect: rect)
                     }
                     self.numKeysHeld += 1
                 }
@@ -191,7 +188,6 @@ class AppCoordinator {
                 )
             },
             
-            
             // MARK: - Nudge From Top
             onNudgeTopUpDown: {
                 self.appEnv.windowLayoutService.nudgeTopUp(
@@ -206,6 +202,10 @@ class AppCoordinator {
         )
         
         self.hotKeyCoordinator?.startModifier(with: defaultsManager.modiferKey)
+    }
+    
+    private func showWith(rect: CGRect) {
+        self.tilingCoverCoordinator.show(with: rect)
     }
     
     private func shouldCloseWith(completion: @escaping () -> Void) {
