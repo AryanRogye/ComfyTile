@@ -28,8 +28,8 @@ final class WindowAnimator {
         self.duration = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? 0 : duration
         
         guard self.duration > 0,
-              let start = focusedWindow.windowFrame?.origin else {
-            focusedWindow.setPosition(x: target.x, y: target.y)
+              let start = focusedWindow.element.windowFrame?.origin else {
+            focusedWindow.element.setPosition(x: target.x, y: target.y)
             completion()
             return
         }
@@ -46,7 +46,7 @@ final class WindowAnimator {
             
             let x = lerp(start.x, target.x, tt)
             let y = lerp(start.y, target.y, tt)
-            focusedWindow.setPosition(x: x, y: y)
+            focusedWindow.element.setPosition(x: x, y: y)
             
             if raw >= 1 {
                 t.invalidate()

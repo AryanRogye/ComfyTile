@@ -14,27 +14,27 @@ class WindowLayoutService: WindowLayoutProviding {
     /// Keep Window Where it is, but its top point is moved up
     func nudgeTopUp(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow(),
-              var frame = f.windowFrame else { return }
+              var frame = f.element.windowFrame else { return }
 
         let delta: CGFloat = CGFloat(step)
         frame.origin.y -= delta
         frame.size.height += delta
         
         
-        f.setPosition(x: frame.origin.x, y: frame.origin.y)
-        f.setSize(width: frame.width, height: frame.height)
+        f.element.setPosition(x: frame.origin.x, y: frame.origin.y)
+        f.element.setSize(width: frame.width, height: frame.height)
     }
     
     func nudgeTopDown(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow(),
-              var frame = f.windowFrame else { return }
+              var frame = f.element.windowFrame else { return }
 
         let delta: CGFloat = CGFloat(step)
         frame.origin.y += delta
         frame.size.height -= delta
         
-        f.setPosition(x: frame.origin.x, y: frame.origin.y)
-        f.setSize(width: frame.width, height: frame.height)
+        f.element.setPosition(x: frame.origin.x, y: frame.origin.y)
+        f.element.setSize(width: frame.width, height: frame.height)
     }
     
     
@@ -42,26 +42,26 @@ class WindowLayoutService: WindowLayoutProviding {
         guard let f = WindowManagerHelpers.getFocusedWindow() else { return }
         
         // current frame
-        guard var frame = f.windowFrame else { return }
+        guard var frame = f.element.windowFrame else { return }
 
         let delta: CGFloat = CGFloat(step)
         frame.size.height += delta
         
         // apply
-        f.setSize(width: frame.width, height: frame.height)
+        f.element.setSize(width: frame.width, height: frame.height)
     }
     
     func nudgeBottomUp(with step: Int) {
         guard let f = WindowManagerHelpers.getFocusedWindow() else { return }
         
         // current frame
-        guard var frame = f.windowFrame else { return }
+        guard var frame = f.element.windowFrame else { return }
         
         let delta: CGFloat = CGFloat(step)
         frame.size.height -= delta
         
         // apply
-        f.setSize(width: frame.width, height: frame.height)
+        f.element.setSize(width: frame.width, height: frame.height)
     }
     
     func fullScreen() {
@@ -73,7 +73,7 @@ class WindowLayoutService: WindowLayoutProviding {
         let pos = WindowManagerHelpers.axPosition(for: frame, on: screen)
         
         animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
-            focusedWindow.setSize(
+            focusedWindow.element.setSize(
                 width: frame.width,
                 height: frame.height
             )
@@ -105,7 +105,7 @@ class WindowLayoutService: WindowLayoutProviding {
         let pos =  WindowManagerHelpers.axPosition(for: rect, on: screen)
         
         animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
-            focusedWindow.setSize(
+            focusedWindow.element.setSize(
                 width: centeredSize.width,
                 height: centeredSize.height
             )
@@ -131,7 +131,7 @@ class WindowLayoutService: WindowLayoutProviding {
         let pos = WindowManagerHelpers.axPosition(for: rect, on: screen)
         
         animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
-            focusedWindow.setSize(
+            focusedWindow.element.setSize(
                 width: rect.width,
                 height: rect.height
             )
@@ -158,7 +158,7 @@ class WindowLayoutService: WindowLayoutProviding {
         let pos = WindowManagerHelpers.axPosition(for: rect, on: screen)
         
         animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
-            focusedWindow.setSize(
+            focusedWindow.element.setSize(
                 width: rect.width,
                 height: rect.height
             )

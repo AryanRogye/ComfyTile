@@ -41,9 +41,20 @@ struct CGSWindowCaptureOptions: OptionSet {
     static let fullSize = CGSWindowCaptureOptions(rawValue: 1 << 19)
 }
 
-let kCGSAllSpacesMask: CGSSpaceMask = 0xFFFF_FFFF_FFFF_FFFF
+//let kCGSAllSpacesMask: CGSSpaceMask = 0xFFFF_FFFF_FFFF_FFFF
+let kCGSAllSpacesMask: CGSSpaceMask = 125
 let kAXFullscreenAttribute = "AXFullScreen"
 let kAXWindowNumberAttribute = "AXWindowNumber" as CFString
+
+@_silgen_name("CGSCopySpacesForWindows")
+func CGSCopySpacesForWindows(
+    _ cid: CGSConnectionID,
+    _ mask: CGSSpaceMask,
+    _ windowIDs: CFArray
+) -> Unmanaged<CFArray>?
+
+
+
 
 extension AXValue {
     func toValue<T>() -> T? {

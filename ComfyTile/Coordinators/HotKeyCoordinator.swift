@@ -23,6 +23,10 @@ extension KeyboardShortcuts.Name {
         .escape,
         modifiers: .option
     ))
+    static let OneVerticalOneHorizontalSplit = Self("OneVerticalOneHorizontalSplit", default: Shortcut(
+        .p,
+        modifiers: [.control, .shift]
+    ))
 }
 
 extension KeyboardShortcuts.Name {
@@ -78,6 +82,7 @@ final class HotKeyCoordinator {
     }
     
     init(
+        onOneVerticalOneHorizontalSplit : @escaping() -> Void = {},
         onWindowViewer      : @escaping () -> Void = {},
         onWindowViewerUp    : @escaping () -> Void = {},
         onWindowViewerEscapeEarly : @escaping () -> Void = {},
@@ -123,6 +128,10 @@ final class HotKeyCoordinator {
         modifierDetector.onDoubleTapOptionRelease = onOptDoubleTapUp
         modifierDetector.onDoubleTapControl = onCtrlDoubleTapDown
         modifierDetector.onDoubleTapControlRelease = onCtrlDoubleTapUp
+        
+        KeyboardShortcuts.onKeyDown(for: .OneVerticalOneHorizontalSplit) {
+            onOneVerticalOneHorizontalSplit()
+        }
         
         KeyboardShortcuts.onKeyDown(for: .windowViewer) {
             onWindowViewer()

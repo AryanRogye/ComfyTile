@@ -16,7 +16,7 @@ struct WindowViewer: View {
     var body: some View {
         VStack {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 200))], spacing: 16) {
-                ForEach(fetchedWindowManager.fetchedWindows, id: \.self) { window in
+                ForEach(fetchedWindowManager.fetchedWindows, id: \.windowID) { window in
                     Button(action: {
                         let index = windowViewerVM.selected
                         fetchedWindowManager.fetchedWindows[index].focusWindow()

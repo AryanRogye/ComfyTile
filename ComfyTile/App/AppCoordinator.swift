@@ -23,6 +23,8 @@ class AppCoordinator {
     private var shortcutHUDVM          : ShortcutHUDViewModel
     private var windowViewerVM         : WindowViewerViewModel
     
+    let windowSplitManager = WindowSplitManager()
+    
     
     private var permissionManager: PermissionService
     var defaultsManager  : DefaultsManager
@@ -73,6 +75,16 @@ class AppCoordinator {
         
         
         hotKeyCoordinator = HotKeyCoordinator(
+            onOneVerticalOneHorizontalSplit: {
+                Task {
+                    await self.fetchedWindowManager.loadWindows()
+                    let inSpace = self.fetchedWindowManager.fetchedWindows.filter(\.isInSpace)
+                    await self.windowSplitManager.splitWindows(
+                        window: inSpace,
+                        style: .primaryLeftStackedHorizontally
+                    )
+                }
+            },
             onWindowViewer: {
                 if self.windowViewerVM.isShown {
                     let nextIndex = self.windowViewerVM.selected + 1
