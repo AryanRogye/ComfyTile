@@ -37,8 +37,8 @@ struct ComfyTileMenuBarContent: View {
     
     @Environment(DefaultsManager.self) var defaultsManager
     @Environment(FetchedWindowManager.self) var fetchedWindowManager
-    @Environment(\.openSettings) var openSettings
-
+    @Environment(\.openWindow) var openWindow
+    
     var body: some View {
         @Bindable var defaultsManager = defaultsManager
         @Bindable var fetchedWindowManager = fetchedWindowManager
@@ -105,7 +105,8 @@ struct ComfyTileMenuBarContent: View {
         .sectionBackground()
         
         Button(action: {
-            openSettings()
+            openWindow(id: "Settings")
+//            openSettings()
         }) {
             Label("Settings", systemImage: "gear")
                 .foregroundStyle(.primary)

@@ -5,6 +5,12 @@
 //  Created by Aryan Rogye on 1/7/26.
 //
 
+import ComfyLogger
+
+extension ComfyLogger {
+    public static let WindowSplitManager = ComfyLogger.Name("WindowSplitManager")
+}
+
 enum WindowSplitStyle {
     case primaryLeftStackedHorizontally
     case primaryRightStackedHorizontally
@@ -20,15 +26,17 @@ class WindowSplitManager {
     }
     
     func splitWindows(window: [FetchedWindow], style: WindowSplitStyle) async {
+        ComfyLogger.WindowSplitManager.insert("Called Split In Space: \(window.count)")
         switch style {
         case .primaryLeftStackedHorizontally:
-            
             guard let primary = await createPrimarySplit(on: window, direction: .left) else { return }
+            if window.count == 1 { return }
             /// Primary left so stacked right
             await calculateAndSetStacked(on: window, direction: .right, avoid: primary)
             
         case .primaryRightStackedHorizontally:
             guard let primary = await createPrimarySplit(on: window, direction: .right) else { return }
+            if window.count == 1 { return }
             /// Primary left so stacked right
             await calculateAndSetStacked(on: window, direction: .left, avoid: primary)
         }
@@ -79,6 +87,16 @@ class WindowSplitManager {
             y += height
             
             try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+            
+            ComfyLogger.WindowSplitManager.insert(
+                "\(w.bundleIdentifier) (Size) (Postion) Requested: (width: \(width), height: \(height))|(x: \(x), y: \(y))"
+            )
+            let appliedRect = foc.element.frame
+            let appliedPos = WindowManagerHelpers.axPosition(for: appliedRect, on: screen)
+            
+            ComfyLogger.WindowSplitManager.insert(
+                "\(w.bundleIdentifier) Applied  : (width: \(appliedRect.width), height: \(appliedRect.height)) | (x: \(appliedPos.x), y: \(appliedPos.y))"
+            )
         }
     }
     
@@ -99,7 +117,8 @@ class WindowSplitManager {
         /// Primary Split is Half of Screen or Best it can be After Half
         let screenFrame = screen.visibleFrame
         
-        let newWidth : CGFloat = screenFrame.width / 2
+        /// if 1 window only, force that to be the full screen
+        let newWidth : CGFloat = window.count == 1 ? screenFrame.width : screenFrame.width / 2
         let newHeight : CGFloat = screenFrame.height
         
         let newX : CGFloat = direction == .left ? screenFrame.origin.x : screenFrame.origin.x + screenFrame.width / 2
