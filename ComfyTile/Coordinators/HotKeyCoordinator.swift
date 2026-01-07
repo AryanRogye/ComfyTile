@@ -23,8 +23,12 @@ extension KeyboardShortcuts.Name {
         .escape,
         modifiers: .option
     ))
-    static let OneVerticalOneHorizontalSplit = Self("OneVerticalOneHorizontalSplit", default: Shortcut(
-        .p,
+    static let primaryLeftStackedHorizontallyTile = Self("PrimaryLeftStackedHorizontallyTile", default: Shortcut(
+        .leftBracket,
+        modifiers: [.control, .shift]
+    ))
+    static let primaryRightStackedHorizontallyTile = Self("PrimaryRightStackedHorizontallyTile", default: Shortcut(
+        .rightBracket,
         modifiers: [.control, .shift]
     ))
 }
@@ -82,7 +86,8 @@ final class HotKeyCoordinator {
     }
     
     init(
-        onOneVerticalOneHorizontalSplit : @escaping() -> Void = {},
+        onPrimaryLeftStackedHorizontallyTile : @escaping() -> Void = {},
+        onPrimaryRightStackedHorizontallyTile: @escaping() -> Void = {},
         onWindowViewer      : @escaping () -> Void = {},
         onWindowViewerUp    : @escaping () -> Void = {},
         onWindowViewerEscapeEarly : @escaping () -> Void = {},
@@ -129,10 +134,13 @@ final class HotKeyCoordinator {
         modifierDetector.onDoubleTapControl = onCtrlDoubleTapDown
         modifierDetector.onDoubleTapControlRelease = onCtrlDoubleTapUp
         
-        KeyboardShortcuts.onKeyDown(for: .OneVerticalOneHorizontalSplit) {
-            onOneVerticalOneHorizontalSplit()
+        KeyboardShortcuts.onKeyDown(for: .primaryLeftStackedHorizontallyTile) {
+            onPrimaryLeftStackedHorizontallyTile()
         }
-        
+        KeyboardShortcuts.onKeyDown(for: .primaryRightStackedHorizontallyTile) {
+            onPrimaryRightStackedHorizontallyTile()
+        }
+
         KeyboardShortcuts.onKeyDown(for: .windowViewer) {
             onWindowViewer()
         }

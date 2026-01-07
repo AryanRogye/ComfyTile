@@ -75,7 +75,8 @@ class AppCoordinator {
         
         
         hotKeyCoordinator = HotKeyCoordinator(
-            onOneVerticalOneHorizontalSplit: {
+            
+            onPrimaryLeftStackedHorizontallyTile: {
                 Task {
                     await self.fetchedWindowManager.loadWindows()
                     let inSpace = self.fetchedWindowManager.fetchedWindows.filter(\.isInSpace)
@@ -85,6 +86,17 @@ class AppCoordinator {
                     )
                 }
             },
+            onPrimaryRightStackedHorizontallyTile: {
+                Task {
+                    await self.fetchedWindowManager.loadWindows()
+                    let inSpace = self.fetchedWindowManager.fetchedWindows.filter(\.isInSpace)
+                    await self.windowSplitManager.splitWindows(
+                        window: inSpace,
+                        style: .primaryRightStackedHorizontally
+                    )
+                }
+            },
+            
             onWindowViewer: {
                 if self.windowViewerVM.isShown {
                     let nextIndex = self.windowViewerVM.selected + 1

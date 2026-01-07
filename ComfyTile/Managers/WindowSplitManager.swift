@@ -23,12 +23,12 @@ class WindowSplitManager {
         switch style {
         case .primaryLeftStackedHorizontally:
             
-            guard let primary = await createPrimarySplit(on: window) else { return }
+            guard let primary = await createPrimarySplit(on: window, direction: .left) else { return }
             /// Primary left so stacked right
             await calculateAndSetStacked(on: window, direction: .right, avoid: primary)
             
         case .primaryRightStackedHorizontally:
-            guard let primary = await createPrimarySplit(on: window) else { return }
+            guard let primary = await createPrimarySplit(on: window, direction: .right) else { return }
             /// Primary left so stacked right
             await calculateAndSetStacked(on: window, direction: .left, avoid: primary)
         }
@@ -82,7 +82,7 @@ class WindowSplitManager {
         }
     }
     
-    private func createPrimarySplit(on window: [FetchedWindow]) async -> CGRect? {
+    private func createPrimarySplit(on window: [FetchedWindow], direction: SplitDirection) async -> CGRect? {
         if window.isEmpty {
             print("Window is Empty")
             return nil
@@ -102,7 +102,7 @@ class WindowSplitManager {
         let newWidth : CGFloat = screenFrame.width / 2
         let newHeight : CGFloat = screenFrame.height
         
-        let newX : CGFloat = screenFrame.origin.x
+        let newX : CGFloat = direction == .left ? screenFrame.origin.x : screenFrame.origin.x + screenFrame.width / 2
         let newY : CGFloat = screenFrame.origin.y
         
         /// Create a rect
@@ -125,8 +125,33 @@ class WindowSplitManager {
         foc.element.setSize(width: rect.width, height: rect.height)
     
         try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
-
-        return foc.element.frame
+        
+        if direction == .left {
+            return foc.element.frame
+        } else {
+            
+            let applied = foc.element.frame
+            let appliedWidth = applied.width
+            
+            // Build rect in screen coords (NOT using applied.origin!)
+            let targetRect = CGRect(
+                x: screenFrame.maxX - appliedWidth,   // anchor to right edge
+                y: screenFrame.origin.y,
+                width: appliedWidth,
+                height: screenFrame.height
+            )
+            
+            let targetPos = WindowManagerHelpers.axPosition(for: targetRect, on: screen)
+            
+            // Apply
+            foc.element.setPosition(x: targetPos.x, y: targetPos.y)
+            foc.element.setSize(width: targetRect.width, height: targetRect.height)
+            
+            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+            
+            return foc.element.frame
+            
+        }
     }
 }
 
