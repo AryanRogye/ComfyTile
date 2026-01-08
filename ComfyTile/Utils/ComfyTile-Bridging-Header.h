@@ -45,13 +45,6 @@ CFArrayRef CGSHWCaptureWindowList(
                                   uint32_t options
                                   );
 
-// Get spaces for windows
-CFArrayRef CGSCopySpacesForWindows(
-                                   CGSConnectionID cid,
-                                   CGSSpaceMask mask,
-                                   CFArrayRef windowIDs
-                                   );
-
 // Get window level (layer)
 int32_t CGSGetWindowLevel(
                           CGSConnectionID cid,

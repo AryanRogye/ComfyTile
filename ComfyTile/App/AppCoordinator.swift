@@ -13,6 +13,7 @@ import Observation
 class AppCoordinator {
     
     /// Coordinators
+    private var windowTilingCoordinator: WindowTilingCoordinator?
     private var hotKeyCoordinator: HotKeyCoordinator?
     private var tilingCoverCoordinator : TilingCoverCoordinator
     private var shortcutHUDCoordinator : ShortcutHUDCoordinator
@@ -22,6 +23,8 @@ class AppCoordinator {
     private var tilingCoverVM          : TilingCoverViewModel
     private var shortcutHUDVM          : ShortcutHUDViewModel
     private var windowViewerVM         : WindowViewerViewModel
+    
+    let windowSplitManager = WindowSplitManager()
     
     
     private var permissionManager: PermissionService
@@ -71,8 +74,24 @@ class AppCoordinator {
             }
         }
         
+        windowTilingCoordinator = WindowTilingCoordinator(
+            fetchedWindowManager: fetchedWindowManager,
+            windowSplitManager: windowSplitManager,
+            windowLayoutService: appEnv.windowLayoutService,
+            defaultsManager: defaultsManager
+        )
+        
         
         hotKeyCoordinator = HotKeyCoordinator(
+            onPrimaryLeftStackedHorizontallyTile: {
+                self.windowTilingCoordinator?.primaryLeftStackedHorizontallyTile()
+            },
+            onPrimaryRightStackedHorizontallyTile: {
+                self.windowTilingCoordinator?.primaryRightStackedHorizontallyTile()
+            },
+            onPrimaryTile: {
+                self.windowTilingCoordinator?.primaryTile()
+            },
             onWindowViewer: {
                 if self.windowViewerVM.isShown {
                     let nextIndex = self.windowViewerVM.selected + 1
@@ -96,6 +115,7 @@ class AppCoordinator {
                     print("Called onWindowViewerEscapeEarly")
                 }
             },
+            
             // MARK: - Modifier Key
             //                        onOptDoubleTapDown: {
             //                            self.isHoldingModifier = true
@@ -114,7 +134,6 @@ class AppCoordinator {
             ////                            self.shortcutHUDCoordinator.hide()
             //                        },
             
-            
             // MARK: - Right Half
             onRightHalfDown: {
                 if self.defaultsManager.showTilingAnimations {
@@ -126,7 +145,7 @@ class AppCoordinator {
             },
             onRightHalfUp: {
                 self.shouldCloseWith {
-                    self.appEnv.windowLayoutService.moveRight()
+                    self.windowTilingCoordinator?.tileRight()
                 }
             },
             // MARK: - Left Half
@@ -140,7 +159,7 @@ class AppCoordinator {
             },
             onLeftHalfUp: {
                 self.shouldCloseWith {
-                    self.appEnv.windowLayoutService.moveLeft()
+                    self.windowTilingCoordinator?.tileLeft()
                 }
             },
             
@@ -155,7 +174,7 @@ class AppCoordinator {
             },
             onCenterUp: {
                 self.shouldCloseWith {
-                    self.appEnv.windowLayoutService.center()
+                    self.windowTilingCoordinator?.tileCenter()
                 }
             },
             
@@ -171,33 +190,25 @@ class AppCoordinator {
             },
             onMaximizeUp: {
                 self.shouldCloseWith {
-                    self.appEnv.windowLayoutService.fullScreen()
+                    self.windowTilingCoordinator?.tileFullScreen()
                 }
             },
             
             
             // MARK: - Nudge From Bottom
             onNudgeBottomDownDown: {
-                self.appEnv.windowLayoutService.nudgeBottomDown(
-                    with: self.defaultsManager.nudgeStep
-                )
+                self.windowTilingCoordinator?.nudgeBottomDown()
             },
             onNudgeBottomUpDown: {
-                self.appEnv.windowLayoutService.nudgeBottomUp(
-                    with: self.defaultsManager.nudgeStep
-                )
+                self.windowTilingCoordinator?.nudgeBottomUp()
             },
             
             // MARK: - Nudge From Top
             onNudgeTopUpDown: {
-                self.appEnv.windowLayoutService.nudgeTopUp(
-                    with: self.defaultsManager.nudgeStep
-                )
+                self.windowTilingCoordinator?.nudgeTopUp()
             },
             onNudgeTopDownDown: {
-                self.appEnv.windowLayoutService.nudgeTopDown(
-                    with: self.defaultsManager.nudgeStep
-                )
+                self.windowTilingCoordinator?.nudgeTopDown()
             }
         )
         

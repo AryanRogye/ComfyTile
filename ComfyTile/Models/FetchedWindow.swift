@@ -7,34 +7,37 @@
 
 import Cocoa
 
-struct FetchedWindow : Hashable, Identifiable {
+struct FetchedWindow: Identifiable {
     var id: CGWindowID { windowID }
     
     let windowID : CGWindowID
     let windowTitle     : String
     let pid : pid_t
-    let axElement : AXUIElement?
+    let element : WindowElement?
     let bundleIdentifier : String
     let screenshot : CGImage?
+    var isInSpace  : Bool
     
     init(
         windowID : CGWindowID,
         windowTitle     : String,
         pid : pid_t,
-        axElement: AXUIElement? = nil,
+        element: WindowElement? = nil,
         bundleIdentifier : String,
-        screenshot: CGImage?
+        screenshot: CGImage?,
+        isInSpace : Bool = false
     ) {
         self.windowID = windowID
         self.windowTitle = windowTitle
         self.pid = pid
-        self.axElement = axElement
+        self.element = element
         self.bundleIdentifier = bundleIdentifier
         self.screenshot = screenshot
+        self.isInSpace  = isInSpace
     }
     
     func focusWindow() {
-        if let axElement = axElement {
+        if let element = element, let axElement = element.element {
             // Precise window focus
             activateApp(pid: pid)
             

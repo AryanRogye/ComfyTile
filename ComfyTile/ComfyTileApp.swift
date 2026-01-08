@@ -22,10 +22,11 @@ struct ComfyTileApp: App {
             fetchedWindowManager: appDelegate.appCoordinator.fetchedWindowManager
         )
         
-        Settings {
+        WindowGroup(id: "Settings") {
             SettingsView()
                 .environment(appDelegate.appCoordinator.defaultsManager)
         }
-        
+        .defaultLaunchBehavior(.suppressed)
+        .windowStyle(.titleBar)
     }
 }

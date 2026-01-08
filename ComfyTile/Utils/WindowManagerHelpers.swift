@@ -17,6 +17,23 @@ struct WindowManagerHelpers {
         "com.aryanrogye.ComfyTile"
     ]
     
+    private static func spacesForWindow(_ windowID: CGWindowID) -> [Int] {
+        let cid = CGSMainConnectionID()
+        let ids: CFArray = [NSNumber(value: Int(windowID))] as CFArray
+        
+        guard let unmanaged = CGSCopySpacesForWindows(cid, kCGSAllSpacesMask, ids) else {
+            return []
+        }
+        
+        // Usually retained for “Copy” functions
+        let cfArray = unmanaged.takeRetainedValue()
+        
+        // Bridge to Swift
+        let nums = cfArray as NSArray as? [NSNumber] ?? []
+        return nums.map { $0.intValue }
+    }
+
+    
     /// Gets ALL User Windows
     public static func getUserWindows() async -> [FetchedWindow]? {
         do {
@@ -65,14 +82,17 @@ struct WindowManagerHelpers {
                     print("Coudlnt get screenshot: \(error)")
                 }
                 
+                let spaces = spacesForWindow(window.windowID)
+                let isInSpace = !spaces.isEmpty
                 /// Add
                 focusedWindows.append(FetchedWindow(
                     windowID: window.windowID,
                     windowTitle: windowTitle,
                     pid: pid,
-                    axElement: axElement,
+                    element: WindowElement(element: axElement),
                     bundleIdentifier: app.bundleIdentifier,
-                    screenshot: screenshot
+                    screenshot: screenshot,
+                    isInSpace: isInSpace
                 ))
             }
             return focusedWindows
@@ -110,7 +130,6 @@ struct WindowManagerHelpers {
             kAXFocusedWindowAttribute as CFString,
             &focusedWindow
         )
-        
         // If that fails, stop.
         if result != .success {
             print("❌ Failed to get focused window: \(result)")
@@ -118,7 +137,7 @@ struct WindowManagerHelpers {
         }
         
         let windowElement = focusedWindow as! AXUIElement
-        return FocusedWindow(element: windowElement, screen: screen)
+        return FocusedWindow(element: WindowElement(element: windowElement), screen: screen)
     }
     
     public static func screenUnderMouse() -> NSScreen? {
