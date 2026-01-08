@@ -13,11 +13,14 @@ import Observation
 class AppCoordinator {
     
     /// Coordinators
-    private var windowTilingCoordinator: WindowTilingCoordinator?
-    private var hotKeyCoordinator: HotKeyCoordinator?
-    private var tilingCoverCoordinator : TilingCoverCoordinator
-    private var shortcutHUDCoordinator : ShortcutHUDCoordinator
+    private var updateController        = UpdateController()
+    private var windowTilingCoordinator : WindowTilingCoordinator?
+    private var hotKeyCoordinator       : HotKeyCoordinator?
+    private var tilingCoverCoordinator  : TilingCoverCoordinator
+    private var shortcutHUDCoordinator  : ShortcutHUDCoordinator
     private var windowViewerCoordinator : WindowViewerCoordinator
+    private var windowCoordinator       = WindowCoordinator()
+    var settingsCoordinator             : SettingsCoordinator
     
     /// View Models
     private var tilingCoverVM          : TilingCoverViewModel
@@ -61,6 +64,11 @@ class AppCoordinator {
         self.windowViewerCoordinator = WindowViewerCoordinator(
             windowViewerVM: windowViewerVM,
             fetchedWindowManager: fetchedWindowManager
+        )
+        self.settingsCoordinator = SettingsCoordinator(
+            windowCoordinator: windowCoordinator,
+            updateController: updateController,
+            defaultsManager: defaultsManager
         )
         
         

@@ -7,9 +7,13 @@
 
 import SwiftUI
 import KeyboardShortcuts
+import Sparkle
 
 @main
 struct ComfyTileApp: App {
+    
+    init() {
+    }
     
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
@@ -19,14 +23,8 @@ struct ComfyTileApp: App {
         
         ComfyTileMenuBar(
             defaultsManager: appDelegate.appCoordinator.defaultsManager,
-            fetchedWindowManager: appDelegate.appCoordinator.fetchedWindowManager
+            fetchedWindowManager: appDelegate.appCoordinator.fetchedWindowManager,
+            settingsCoordinator : appDelegate.appCoordinator.settingsCoordinator
         )
-        
-        WindowGroup(id: "Settings") {
-            SettingsView()
-                .environment(appDelegate.appCoordinator.defaultsManager)
-        }
-        .defaultLaunchBehavior(.suppressed)
-        .windowStyle(.titleBar)
     }
 }

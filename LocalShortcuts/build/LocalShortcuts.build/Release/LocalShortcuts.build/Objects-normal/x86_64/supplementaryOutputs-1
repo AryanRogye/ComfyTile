@@ -1,0 +1,12 @@
+{
+  "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/Sources/LocalShortcuts/Key.swift" : {
+    "abi-baseline-json" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/x86_64/LocalShortcuts.abi.json",
+    "const-values" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/x86_64/LocalShortcuts-primary.swiftconstvalues",
+    "dependencies" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/x86_64/LocalShortcuts-primary.d",
+    "diagnostics" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/x86_64/LocalShortcuts-primary.dia",
+    "objc-header" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/x86_64/LocalShortcuts-Swift.h",
+    "swiftdoc" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/x86_64/LocalShortcuts.swiftdoc",
+    "swiftmodule" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/x86_64/LocalShortcuts.swiftmodule",
+    "swiftsourceinfo" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/x86_64/LocalShortcuts.swiftsourceinfo"
+  }
+}

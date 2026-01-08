@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComfyLogger
+import Sparkle
 
 enum SettingsTab: String, CaseIterable {
     case general = "General"
@@ -49,12 +50,40 @@ struct SettingsView: View {
 
 struct GeneralSettings: View {
     
+    @Environment(UpdateController.self) var updateController
     @Bindable var defaultsManager : DefaultsManager
+    
+    // MARK: - App Version Number
+    private var appVersion: some View {
+        Text("\(Bundle.main.versionNumber)")
+            .font(.system(size: 13, weight: .medium))
+            .foregroundColor(.primary)
+    }
+    
+    // MARK: - App Build Number
+    private var appBuild: some View {
+        Text("\(Bundle.main.buildNumber)")
+            .font(.system(size: 13, weight: .medium))
+            .foregroundColor(.primary)
+    }
     
     var body: some View {
         Form {
             Section("Animations") {
                 Toggle("Tiling Animations", isOn: $defaultsManager.showTilingAnimations).toggleStyle(.switch)
+            }
+            Section("About") {
+                HStack {
+                    Text("Version")
+                    Spacer()
+                    appVersion
+                }
+                HStack {
+                    Text("Build")
+                    Spacer()
+                    appBuild
+                }
+                CheckForUpdatesView(updater: updateController.updateController().updater)
             }
         }
         .formStyle(.grouped)

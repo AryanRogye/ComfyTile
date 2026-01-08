@@ -1,0 +1,4 @@
+module LocalShortcuts {
+header "LocalShortcuts-Swift.h"
+export *
+}

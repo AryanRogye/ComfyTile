@@ -1,0 +1,31 @@
+{
+  "" : {
+    "const-values" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcuts-primary.swiftconstvalues",
+    "dependencies" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcuts-primary.d",
+    "diagnostics" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcuts-primary.dia",
+    "emit-module-dependencies" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcuts-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcuts-primary-emit-module.dia",
+    "pch" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcuts-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcuts-primary.swiftdeps"
+  },
+  "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/Sources/LocalShortcuts/Key.swift" : {
+    "index-unit-output-path" : "/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/Key.o",
+    "llvm-bc" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/Key.bc",
+    "object" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/Key.o"
+  },
+  "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/Sources/LocalShortcuts/LocalShortcuts.swift" : {
+    "index-unit-output-path" : "/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcuts.o",
+    "llvm-bc" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcuts.bc",
+    "object" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcuts.o"
+  },
+  "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/Sources/LocalShortcuts/LocalShortcutsRecorder.swift" : {
+    "index-unit-output-path" : "/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcutsRecorder.o",
+    "llvm-bc" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcutsRecorder.bc",
+    "object" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/LocalShortcutsRecorder.o"
+  },
+  "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/Sources/LocalShortcuts/Modifier.swift" : {
+    "index-unit-output-path" : "/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/Modifier.o",
+    "llvm-bc" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/Modifier.bc",
+    "object" : "/Users/aryanrogye/Code/Projects/ComfyTile/LocalShortcuts/build/LocalShortcuts.build/Release/LocalShortcuts.build/Objects-normal/arm64/Modifier.o"
+  }
+}

@@ -9,8 +9,9 @@ import SwiftUI
 
 struct ComfyTileMenuBar: Scene {
     
-    @Bindable var defaultsManager: DefaultsManager
+    @Bindable var defaultsManager      : DefaultsManager
     @Bindable var fetchedWindowManager : FetchedWindowManager
+    @Bindable var settingsCoordinator  : SettingsCoordinator
     
     var body: some Scene {
         MenuBarExtra {
@@ -19,6 +20,7 @@ struct ComfyTileMenuBar: Scene {
                     ComfyTileMenuBarContent()
                         .environment(defaultsManager)
                         .environment(fetchedWindowManager)
+                        .environment(settingsCoordinator)
                 }
                 .padding()
                 .environment(\.controlSize, .small)
@@ -37,7 +39,7 @@ struct ComfyTileMenuBarContent: View {
     
     @Environment(DefaultsManager.self) var defaultsManager
     @Environment(FetchedWindowManager.self) var fetchedWindowManager
-    @Environment(\.openWindow) var openWindow
+    @Environment(SettingsCoordinator.self) var settingsCoordinator
     
     var body: some View {
         @Bindable var defaultsManager = defaultsManager
@@ -105,8 +107,7 @@ struct ComfyTileMenuBarContent: View {
         .sectionBackground()
         
         Button(action: {
-            openWindow(id: "Settings")
-//            openSettings()
+            settingsCoordinator.openSettings()
         }) {
             Label("Settings", systemImage: "gear")
                 .foregroundStyle(.primary)
