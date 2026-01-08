@@ -3,12 +3,12 @@
     <channel>
         <title>ComfyTile</title>
         <item>
-            <title>1.0.3</title>
-            <pubDate>Thu, 08 Jan 2026 14:18:48 -0600</pubDate>
-            <sparkle:version>5</sparkle:version>
-            <sparkle:shortVersionString>1.0.3</sparkle:shortVersionString>
+            <title>0.1</title>
+            <pubDate>Thu, 08 Jan 2026 14:26:26 -0600</pubDate>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <enclosure url="ComfyTile-Installer.dmg" length="2852154" type="application/octet-stream"/>
+            <enclosure url="https://aryanrogye.github.io/ComfyTile/updates/ComfyTile-Installer.dmg" length="5380145" type="application/octet-stream" sparkle:edSignature="X5gQSeEBtB7IgAdbXIxi0rcPB9ghrR5wEcn8gFIxOcHtG+DrXiiByPrBMIWjDWBsJQBC5yYRyDA2SMyKGzjkCw=="/>
         </item>
     </channel>
 </rss>
