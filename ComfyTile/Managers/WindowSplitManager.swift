@@ -60,7 +60,6 @@ class WindowSplitManager {
             return
         }
         
-        let foc = WindowManagerHelpers.getFocusedWindow()
         if window.count == 1 {
             lastStartingPrimary = (lastStartingPrimary + 1) % window.count
         } else {

@@ -11,6 +11,7 @@
 		9B490C752F0B5FFF00963D05 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B490C742F0B5FFF00963D05 /* LocalShortcuts */; };
 		9B4E04B82E934B05001CF411 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9B4E04B72E934B05001CF411 /* Defaults */; };
 		9B8FBD922F0F033400CBF4B8 /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B8FBD912F0F033400CBF4B8 /* ComfyLogger */; };
+		9B8FBF1B2F1039BF00CBF4B8 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9B8FBF1A2F1039BF00CBF4B8 /* Sparkle */; };
 		9BF95F0E2E9326AE00776771 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B8FBF1B2F1039BF00CBF4B8 /* Sparkle in Frameworks */,
 				9B490C752F0B5FFF00963D05 /* LocalShortcuts in Frameworks */,
 				9B8FBD922F0F033400CBF4B8 /* ComfyLogger in Frameworks */,
 				9B4E04B82E934B05001CF411 /* Defaults in Frameworks */,
@@ -96,6 +98,7 @@
 				9B4E04B72E934B05001CF411 /* Defaults */,
 				9B490C742F0B5FFF00963D05 /* LocalShortcuts */,
 				9B8FBD912F0F033400CBF4B8 /* ComfyLogger */,
+				9B8FBF1A2F1039BF00CBF4B8 /* Sparkle */,
 			);
 			productName = TilingWIndowManager_Test;
 			productReference = 9BF95ECE2E9321E000776771 /* ComfyTile.app */;
@@ -130,6 +133,7 @@
 				9B4E04B62E934B05001CF411 /* XCRemoteSwiftPackageReference "Defaults" */,
 				9B490C732F0B5FFF00963D05 /* XCLocalSwiftPackageReference "LocalShortcuts" */,
 				9B8FBD902F0F033400CBF4B8 /* XCLocalSwiftPackageReference "ComfyLogger" */,
+				9B8FBF192F1039BF00CBF4B8 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9BF95ECF2E9321E000776771 /* Products */;
@@ -292,7 +296,7 @@
 				CODE_SIGN_ENTITLEMENTS = ComfyTile/ComfyTile.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = B9P888266K;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -310,7 +314,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aryanrogye.ComfyTile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -339,7 +343,7 @@
 				CODE_SIGN_ENTITLEMENTS = ComfyTile/ComfyTile.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = B9P888266K;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -357,7 +361,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aryanrogye.ComfyTile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -420,6 +424,14 @@
 				minimumVersion = 9.0.5;
 			};
 		};
+		9B8FBF192F1039BF00CBF4B8 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.1;
+			};
+		};
 		9BF95F0C2E9326AE00776771 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
@@ -443,6 +455,11 @@
 		9B8FBD912F0F033400CBF4B8 /* ComfyLogger */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ComfyLogger;
+		};
+		9B8FBF1A2F1039BF00CBF4B8 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9B8FBF192F1039BF00CBF4B8 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 		9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;

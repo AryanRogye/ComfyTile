@@ -7,6 +7,9 @@ xcuserdata/
 .netrc
 
 
+./updates/ComfyTile-Installer.dmg
+./updates/ComfyTile.app
+./updates/create_dmg.sh
 
 # Xcode
 DerivedData/
