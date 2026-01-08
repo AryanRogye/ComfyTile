@@ -1,9 +1,14 @@
-.DS_Store
-.build
+*.DS_Store
+
+ComfyLogger/build
+LocalShortcuts/build/
+
 /Packages
 xcuserdata/
-.swiftpm/configuration/registries.json
-.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+*.swiftpm/
+*.swiftpm/configuration/registries.json
+*.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
 
 

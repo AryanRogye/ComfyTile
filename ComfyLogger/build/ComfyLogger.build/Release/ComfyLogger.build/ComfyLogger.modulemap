@@ -1,4 +1,0 @@
-module ComfyLogger {
-header "ComfyLogger-Swift.h"
-export *
-}
