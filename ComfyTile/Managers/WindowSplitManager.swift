@@ -78,7 +78,9 @@ class WindowSplitManager {
 
             guard let foc = WindowManagerHelpers.getFocusedWindow() else { continue }
             
-            foc.element.setPosition(x: x, y: y)
+            let pos = WindowManagerHelpers.axPosition(for: NSRect(x: x, y: y, width: width, height: height), on: screen)
+            
+            foc.element.setPosition(x: pos.x, y: pos.y)
             
             try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
 
