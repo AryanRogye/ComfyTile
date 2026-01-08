@@ -12,6 +12,7 @@ extension ComfyLogger {
 }
 
 enum WindowSplitStyle {
+    case primaryOnly
     case primaryLeftStackedHorizontally
     case primaryRightStackedHorizontally
 }
@@ -28,20 +29,60 @@ class WindowSplitManager {
     func splitWindows(window: [FetchedWindow], style: WindowSplitStyle) async {
         ComfyLogger.WindowSplitManager.insert("Called Split In Space: \(window.count)")
         switch style {
+        case .primaryOnly:
+            await primaryOnlySplit(on: window)
         case .primaryLeftStackedHorizontally:
-            guard let primary = await createPrimarySplit(on: window, direction: .left) else { return }
+            let (foc, primary) = await createPrimarySplit(on: window, direction: .left)
+            
+            guard let primary, let foc else { return }
             if window.count == 1 { return }
             /// Primary left so stacked right
-            await calculateAndSetStacked(on: window, direction: .right, avoid: primary)
+            await calculateAndSetStacked(on: window, direction: .right, avoid: foc.element.frame)
+            primary.focusWindow()
             
         case .primaryRightStackedHorizontally:
-            guard let primary = await createPrimarySplit(on: window, direction: .right) else { return }
+            let (foc, primary) = await createPrimarySplit(on: window, direction: .right)
+            guard let primary, let foc else { return }
             if window.count == 1 { return }
             /// Primary left so stacked right
-            await calculateAndSetStacked(on: window, direction: .left, avoid: primary)
+            await calculateAndSetStacked(on: window, direction: .left, avoid: foc.element.frame)
+            primary.focusWindow()
         }
     }
     
+    private func primaryOnlySplit(on window: [FetchedWindow]) async {
+        if window.isEmpty {
+            print("Window is Empty")
+            return
+        }
+        guard let screen = WindowManagerHelpers.screenUnderMouse() else {
+            print("❌ Failed to determine screen under mouse")
+            return
+        }
+        
+        let foc = WindowManagerHelpers.getFocusedWindow()
+        if window.count == 1 {
+            lastStartingPrimary = (lastStartingPrimary + 1) % window.count
+        } else {
+            lastStartingPrimary = (lastStartingPrimary + 1) % window.count
+        }
+        
+        let frame = screen.visibleFrame
+        let pos = WindowManagerHelpers.axPosition(for: frame, on: screen)
+        
+        let primary = window[lastStartingPrimary]
+        primary.focusWindow()
+        
+        try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        guard let foc = WindowManagerHelpers.getFocusedWindow() else { return }
+        
+        foc.element.setPosition(x: pos.x, y: pos.y)
+        
+        try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        
+        foc.element.setSize(width: frame.width, height: frame.height)
+    }
+
     /// Calculate Horizontal Split Going Down
     /// Direction is if placing on left or right
     private func calculateAndSetStacked(on window: [FetchedWindow], direction: SplitDirection, avoid avoidRect: CGRect) async {
@@ -102,14 +143,14 @@ class WindowSplitManager {
         }
     }
     
-    private func createPrimarySplit(on window: [FetchedWindow], direction: SplitDirection) async -> CGRect? {
+    private func createPrimarySplit(on window: [FetchedWindow], direction: SplitDirection) async -> (FocusedWindow?, FetchedWindow?) {
         if window.isEmpty {
             print("Window is Empty")
-            return nil
+            return (nil, nil)
         }
         guard let screen = WindowManagerHelpers.screenUnderMouse() else {
             print("❌ Failed to determine screen under mouse")
-            return nil
+            return (nil, nil)
         }
         
 
@@ -137,7 +178,7 @@ class WindowSplitManager {
         try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
         
         /// Get Better Details When Focused
-        guard let foc = WindowManagerHelpers.getFocusedWindow() else { return nil }
+        guard let foc = WindowManagerHelpers.getFocusedWindow() else { return (nil, nil) }
 
         foc.element.setPosition(x: pos.x, y: pos.y)
         
@@ -148,7 +189,7 @@ class WindowSplitManager {
         try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
         
         if direction == .left {
-            return foc.element.frame
+            return (foc, primary)
         } else {
             
             let applied = foc.element.frame
@@ -170,7 +211,7 @@ class WindowSplitManager {
             
             try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
             
-            return foc.element.frame
+            return (foc, primary)
             
         }
     }

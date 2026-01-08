@@ -130,7 +130,6 @@ struct WindowManagerHelpers {
             kAXFocusedWindowAttribute as CFString,
             &focusedWindow
         )
-        
         // If that fails, stop.
         if result != .success {
             print("❌ Failed to get focused window: \(result)")

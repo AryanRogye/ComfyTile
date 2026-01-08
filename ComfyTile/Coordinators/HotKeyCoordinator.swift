@@ -31,6 +31,10 @@ extension KeyboardShortcuts.Name {
         .rightBracket,
         modifiers: [.control, .shift]
     ))
+    static let primaryTile = Self("PrimaryTile", default: Shortcut(
+        .space,
+        modifiers: [.control, .shift]
+    ))
 }
 
 extension KeyboardShortcuts.Name {
@@ -88,6 +92,7 @@ final class HotKeyCoordinator {
     init(
         onPrimaryLeftStackedHorizontallyTile : @escaping() -> Void = {},
         onPrimaryRightStackedHorizontallyTile: @escaping() -> Void = {},
+        onPrimaryTile                        : @escaping() -> Void = {},
         onWindowViewer      : @escaping () -> Void = {},
         onWindowViewerUp    : @escaping () -> Void = {},
         onWindowViewerEscapeEarly : @escaping () -> Void = {},
@@ -139,6 +144,9 @@ final class HotKeyCoordinator {
         }
         KeyboardShortcuts.onKeyDown(for: .primaryRightStackedHorizontallyTile) {
             onPrimaryRightStackedHorizontallyTile()
+        }
+        KeyboardShortcuts.onKeyDown(for: .primaryTile) {
+            onPrimaryTile()
         }
 
         KeyboardShortcuts.onKeyDown(for: .windowViewer) {
