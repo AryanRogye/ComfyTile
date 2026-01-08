@@ -6,6 +6,11 @@
 //
 
 import Cocoa
+import ComfyLogger
+
+extension ComfyLogger {
+    public static let WindowElement = ComfyLogger.Name("WindowElement")
+}
 
 class WindowElement {
     var element: AXUIElement?
@@ -26,6 +31,7 @@ class WindowElement {
         set {
             guard let newValue = newValue else { return }
             element?.setValue(.size, newValue)
+            ComfyLogger.WindowElement.insert("\(try? element?.title(), default: "-") Set Size: \(newValue)")
         }
     }
     
@@ -36,6 +42,7 @@ class WindowElement {
         set {
             guard let newValue = newValue else { return }
             element?.setValue(.position, newValue)
+            ComfyLogger.WindowElement.insert("\(try? element?.title(), default: "-") Set Position: \(newValue)")
         }
     }
     
