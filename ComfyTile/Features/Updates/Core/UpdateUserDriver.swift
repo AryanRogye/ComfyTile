@@ -5,19 +5,19 @@
 //  Created by Aryan Rogye on 1/8/26.
 //
 
-import SwiftUI
-import Sparkle
 import Combine
 import ComfyLogger
+import Sparkle
+import SwiftUI
 
 final class UpdateUserDriver: NSObject, SPUUserDriver {
-    
-    let vm : UpdaterViewModel
-    
+
+    let vm: UpdaterViewModel
+
     init(vm: UpdaterViewModel) {
         self.vm = vm
     }
-        
+
     // MARK: - Show
     /**
      * Show an updater permission request to the user
@@ -33,13 +33,12 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         _ request: SPUUpdatePermissionRequest
     ) async -> SUUpdatePermissionResponse {
         ComfyLogger.Updater.insert("Called to Show")
-        
+
         /// Send Request to VM, VM will handle showing it, and setting it back
         return await withCheckedContinuation { cont in
             vm.presentPermission(request, cont: cont)
         }
     }
-    
 
     // MARK: - showUserInitiatedUpdateCheck
     /**
@@ -52,7 +51,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
         ComfyLogger.Updater.insert("User Initiated Update Check")
         vm.showUserInitiatedUpdate(cancellation)
     }
-    
+
     // MARK: - showUpdateFound
     /**
      * Trigger for when a Update is found, we use this
@@ -74,7 +73,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
             )
         }
     }
-    
+
     // MARK: - showUpdateReleaseNotes
     // TODO: Show Update Release Notes in UI
     /**
@@ -89,10 +88,10 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func showUpdateReleaseNotes(
         with downloadData: SPUDownloadData
     ) {
-        
+        // Store for future use, not currently displayed in UI
+        vm.releaseNotesData = downloadData
     }
-    
-    
+
     // MARK: - showUpdateReleaseNotesFailedToDownloadWithError
     // TODO: Show Release Notes Error After Above is Done
     /**
@@ -107,9 +106,9 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func showUpdateReleaseNotesFailedToDownloadWithError(
         _ error: any Error
     ) {
-        
+        vm.showUpdateReleaseNotesError = true
     }
-    
+
     // MARK: - showUpdateNotFoundWithError
     /**
      * Show the user a new update was not found
@@ -121,12 +120,12 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
      */
     func showUpdateNotFoundWithError(_ error: any Error, acknowledgement: @escaping () -> Void) {
         ComfyLogger.Updater.insert("No update found: \(error.localizedDescription)")
+        vm.showUserInitiatedUpdate = false  // Must reset this first so phase shows .noUpdate
         vm.showUpdateNotFoundError = true
         vm.updateNotFoundError = error.localizedDescription
         acknowledgement()
     }
-    
-    
+
     // MARK: - showUpdaterError
     /**
      * Show the user an update error occurred
@@ -147,7 +146,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
 
         acknowledgement()
     }
-    
+
     // MARK: - showDownloadInitiated
     /**
      * Show the user that downloading the new update initiated
@@ -159,7 +158,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func showDownloadInitiated(cancellation: @escaping () -> Void) {
         vm.startedDownload(cancel: cancellation)
     }
-    
+
     // MARK: - showDownloadDidReceiveExpectedContentLength
     /**
      * Show the user the content length of the new update that will be downloaded
@@ -171,8 +170,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func showDownloadDidReceiveExpectedContentLength(_ expectedContentLength: UInt64) {
         vm.receivedDownloadContentSize(expectedContentLength)
     }
-    
-    
+
     // MARK: - showDownloadDidReceiveData
     /**
      * Show the user that the update download received more data
@@ -183,8 +181,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func showDownloadDidReceiveData(ofLength length: UInt64) {
         vm.updateDownloadReceive(length: length)
     }
-    
-    
+
     // MARK: - showDownloadDidStartExtractingUpdate
     /**
      * Show the user that the update finished downloading and started extracting
@@ -200,8 +197,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func showDownloadDidStartExtractingUpdate() {
         vm.startedExtraction()
     }
-    
-    
+
     // MARK: - showExtractionReceivedProgress
     /**
      * Show the user that the update is extracting with progress
@@ -215,14 +211,13 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     func showExtractionReceivedProgress(_ progress: Double) {
         vm.updateExtraction(progress: progress)
     }
-    
+
     // MARK: - showReadyToInstallAndRelaunch
     func showReadyToInstallAndRelaunch() async -> SPUUserUpdateChoice {
         /// for now just install it
         return .install
     }
-    
-    
+
     // MARK: - showInstallingUpdate
     /**
      * Show the user that the update is installing
@@ -247,8 +242,7 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
     ) {
         vm.startedInstalling()
     }
-    
-    
+
     // MARK: - showUpdateInstalledAndRelaunched
     /**
      * Show the user that the update installation finished
@@ -264,12 +258,13 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
      * @param relaunched Indicates if the update was relaunched.
      * @param acknowledgement Acknowledge to the updater that the finished installation was shown.
      */
-    func showUpdateInstalledAndRelaunched(_ relaunched: Bool, acknowledgement: @escaping () -> Void) {
+    func showUpdateInstalledAndRelaunched(_ relaunched: Bool, acknowledgement: @escaping () -> Void)
+    {
         ComfyLogger.Updater.insert("Update installed. relaunched=\(relaunched)")
         vm.resetUpdateUI()
         acknowledgement()
     }
-    
+
     // MARK: - dismissUpdateInstallation
     /**
      * Dismiss the current update installation
@@ -279,6 +274,16 @@ final class UpdateUserDriver: NSObject, SPUUserDriver {
      * Basically, stop everything that could have been started. Sparkle may invoke this when aborting or finishing an update.
      */
     func dismissUpdateInstallation() {
+        // Preserve "no update found" error so user can acknowledge it
+        let preserveNoUpdateError = vm.showUpdateNotFoundError
+        let preserveNoUpdateMessage = vm.updateNotFoundError
+
         vm.resetUpdateUI()
+
+        // Restore the error state if it was set
+        if preserveNoUpdateError {
+            vm.showUpdateNotFoundError = true
+            vm.updateNotFoundError = preserveNoUpdateMessage
+        }
     }
 }

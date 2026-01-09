@@ -5,13 +5,13 @@
 //  Created by Aryan Rogye on 1/8/26.
 //
 
-import Sparkle
 import Foundation
+import Sparkle
 
 @Observable
 @MainActor
 final class UpdaterViewModel {
-    
+
     enum UpdaterChoice {
         /// Downloads (if needed) and installs the update.
         case install
@@ -20,64 +20,69 @@ final class UpdaterViewModel {
         /// Dismisses the update until Sparkle reminds the user of it at a later time
         case dismiss
     }
-    
+
     /// Most likely will only be shown once, 2nd run of the app
     var showPermissionAlert: Bool = false
-    
+
     /// When User Initiates a "Check Update Exists"
     var showUserInitiatedUpdate: Bool = false
-    
+
     var showUpdateFound: Bool = false
-    
+
     /// Update Error if triggered "Check if Update"
     var showUpdateNotFoundError: Bool = false
     var updateNotFoundError: String? = nil
-    
+
     /// Downloading Related
     var updateDownloadStarted = false
     var downloadContentSize: UInt64?
     var downloadCurrentProgress: UInt64?
-    
+
     /// Update Error if downloading Error
-    var showUpdateError : Bool = false
+    var showUpdateError: Bool = false
     var updateErrorMessage: String? = nil
 
     /// Extraction Related
     var updateExtractionStarted = false
-    let maxExtraction : Double = 1.0
+    let maxExtraction: Double = 1.0
     var currentExtraction: Double? = nil
-    
+
     var installing: Bool = false
-    
+
     var appcast: SUAppcastItem?
     var updateState: SPUUserUpdateState?
-    
+
+    /// Release notes data (stored for future use, not currently displayed)
+    var releaseNotesData                : SPUDownloadData?
+    var showUpdateReleaseNotesError     : Bool = false
+    var updateReleaseNotesErrorMessage  : String? = nil
+
     @ObservationIgnored
     private var permissionContinuation: CheckedContinuation<SUUpdatePermissionResponse, Never>?
-    
+
     @ObservationIgnored
     private var updateFoundContinuation: CheckedContinuation<SPUUserUpdateChoice, Never>?
-    
+
     @ObservationIgnored
     private var updateReadyToInstallAndRelaunch: CheckedContinuation<SPUUserUpdateChoice, Never>?
 
     /// Use to Cancel User Initiated Update
     @ObservationIgnored
     var cancelUserInitiatedUpdate: () -> Void = { }
-    
+
     @ObservationIgnored
     var cancelDownloadInstall: () -> Void = { }
-    
+
     @ObservationIgnored
     var openMenuBar: () -> Void = { }
-    
+
     @ObservationIgnored
     var closeMenuBar: () -> Void = { }
-    
+
     public func startedInstalling() {
         installing = true
     }
-    
+
     public func resetProgressKeepUIVisible() {
         updateDownloadStarted = false
         downloadContentSize = nil
@@ -86,13 +91,13 @@ final class UpdaterViewModel {
         currentExtraction = nil
         installing = false
     }
-    
+
     public func resetUpdateUI() {
         permissionContinuation = nil
         updateFoundContinuation = nil
         updateReadyToInstallAndRelaunch = nil
-        cancelUserInitiatedUpdate = { }
-        cancelDownloadInstall = { }
+        cancelUserInitiatedUpdate = {}
+        cancelDownloadInstall = {}
         appcast = nil
         updateState = nil
         showPermissionAlert = false
@@ -113,7 +118,7 @@ final class UpdaterViewModel {
 
 // MARK: - Extraction
 extension UpdaterViewModel {
-    
+
     public func startedExtraction() {
         updateExtractionStarted = true
         updateDownloadStarted = false
@@ -121,16 +126,16 @@ extension UpdaterViewModel {
         downloadCurrentProgress = nil
         openMenuBar()
     }
-    
+
     public func updateExtraction(progress: Double) {
         currentExtraction = progress
     }
-    
+
 }
 
 // MARK: - Downloading
 extension UpdaterViewModel {
-    
+
     /**
      * Started Download Flag
      */
@@ -144,13 +149,13 @@ extension UpdaterViewModel {
         showUpdateError = false
         updateErrorMessage = nil
         openMenuBar()
-        
+
         cancelDownloadInstall = { [weak self] in
             self?.updateDownloadStarted = false
             cancel()
         }
     }
-    
+
     /**
      * What the max size of what we're going to download
      *
@@ -165,7 +170,7 @@ extension UpdaterViewModel {
         }
         downloadContentSize = size
     }
-    
+
     public func updateDownloadReceive(length: UInt64) {
         // Previous behavior:
         // if let downloadCurrentProgress {
@@ -180,7 +185,7 @@ extension UpdaterViewModel {
         }
 
         if let total = downloadContentSize,
-           let progress = downloadCurrentProgress,
+            let progress = downloadCurrentProgress,
            progress > total {
             downloadContentSize = progress
         }
@@ -189,7 +194,7 @@ extension UpdaterViewModel {
 
 // MARK: - Update Found {
 extension UpdaterViewModel {
-    
+
     /**
      * Present when a update is found
      * @param appcast info about the appcast we will install
@@ -204,7 +209,7 @@ extension UpdaterViewModel {
         self.appcast = appcast
         self.updateState = state
         updateFoundContinuation = cont
-        
+
         /// If User Initiated Update Cancel It
         if showUserInitiatedUpdate {
             cancelUserInitiatedUpdate()
@@ -220,17 +225,17 @@ extension UpdaterViewModel {
         choice: UpdaterChoice
     ) {
         guard let cont = updateFoundContinuation else { return }
-        
-        
+
+
         let result: SPUUserUpdateChoice = switch choice {
-        case .install: .install
-        case .skip: .skip
-        case .dismiss: .dismiss
-        }
-        
+            case .install: .install
+            case .skip: .skip
+            case .dismiss: .dismiss
+            }
+
         cont.resume(returning: result)
         updateFoundContinuation = nil
-        
+
         if choice != .install {
             appcast = nil
             updateState = nil
@@ -243,7 +248,7 @@ extension UpdaterViewModel {
     /// We Initiated a "Is there a Update"
     public func showUserInitiatedUpdate(_ completion: @escaping () -> Void) {
         showUserInitiatedUpdate = true
-        
+
         cancelUserInitiatedUpdate = { [weak self] in
             guard let self else { return }
             completion()
@@ -254,7 +259,7 @@ extension UpdaterViewModel {
 
 // MARK: - Onboarding
 extension UpdaterViewModel {
-    
+
     /**
      * Intro: How user wants to update our app
      * @param request unused
@@ -278,12 +283,12 @@ extension UpdaterViewModel {
         automaticUpdateChecks: Bool,
     ) {
         guard let cont = permissionContinuation else { return }
-        
+
         let result = SUUpdatePermissionResponse(
             automaticUpdateChecks: automaticUpdateChecks,
             sendSystemProfile: false
         )
-        
+
         cont.resume(returning: result)
         permissionContinuation = nil
         showPermissionAlert = false
@@ -295,37 +300,37 @@ extension UpdaterViewModel {
 extension UpdaterViewModel {
     enum Phase: Equatable {
         case idle
-        
+
         case permissionRequest
         case checkingUserInitiated
-        
+
         case updateFound(appcast: SUAppcastItem, state: SPUUserUpdateState)
-        
+
         case downloading(progress: UInt64, total: UInt64?)
         case extracting(progress: Double?)
         case installing
-        
+
         case noUpdate(message: String)
         case error(message: String)
     }
-    
+
     var phase: Phase {
-        
+
         /// Update Error if downloading Error "Happens Most Likely During Download"
         if showUpdateError, let msg = updateErrorMessage {
             return .error(message: msg)
         }
-        
+
         /// If Installing
         if installing {
             return .installing
         }
-        
+
         /// If Extracting
         if updateExtractionStarted {
             return .extracting(progress: currentExtraction)
         }
-        
+
         /// If Downloading
         if updateDownloadStarted {
             let p = downloadCurrentProgress ?? 0
@@ -334,25 +339,25 @@ extension UpdaterViewModel {
                 total: downloadContentSize
             )
         }
-        
+
         /// Update Found
         if let a = appcast, let s = updateState {
             return .updateFound(appcast: a, state: s)
         }
-        
+
         /// User Initiated Update
         if showUserInitiatedUpdate {
             return .checkingUserInitiated
         }
-        
+
         /// No Update Found
         if showUpdateNotFoundError {
             return .noUpdate(message: updateNotFoundError ?? "No update found")
         }
-        
+
         /// Show how user wants to check for updates, most likely this will be automatic
         if showPermissionAlert { return .permissionRequest }
-        
+
         return .idle
     }
 }

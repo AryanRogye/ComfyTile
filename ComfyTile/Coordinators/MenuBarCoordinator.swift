@@ -54,7 +54,7 @@ class MenuBarCoordinator: NSObject {
         configureStatusItem()
         configurePanel()
     }
-    
+
     private func configureClosures() {
         settingsVM?.openMenuBar = { [weak self] in
             guard let self else { return }
@@ -247,10 +247,28 @@ class MenuBarCoordinator: NSObject {
                     return event
                 }
 
-                // Check if click is outside the panel
-                if event.window != panel {
-                    self.hidePanel()
+                // Check if click is in the panel itself
+                if event.window == panel {
+                    return event
                 }
+
+                // Check if click is in a popover or child window (e.g., SwiftUI popover)
+                // SwiftUI popovers create separate windows with a higher level
+                if let clickedWindow = event.window {
+                    // Allow clicks in any window that appears to be a popover/child
+                    // Popovers have level >= panel level and are typically NSPanel subclasses
+                    if clickedWindow.level >= panel.level {
+                        return event
+                    }
+
+                    // Also check if it's a child window of the panel
+                    if panel.childWindows?.contains(clickedWindow) == true {
+                        return event
+                    }
+                }
+
+                // Click is outside all related windows - dismiss
+                self.hidePanel()
             }
 
             return event
