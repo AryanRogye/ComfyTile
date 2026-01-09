@@ -68,6 +68,12 @@ final class UpdaterViewModel {
     @ObservationIgnored
     var cancelDownloadInstall: () -> Void = { }
     
+    @ObservationIgnored
+    var openMenuBar: () -> Void = { }
+    
+    @ObservationIgnored
+    var closeMenuBar: () -> Void = { }
+    
     public func startedInstalling() {
         installing = true
     }
@@ -113,6 +119,7 @@ extension UpdaterViewModel {
         updateDownloadStarted = false
         downloadContentSize = nil
         downloadCurrentProgress = nil
+        openMenuBar()
     }
     
     public func updateExtraction(progress: Double) {
@@ -136,6 +143,7 @@ extension UpdaterViewModel {
         installing = false
         showUpdateError = false
         updateErrorMessage = nil
+        openMenuBar()
         
         cancelDownloadInstall = { [weak self] in
             self?.updateDownloadStarted = false
@@ -201,6 +209,8 @@ extension UpdaterViewModel {
         if showUserInitiatedUpdate {
             cancelUserInitiatedUpdate()
         }
+        /// Open Menubar When Found
+        openMenuBar()
     }
     /**
      * Let user click in UI
@@ -257,6 +267,8 @@ extension UpdaterViewModel {
         precondition(permissionContinuation == nil, "Permission already pending")
         showPermissionAlert = true
         permissionContinuation = cont
+        /// Open Menubar as prompt is there
+        openMenuBar()
     }
     /**
      * We send this back when user has decided how they want to update the app

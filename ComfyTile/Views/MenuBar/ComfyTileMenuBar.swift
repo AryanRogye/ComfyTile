@@ -14,6 +14,7 @@ import SwiftUI
     @Previewable @State var updateController = UpdateController()
     
     lazy var settingsCoordinator = SettingsCoordinator(
+        settingsVM: SettingsViewModel(),
         windowCoordinator: WindowCoordinator(),
         updateController: updateController,
         defaultsManager: defaultsManager

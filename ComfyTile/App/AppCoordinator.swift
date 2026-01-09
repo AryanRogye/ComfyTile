@@ -11,8 +11,9 @@ import Cocoa
 
 @MainActor
 class AppCoordinator {
-    
+
     /// Coordinators
+
     var updateController                = UpdateController()
     private var windowTilingCoordinator : WindowTilingCoordinator?
     private var hotKeyCoordinator       : HotKeyCoordinator?
@@ -20,30 +21,31 @@ class AppCoordinator {
     private var shortcutHUDCoordinator  : ShortcutHUDCoordinator
     private var windowViewerCoordinator : WindowViewerCoordinator
     private var windowCoordinator       = WindowCoordinator()
+    private var menuBarCoordinator      = MenuBarCoordinator()
     var settingsCoordinator             : SettingsCoordinator
-    
+
     /// View Models
     private var tilingCoverVM          : TilingCoverViewModel
     private var shortcutHUDVM          : ShortcutHUDViewModel
     private var windowViewerVM         : WindowViewerViewModel
-    
+    private var settingsVM             = SettingsViewModel()
+
     let windowSplitManager = WindowSplitManager()
-    
-    
-    private var permissionManager: PermissionService
-    var defaultsManager  : DefaultsManager
-    var fetchedWindowManager : FetchedWindowManager
-    
+
+    private var permissionManager : PermissionService
+    var defaultsManager           : DefaultsManager
+    var fetchedWindowManager      : FetchedWindowManager
+
     let appEnv : AppEnv
-    
+
     var cancellables: Set<AnyCancellable> = []
-    
+
     var numKeysHeld = 0
     var isHoldingModifier = false
-    
+
     deinit {
     }
-    
+
     init(appEnv: AppEnv) {
         permissionManager = PermissionService()
         self.appEnv = appEnv
@@ -57,7 +59,7 @@ class AppCoordinator {
         self.tilingCoverCoordinator = TilingCoverCoordinator(
             tilingCoverVM: tilingCoverVM
         )
-        
+
         self.shortcutHUDCoordinator = ShortcutHUDCoordinator(
             shortcutHUDVM: shortcutHUDVM
         )
@@ -66,12 +68,21 @@ class AppCoordinator {
             fetchedWindowManager: fetchedWindowManager
         )
         self.settingsCoordinator = SettingsCoordinator(
+            settingsVM: settingsVM,
             windowCoordinator: windowCoordinator,
             updateController: updateController,
             defaultsManager: defaultsManager
         )
-        
-        
+
+        // Start the AppKit-based menu bar
+        menuBarCoordinator.start(
+            settingsVM: settingsVM,
+            defaultsManager: defaultsManager,
+            fetchedWindowManager: fetchedWindowManager,
+            settingsCoordinator: settingsCoordinator,
+            updateController: updateController
+        )
+
         withObservationTracking { [weak self] in
             guard let self = self else { return }
             _ = self.defaultsManager.modiferKey
@@ -81,15 +92,14 @@ class AppCoordinator {
                 self.hotKeyCoordinator?.startModifier(with: self.defaultsManager.modiferKey)
             }
         }
-        
+
         windowTilingCoordinator = WindowTilingCoordinator(
             fetchedWindowManager: fetchedWindowManager,
             windowSplitManager: windowSplitManager,
             windowLayoutService: appEnv.windowLayoutService,
             defaultsManager: defaultsManager
         )
-        
-        
+
         hotKeyCoordinator = HotKeyCoordinator(
             onPrimaryLeftStackedHorizontallyTile: {
                 self.windowTilingCoordinator?.primaryLeftStackedHorizontallyTile()
@@ -103,7 +113,8 @@ class AppCoordinator {
             onWindowViewer: {
                 if self.windowViewerVM.isShown {
                     let nextIndex = self.windowViewerVM.selected + 1
-                    guard self.fetchedWindowManager.fetchedWindows.indices.contains(nextIndex) else {
+                    guard self.fetchedWindowManager.fetchedWindows.indices.contains(nextIndex)
+                    else {
                         /// If Next Index Doesnt Exist Start at 0 and return
                         self.windowViewerVM.selected = 0
                         return
@@ -123,7 +134,7 @@ class AppCoordinator {
                     print("Called onWindowViewerEscapeEarly")
                 }
             },
-            
+
             // MARK: - Modifier Key
             //                        onOptDoubleTapDown: {
             //                            self.isHoldingModifier = true
@@ -141,7 +152,7 @@ class AppCoordinator {
             //                            self.isHoldingModifier = false
             ////                            self.shortcutHUDCoordinator.hide()
             //                        },
-            
+
             // MARK: - Right Half
             onRightHalfDown: {
                 if self.defaultsManager.showTilingAnimations {
@@ -170,7 +181,7 @@ class AppCoordinator {
                     self.windowTilingCoordinator?.tileLeft()
                 }
             },
-            
+
             // MARK: - Center
             onCenterDown: {
                 if self.defaultsManager.showTilingAnimations {
@@ -185,7 +196,7 @@ class AppCoordinator {
                     self.windowTilingCoordinator?.tileCenter()
                 }
             },
-            
+
             // MARK: - Full Screen
             onMaximizeDown: {
                 if self.defaultsManager.showTilingAnimations {
@@ -194,15 +205,14 @@ class AppCoordinator {
                     }
                     self.numKeysHeld += 1
                 }
-                
+
             },
             onMaximizeUp: {
                 self.shouldCloseWith {
                     self.windowTilingCoordinator?.tileFullScreen()
                 }
             },
-            
-            
+
             // MARK: - Nudge From Bottom
             onNudgeBottomDownDown: {
                 self.windowTilingCoordinator?.nudgeBottomDown()
@@ -210,7 +220,7 @@ class AppCoordinator {
             onNudgeBottomUpDown: {
                 self.windowTilingCoordinator?.nudgeBottomUp()
             },
-            
+
             // MARK: - Nudge From Top
             onNudgeTopUpDown: {
                 self.windowTilingCoordinator?.nudgeTopUp()
@@ -219,14 +229,14 @@ class AppCoordinator {
                 self.windowTilingCoordinator?.nudgeTopDown()
             }
         )
-        
+
         self.hotKeyCoordinator?.startModifier(with: defaultsManager.modiferKey)
     }
-    
+
     private func showWith(rect: CGRect) {
         self.tilingCoverCoordinator.show(with: rect)
     }
-    
+
     private func shouldCloseWith(completion: @escaping () -> Void) {
         if !self.defaultsManager.showTilingAnimations {
             completion()
