@@ -8,7 +8,7 @@
             <sparkle:version>9</sparkle:version>
             <sparkle:shortVersionString>0.3</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://aryanrogye.github.io/ComfyTile/updates/ComfyTile-Installer.dmg" length="3821840" type="application/octet-stream" sparkle:edSignature="zPq1r1EbJsqihN7jzxutuCH4YW2IuOhyShKQcA8ij48PARgKei6gWlpJSfFuIl8+wWMwYdewFOCGh8QQJEgdAg=="/>
+            <enclosure url="https://github.com/AryanRogye/ComfyTile/releases/download/0.3/ComfyTile-Installer.dmg" length="3821840" type="application/octet-stream" sparkle:edSignature="zPq1r1EbJsqihN7jzxutuCH4YW2IuOhyShKQcA8ij48PARgKei6gWlpJSfFuIl8+wWMwYdewFOCGh8QQJEgdAg=="/>
         </item>
     </channel>
 </rss>
