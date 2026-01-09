@@ -12,7 +12,6 @@ import SwiftUI
 class MenuBarCoordinator: NSObject {
 
     // MARK: - Properties
-
     private var statusItem: NSStatusItem?
     private var panel: NSPanel?
     private var hostingController: NSHostingController<ComfyTileMenuBarRootView>?
@@ -130,22 +129,10 @@ class MenuBarCoordinator: NSObject {
         panel.backgroundColor = .clear
         panel.hasShadow = true
 
-        // Create a container view with the visual effect as the base
-        let containerView = NSView(frame: NSRect(x: 0, y: 0, width: 400, height: 300))
+        /// ContainerView can be .zero because SwiftUI decides the frame
+        let containerView = NSView(frame: .zero)
         containerView.wantsLayer = true
-        containerView.layer?.cornerRadius = 10
         containerView.layer?.masksToBounds = true
-
-        // Add visual effect view as the background
-        let visualEffectView = NSVisualEffectView(frame: containerView.bounds)
-        visualEffectView.autoresizingMask = [.width, .height]
-        visualEffectView.blendingMode = .behindWindow
-        visualEffectView.material = .menu
-        visualEffectView.state = .active
-        visualEffectView.wantsLayer = true
-        visualEffectView.layer?.cornerRadius = 10
-        visualEffectView.layer?.masksToBounds = true
-        containerView.addSubview(visualEffectView)
 
         // Add the hosting controller's view on top
         if let hostingView = hostingController?.view {

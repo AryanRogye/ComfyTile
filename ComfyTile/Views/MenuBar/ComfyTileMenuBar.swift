@@ -70,6 +70,7 @@ struct ComfyTileMenuBarRootView: View {
             ComfyTileUpdateView(updateController: updateController)
         }
         .frame(minWidth: 400, minHeight: 300)
+        .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 12))
     }
 }
 
