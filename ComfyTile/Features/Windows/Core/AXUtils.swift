@@ -5,6 +5,8 @@
 //  Created by Aryan Rogye on 11/2/25.
 //
 
+import Cocoa
+
 @MainActor
 struct AXUtils {
     public static func findMatchingAXWindow(

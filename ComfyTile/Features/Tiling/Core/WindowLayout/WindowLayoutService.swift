@@ -70,7 +70,7 @@ class WindowLayoutService: WindowLayoutProviding {
         let screen = focusedWindow.screen
         let frame = screen.visibleFrame
         
-        let pos = WindowManagerHelpers.axPosition(for: frame, on: screen)
+        let pos = frame.axPosition(on: screen)
         
         animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
             focusedWindow.element.setSize(
@@ -102,7 +102,7 @@ class WindowLayoutService: WindowLayoutProviding {
         
         /// Creating Target Rect
         let rect = NSRect(x: centeredOrigin.x, y: centeredOrigin.y, width: centeredSize.width, height: centeredSize.height)
-        let pos =  WindowManagerHelpers.axPosition(for: rect, on: screen)
+        let pos = rect.axPosition(on: screen)
         
         animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
             focusedWindow.element.setSize(
@@ -128,7 +128,7 @@ class WindowLayoutService: WindowLayoutProviding {
             height: frame.height
         )
         
-        let pos = WindowManagerHelpers.axPosition(for: rect, on: screen)
+        let pos = rect.axPosition(on: screen)
         
         animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
             focusedWindow.element.setSize(
@@ -155,7 +155,7 @@ class WindowLayoutService: WindowLayoutProviding {
             height: frame.height
         )
         
-        let pos = WindowManagerHelpers.axPosition(for: rect, on: screen)
+        let pos = rect.axPosition(on: screen)
         
         animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
             focusedWindow.element.setSize(
@@ -177,7 +177,7 @@ class WindowLayoutService: WindowLayoutProviding {
                     height: frame.height
                 )
                 
-                let targetPos = WindowManagerHelpers.axPosition(for: targetRect, on: screen)
+                let targetPos = targetRect.axPosition(on: screen)
 
                 focusedWindow.element.setPosition(x: targetPos.x, y: targetPos.y)
                 focusedWindow.element.setSize(width: targetRect.width, height: targetRect.height)

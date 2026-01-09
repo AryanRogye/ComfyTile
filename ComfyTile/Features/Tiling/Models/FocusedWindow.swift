@@ -9,6 +9,7 @@ import Cocoa
 
 
 class FocusedWindow {
+    /// More stronger element
     var element: WindowElement
     var screen: NSScreen
     

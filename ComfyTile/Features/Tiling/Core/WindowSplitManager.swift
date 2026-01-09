@@ -6,6 +6,7 @@
 //
 
 import ComfyLogger
+import Cocoa
 
 extension ComfyLogger {
     public static let WindowSplitManager = ComfyLogger.Name("WindowSplitManager")
@@ -67,7 +68,7 @@ class WindowSplitManager {
         }
         
         let frame = screen.visibleFrame
-        let pos = WindowManagerHelpers.axPosition(for: frame, on: screen)
+        let pos = frame.axPosition(on: screen)
         
         let primary = window[lastStartingPrimary]
         primary.focusWindow()
@@ -118,7 +119,8 @@ class WindowSplitManager {
 
             guard let foc = WindowManagerHelpers.getFocusedWindow() else { continue }
             
-            let pos = WindowManagerHelpers.axPosition(for: NSRect(x: x, y: y, width: width, height: height), on: screen)
+            let rect = NSRect(x: x, y: y, width: width, height: height)
+            let pos = rect.axPosition(on: screen)
             
             foc.element.setPosition(x: pos.x, y: pos.y)
             
@@ -134,7 +136,7 @@ class WindowSplitManager {
                 "\(w.bundleIdentifier) (Size) (Postion) Requested: (width: \(width), height: \(height))|(x: \(x), y: \(y))"
             )
             let appliedRect = foc.element.frame
-            let appliedPos = WindowManagerHelpers.axPosition(for: appliedRect, on: screen)
+            let appliedPos = appliedRect.axPosition(on: screen)
             
             ComfyLogger.WindowSplitManager.insert(
                 "\(w.bundleIdentifier) Applied  : (width: \(appliedRect.width), height: \(appliedRect.height)) | (x: \(appliedPos.x), y: \(appliedPos.y))"
@@ -168,7 +170,7 @@ class WindowSplitManager {
         
         /// Create a rect
         let rect = NSRect(x: newX, y: newY, width: newWidth, height: newHeight)
-        let pos = WindowManagerHelpers.axPosition(for: rect, on: screen)
+        let pos = rect.axPosition(on: screen)
         
         let primary = window[lastStartingPrimary]
         /// Focus
@@ -202,7 +204,7 @@ class WindowSplitManager {
                 height: screenFrame.height
             )
             
-            let targetPos = WindowManagerHelpers.axPosition(for: targetRect, on: screen)
+            let targetPos = targetRect.axPosition(on: screen)
             
             // Apply
             foc.element.setPosition(x: targetPos.x, y: targetPos.y)

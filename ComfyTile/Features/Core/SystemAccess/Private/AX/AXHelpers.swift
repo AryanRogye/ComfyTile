@@ -1,5 +1,5 @@
 //
-//  PrivateAPIs.swift
+//  AXHelpers.swift
 //  ComfyTile
 //  Copyright (C) 2025 Aryan Rogye
 //  SPDX-License-Identifier: GPL-3.0-or-later
@@ -18,43 +18,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
-import Foundation
-import ApplicationServices.HIServices.AXActionConstants
-import ApplicationServices.HIServices.AXAttributeConstants
-import ApplicationServices.HIServices.AXError
-import ApplicationServices.HIServices.AXRoleConstants
-import ApplicationServices.HIServices.AXUIElement
-import ApplicationServices.HIServices.AXValue
+import ApplicationServices
 import Cocoa
-
-@_silgen_name("_AXUIElementCreateWithRemoteToken")
-func _AXUIElementCreateWithRemoteToken(_ token: CFData) -> Unmanaged<AXUIElement>?
-
-
-struct CGSWindowCaptureOptions: OptionSet {
-    let rawValue: UInt32
-    
-    static let ignoreGlobalClipShape = CGSWindowCaptureOptions(rawValue: 1 << 11)
-    static let nominalResolution = CGSWindowCaptureOptions(rawValue: 1 << 9)
-    static let bestResolution = CGSWindowCaptureOptions(rawValue: 1 << 8)
-    static let fullSize = CGSWindowCaptureOptions(rawValue: 1 << 19)
-}
-
-//let kCGSAllSpacesMask: CGSSpaceMask = 0xFFFF_FFFF_FFFF_FFFF
-let kCGSAllSpacesMask: CGSSpaceMask = 125
-let kAXFullscreenAttribute = "AXFullScreen"
-let kAXWindowNumberAttribute = "AXWindowNumber" as CFString
-
-@_silgen_name("CGSCopySpacesForWindows")
-func CGSCopySpacesForWindows(
-    _ cid: CGSConnectionID,
-    _ mask: CGSSpaceMask,
-    _ windowIDs: CFArray
-) -> Unmanaged<CFArray>?
-
-
-
 
 extension AXValue {
     func toValue<T>() -> T? {
@@ -72,8 +37,6 @@ extension AXValue {
         }
     }
 }
-
-
 
 /// Stripped out version from DockDoor
 extension AXUIElement {
@@ -110,7 +73,7 @@ extension AXUIElement {
     func setValue(_ attribute: NSAccessibility.Attribute, _ value: AnyObject) {
         AXUIElementSetAttributeValue(self, attribute.rawValue as CFString, value)
     }
-
+    
     
     func getWrappedValue<T>(_ attribute: NSAccessibility.Attribute) -> T? {
         guard let value = getValue(attribute), CFGetTypeID(value) == AXValueGetTypeID() else { return nil }

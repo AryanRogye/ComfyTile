@@ -7,7 +7,7 @@
 
 import Combine
 import Observation
-
+import Cocoa
 
 @MainActor
 class AppCoordinator {

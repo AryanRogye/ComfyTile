@@ -8,71 +8,6 @@
 import Sparkle
 import Foundation
 
-extension UpdaterViewModel {
-    enum Phase: Equatable {
-        case idle
-        
-        case permissionRequest
-        case checkingUserInitiated
-        
-        case updateFound(appcast: SUAppcastItem, state: SPUUserUpdateState)
-        
-        case downloading(progress: UInt64, total: UInt64?)
-        case extracting(progress: Double?)
-        case installing
-        
-        case noUpdate(message: String)
-        case error(message: String)
-    }
-    
-    var phase: Phase {
-        
-        /// Update Error if downloading Error "Happens Most Likely During Download"
-        if showUpdateError, let msg = updateErrorMessage {
-            return .error(message: msg)
-        }
-        
-        /// If Installing
-        if installing {
-            return .installing
-        }
-        
-        /// If Extracting
-        if updateExtractionStarted {
-            return .extracting(progress: currentExtraction)
-        }
-        
-        /// If Downloading
-        if updateDownloadStarted {
-            let p = downloadCurrentProgress ?? 0
-            return .downloading(
-                progress: p,
-                total: downloadContentSize
-            )
-        }
-        
-        /// Update Found
-        if let a = appcast, let s = updateState {
-            return .updateFound(appcast: a, state: s)
-        }
-        
-        /// User Initiated Update
-        if showUserInitiatedUpdate {
-            return .checkingUserInitiated
-        }
-        
-        /// No Update Found
-        if showUpdateNotFoundError {
-            return .noUpdate(message: updateNotFoundError ?? "No update found")
-        }
-        
-        /// Show how user wants to check for updates, most likely this will be automatic
-        if showPermissionAlert { return .permissionRequest }
-        
-        return .idle
-    }
-}
-
 @Observable
 @MainActor
 final class UpdaterViewModel {
@@ -340,5 +275,72 @@ extension UpdaterViewModel {
         cont.resume(returning: result)
         permissionContinuation = nil
         showPermissionAlert = false
+    }
+}
+
+
+// MARK: - View Helper
+extension UpdaterViewModel {
+    enum Phase: Equatable {
+        case idle
+        
+        case permissionRequest
+        case checkingUserInitiated
+        
+        case updateFound(appcast: SUAppcastItem, state: SPUUserUpdateState)
+        
+        case downloading(progress: UInt64, total: UInt64?)
+        case extracting(progress: Double?)
+        case installing
+        
+        case noUpdate(message: String)
+        case error(message: String)
+    }
+    
+    var phase: Phase {
+        
+        /// Update Error if downloading Error "Happens Most Likely During Download"
+        if showUpdateError, let msg = updateErrorMessage {
+            return .error(message: msg)
+        }
+        
+        /// If Installing
+        if installing {
+            return .installing
+        }
+        
+        /// If Extracting
+        if updateExtractionStarted {
+            return .extracting(progress: currentExtraction)
+        }
+        
+        /// If Downloading
+        if updateDownloadStarted {
+            let p = downloadCurrentProgress ?? 0
+            return .downloading(
+                progress: p,
+                total: downloadContentSize
+            )
+        }
+        
+        /// Update Found
+        if let a = appcast, let s = updateState {
+            return .updateFound(appcast: a, state: s)
+        }
+        
+        /// User Initiated Update
+        if showUserInitiatedUpdate {
+            return .checkingUserInitiated
+        }
+        
+        /// No Update Found
+        if showUpdateNotFoundError {
+            return .noUpdate(message: updateNotFoundError ?? "No update found")
+        }
+        
+        /// Show how user wants to check for updates, most likely this will be automatic
+        if showPermissionAlert { return .permissionRequest }
+        
+        return .idle
     }
 }

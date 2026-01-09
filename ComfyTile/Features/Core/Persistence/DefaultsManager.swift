@@ -1,19 +1,12 @@
 //
-//  Defaults.swift
+//  DefaultsManager.swift
 //  ComfyTile
 //
-//  Created by Aryan Rogye on 10/5/25.
+//  Created by Aryan Rogye on 1/9/26.
 //
 
 import Defaults
-import Combine
 import Foundation
-
-extension Defaults.Keys {
-    static let nudgeStep = Key<Int>("NudgeStep", default: 2)
-    static let modiferKey = Key<String>("ModiferKey", default: "Control")
-    static let showTilingAnimations = Key<Bool>("ShowTilingAnimations", default: true)
-}
 
 @Observable @MainActor
 class DefaultsManager {

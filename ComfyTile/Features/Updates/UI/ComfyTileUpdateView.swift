@@ -8,6 +8,7 @@
 import SwiftUI
 import Sparkle
 
+/// Shown in MenuBar
 struct ComfyTileUpdateView: View {
     @Bindable var updateController: UpdateController
     
