@@ -214,14 +214,32 @@ extension UpdaterViewModel {
      * @param size the max size
      */
     public func receivedDownloadContentSize(_ size: UInt64) {
+        // Previous behavior:
+        // downloadContentSize = size
+        guard size > 0, size < UInt64.max else {
+            downloadContentSize = nil
+            return
+        }
         downloadContentSize = size
     }
     
     public func updateDownloadReceive(length: UInt64) {
-        if let downloadCurrentProgress {
-            self.downloadCurrentProgress! += length
+        // Previous behavior:
+        // if let downloadCurrentProgress {
+        //     self.downloadCurrentProgress! += length
+        // } else {
+        //     downloadCurrentProgress = length
+        // }
+        if let current = downloadCurrentProgress {
+            downloadCurrentProgress = current + length
         } else {
             downloadCurrentProgress = length
+        }
+
+        if let total = downloadContentSize,
+           let progress = downloadCurrentProgress,
+           progress > total {
+            downloadContentSize = progress
         }
     }
 }
