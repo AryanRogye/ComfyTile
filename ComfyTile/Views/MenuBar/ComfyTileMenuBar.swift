@@ -7,14 +7,55 @@
 
 import SwiftUI
 
-struct ComfyTileMenuBar: Scene {
+#Preview {
     
-    @Bindable var defaultsManager      : DefaultsManager
-    @Bindable var fetchedWindowManager : FetchedWindowManager
-    @Bindable var settingsCoordinator  : SettingsCoordinator
+    @Previewable @State var defaultsManager = DefaultsManager()
+    @Previewable @State var fetchedWindowManager = FetchedWindowManager()
+    @Previewable @State var updateController = UpdateController()
+    
+    lazy var settingsCoordinator = SettingsCoordinator(
+        windowCoordinator: WindowCoordinator(),
+        updateController: updateController,
+        defaultsManager: defaultsManager
+    )
+    
+    ComfyTileMenuBarRootView(
+        defaultsManager: defaultsManager,
+        fetchedWindowManager: fetchedWindowManager,
+        settingsCoordinator: settingsCoordinator,
+        updateController: updateController,
+    )
+}
+
+struct ComfyTileMenuBar: Scene {
+    @Bindable var defaultsManager: DefaultsManager
+    @Bindable var fetchedWindowManager: FetchedWindowManager
+    @Bindable var settingsCoordinator: SettingsCoordinator
+    @Bindable var updateController: UpdateController
     
     var body: some Scene {
         MenuBarExtra {
+            ComfyTileMenuBarRootView(
+                defaultsManager: defaultsManager,
+                fetchedWindowManager: fetchedWindowManager,
+                settingsCoordinator: settingsCoordinator,
+                updateController: updateController
+            )
+        } label: {
+            Image("ComfyTileMenuBar").renderingMode(.template)
+        }
+        .menuBarExtraStyle(.window)
+    }
+}
+
+struct ComfyTileMenuBarRootView: View {
+    @Bindable var defaultsManager: DefaultsManager
+    @Bindable var fetchedWindowManager: FetchedWindowManager
+    @Bindable var settingsCoordinator: SettingsCoordinator
+    @Bindable var updateController: UpdateController
+    
+    var body: some View {
+        VStack(spacing: 0) {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading) {
                     ComfyTileMenuBarContent()
@@ -25,21 +66,19 @@ struct ComfyTileMenuBar: Scene {
                 .padding()
                 .environment(\.controlSize, .small)
             }
-            .frame(minWidth: 400, minHeight: 300)
-        } label: {
-            Image("ComfyTileMenuBar")
-                .renderingMode(.template)
+            ComfyTileUpdateView(updateController: updateController)
         }
-        .menuBarExtraStyle(.window)
-        
+        .frame(minWidth: 400, minHeight: 300)
     }
 }
+
 
 struct ComfyTileMenuBarContent: View {
     
     @Environment(DefaultsManager.self) var defaultsManager
     @Environment(FetchedWindowManager.self) var fetchedWindowManager
     @Environment(SettingsCoordinator.self) var settingsCoordinator
+    
     
     var body: some View {
         @Bindable var defaultsManager = defaultsManager
@@ -50,8 +89,7 @@ struct ComfyTileMenuBarContent: View {
                 await fetchedWindowManager.loadWindows()
             }
         }) {
-                Label("Refresh", systemImage: "arrow.clockwise")
-            
+            Label("Refresh", systemImage: "arrow.clockwise")
         }
         
         ShortcutRecorder(label: "Window Viewer", type: .windowViewer)

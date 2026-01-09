@@ -24,7 +24,8 @@ struct ComfyTileApp: App {
         ComfyTileMenuBar(
             defaultsManager: appDelegate.appCoordinator.defaultsManager,
             fetchedWindowManager: appDelegate.appCoordinator.fetchedWindowManager,
-            settingsCoordinator : appDelegate.appCoordinator.settingsCoordinator
+            settingsCoordinator : appDelegate.appCoordinator.settingsCoordinator,
+            updateController: appDelegate.appCoordinator.updateController
         )
     }
 }

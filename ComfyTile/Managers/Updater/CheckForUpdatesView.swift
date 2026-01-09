@@ -1,33 +1,15 @@
 //
-//  Updater.swift
+//  CheckForUpdatesView.swift
 //  ComfyTile
 //
 //  Created by Aryan Rogye on 1/8/26.
 //
 
-import SwiftUI
 import Sparkle
+import SwiftUI
 import Combine
 
-@Observable
-final class UpdateController {
-    
-    @ObservationIgnored
-    private let updaterController: SPUStandardUpdaterController
-    
-    public func updateController() -> SPUStandardUpdaterController {
-        return updaterController
-    }
-    
-    init() {
-        updaterController = SPUStandardUpdaterController(
-            startingUpdater: true,
-            updaterDelegate: nil,
-            userDriverDelegate: nil
-        )
-    }
-}
-
+/// ViewModel for CheckForUpdateView
 final class Updater: ObservableObject {
     @Published var canCheckForUpdates = false
     

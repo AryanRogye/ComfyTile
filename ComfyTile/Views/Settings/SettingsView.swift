@@ -40,7 +40,9 @@ struct SettingsView: View {
             case .logs:
                 ComfyLogger.ComfyLoggerView(
                     names: [
-                        ComfyLogger.WindowSplitManager
+                        ComfyLogger.WindowSplitManager,
+                        ComfyLogger.Updater,
+                        ComfyLogger.WindowElement
                     ]
                 )
             }
@@ -83,11 +85,41 @@ struct GeneralSettings: View {
                     Spacer()
                     appBuild
                 }
-                CheckForUpdatesView(updater: updateController.updateController().updater)
+                
+                if let updateNotFoundError = updateController.updaterVM.updateNotFoundError,
+                    updateController.updaterVM.showUpdateNotFoundError {
+                    Text(updateNotFoundError)
+                    Button {
+                        updateController.updaterVM.updateNotFoundError = nil
+                        updateController.updaterVM.showUpdateNotFoundError = false
+                        updateController.updaterVM.showUserInitiatedUpdate = false
+                    } label: {
+                        Text("Ok")
+                    }
+                } else {
+                    if updateController.updaterVM.showUserInitiatedUpdate {
+                        HStack {
+                            Button {
+                                updateController.updaterVM.cancelUserInitiatedUpdate()
+                            } label: {
+                                Text("Cancel")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            
+                            ProgressView()
+                                .progressViewStyle(.linear)
+                                .frame(maxWidth: .infinity)
+                        }
+                        
+                    } else {
+                        CheckForUpdatesView(updater: updateController.updater)
+                    }
+                }
             }
         }
         .formStyle(.grouped)
         .frame(minWidth: 500, minHeight: 500)
+        .animation(.easeInOut, value: updateController.updaterVM.showUserInitiatedUpdate)
     }
 }
 

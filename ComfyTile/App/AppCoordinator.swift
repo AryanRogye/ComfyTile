@@ -13,7 +13,7 @@ import Observation
 class AppCoordinator {
     
     /// Coordinators
-    private var updateController        = UpdateController()
+    var updateController                = UpdateController()
     private var windowTilingCoordinator : WindowTilingCoordinator?
     private var hotKeyCoordinator       : HotKeyCoordinator?
     private var tilingCoverCoordinator  : TilingCoverCoordinator
