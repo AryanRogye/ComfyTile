@@ -11,115 +11,53 @@ import Sparkle
 
 enum SettingsTab: String, CaseIterable {
     case general = "General"
-    case logs = "Logs"
 }
 
 struct SettingsView: View {
     
-    @State private var selectedTab: SettingsTab = .general
     @Environment(DefaultsManager.self) var defaultsManager
+    @Environment(SettingsViewModel.self) var settingsVM
+    
+    private var borderColor: Color {
+        Color.secondary
+    }
+    private var strokeColor: Color {
+        borderColor.opacity(0.2)
+    }
     
     var body: some View {
-        @Bindable var defaultsManager = defaultsManager
-        NavigationSplitView {
-            List(selection: $selectedTab) {
-                ForEach(SettingsTab.allCases, id: \.self) { tab in
-                    // Use NavigationLink or Text with tag for selection
-                    NavigationLink(value: tab) {
-                        Text(tab.rawValue)
-                    }
+        @Bindable var settingsVM = settingsVM
+        VStack(spacing: 0){
+            if defaultsManager.comfyTileTabPlacement == .bottom {
+                SettingsTopBar() {
+                    settingsVM.isSidebarOpen.toggle()
                 }
+                .transition(.move(edge: .bottom).combined(with: .slide))
             }
-            .navigationSplitViewColumnWidth(min: 200, ideal: 250) // Optional styling
             
-        } detail: {
-            // 2. The actual view content goes in detail
-            switch selectedTab {
-            case .general:
-                GeneralSettings(defaultsManager: defaultsManager)
-            case .logs:
-                ComfyLogger.ComfyLoggerView(
-                    names: [
-                        ComfyLogger.WindowSplitManager,
-                        ComfyLogger.Updater,
-                        ComfyLogger.WindowElement
-                    ]
-                )
-            }
-        }
-    }
-}
-
-struct GeneralSettings: View {
-    
-    @Environment(UpdateController.self) var updateController
-    @Bindable var defaultsManager : DefaultsManager
-    
-    // MARK: - App Version Number
-    private var appVersion: some View {
-        Text("\(Bundle.main.versionNumber)")
-            .font(.system(size: 13, weight: .medium))
-            .foregroundColor(.primary)
-    }
-    
-    // MARK: - App Build Number
-    private var appBuild: some View {
-        Text("\(Bundle.main.buildNumber)")
-            .font(.system(size: 13, weight: .medium))
-            .foregroundColor(.primary)
-    }
-    
-    var body: some View {
-        Form {
-            Section("Animations") {
-                Toggle("Tiling Animations", isOn: $defaultsManager.showTilingAnimations).toggleStyle(.switch)
-            }
-            Section("About") {
-                HStack {
-                    Text("Version")
-                    Spacer()
-                    appVersion
-                }
-                HStack {
-                    Text("Build")
-                    Spacer()
-                    appBuild
+            HStack(spacing: 0) {
+                if settingsVM.isSidebarOpen {
+                    SettingsSidebar(selected: $settingsVM.selectedTab)
+                        .transition(.move(edge: .leading))
                 }
                 
-                if let updateNotFoundError = updateController.updaterVM.updateNotFoundError,
-                    updateController.updaterVM.showUpdateNotFoundError {
-                    Text(updateNotFoundError)
-                    Button {
-                        updateController.updaterVM.updateNotFoundError = nil
-                        updateController.updaterVM.showUpdateNotFoundError = false
-                        updateController.updaterVM.showUserInitiatedUpdate = false
-                    } label: {
-                        Text("Ok")
-                    }
-                } else {
-                    if updateController.updaterVM.showUserInitiatedUpdate {
-                        HStack {
-                            Button {
-                                updateController.updaterVM.cancelUserInitiatedUpdate()
-                            } label: {
-                                Text("Cancel")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            
-                            ProgressView()
-                                .progressViewStyle(.linear)
-                                .frame(maxWidth: .infinity)
-                        }
-                        
-                    } else {
-                        CheckForUpdatesView(updater: updateController.updater)
-                    }
+                VStack{strokeColor}.frame(maxWidth: 0.5)
+                
+                VStack {
+                    SettingsContent()
                 }
             }
+            .animation(.snappy, value: settingsVM.isSidebarOpen)
+            
+            
+            if defaultsManager.comfyTileTabPlacement == .top {
+                SettingsTopBar() {
+                    settingsVM.isSidebarOpen.toggle()
+                }
+                .transition(.move(edge: .bottom).combined(with: .slide))
+            }
         }
-        .formStyle(.grouped)
-        .frame(minWidth: 500, minHeight: 500)
-        .animation(.easeInOut, value: updateController.updaterVM.showUserInitiatedUpdate)
+        .animation(.snappy(duration: 0.15, extraBounce: 0.1), value: defaultsManager.comfyTileTabPlacement)
     }
 }
 

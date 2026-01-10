@@ -21,10 +21,10 @@ class MenuBarCoordinator: NSObject {
     private var globalEventMonitor: Any?
 
     /// Dependencies
+    private var comfyTileMenuBarVM      : ComfyTileMenuBarViewModel?
     private var settingsVM     : SettingsViewModel?
     private var defaultsManager: DefaultsManager?
     private var fetchedWindowManager: FetchedWindowManager?
-    private var settingsCoordinator: SettingsCoordinator?
     private var updateController: UpdateController?
 
     // MARK: - Initialization
@@ -37,16 +37,16 @@ class MenuBarCoordinator: NSObject {
 
     /// Start the menu bar coordinator with required dependencies
     public func start(
+        comfyTileMenuBarVM      : ComfyTileMenuBarViewModel,
         settingsVM              : SettingsViewModel,
         defaultsManager         : DefaultsManager,
         fetchedWindowManager    : FetchedWindowManager,
-        settingsCoordinator     : SettingsCoordinator,
         updateController        : UpdateController
     ) {
+        self.comfyTileMenuBarVM     = comfyTileMenuBarVM
         self.settingsVM             = settingsVM
         self.defaultsManager        = defaultsManager
         self.fetchedWindowManager   = fetchedWindowManager
-        self.settingsCoordinator    = settingsCoordinator
         self.updateController       = updateController
 
         configureClosures()
@@ -95,28 +95,30 @@ class MenuBarCoordinator: NSObject {
     // MARK: - Panel Configuration
 
     private func configurePanel() {
-        guard let defaultsManager = defaultsManager,
-            let fetchedWindowManager = fetchedWindowManager,
-            let settingsCoordinator = settingsCoordinator,
-            let updateController = updateController
+        guard let comfyTileMenuBarVM = comfyTileMenuBarVM,
+              let settingsVM = settingsVM,
+              let defaultsManager = defaultsManager,
+              let fetchedWindowManager = fetchedWindowManager,
+              let updateController = updateController
         else {
             return
         }
 
         // Create the SwiftUI content view
         let contentView = ComfyTileMenuBarRootView(
+            settingsVM: settingsVM,
+            comfyTileMenuBarVM: comfyTileMenuBarVM,
             defaultsManager: defaultsManager,
             fetchedWindowManager: fetchedWindowManager,
-            settingsCoordinator: settingsCoordinator,
             updateController: updateController
         )
 
         // Create hosting controller
         hostingController = NSHostingController(rootView: contentView)
 
-        // Create a borderless, floating panel
+        // Create a borderless, floating panel with size from comfyTileMenuBarVM
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
+            contentRect: NSRect(x: 0, y: 0, width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height),
             styleMask: [.nonactivatingPanel, .borderless],
             backing: .buffered,
             defer: false
@@ -129,12 +131,10 @@ class MenuBarCoordinator: NSObject {
         panel.backgroundColor = .clear
         panel.hasShadow = true
 
-        /// ContainerView can be .zero because SwiftUI decides the frame
-        let containerView = NSView(frame: .zero)
+        let containerView = NSView(frame: NSRect(x: 0, y: 0, width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height))
         containerView.wantsLayer = true
         containerView.layer?.masksToBounds = true
 
-        // Add the hosting controller's view on top
         if let hostingView = hostingController?.view {
             hostingView.frame = containerView.bounds
             hostingView.autoresizingMask = [.width, .height]
@@ -144,6 +144,7 @@ class MenuBarCoordinator: NSObject {
         panel.contentView = containerView
 
         self.panel = panel
+        self.comfyTileMenuBarVM?.panel = panel
     }
 
     // MARK: - Panel Toggle

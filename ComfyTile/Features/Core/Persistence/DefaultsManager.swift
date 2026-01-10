@@ -20,6 +20,12 @@ class DefaultsManager {
         }
     }
     
+    var comfyTileTabPlacement: ComfyTileTabPlacement = Defaults[.comfyTileTabPlacement] {
+        didSet {
+            Defaults[.comfyTileTabPlacement] = comfyTileTabPlacement
+        }
+    }
+    
     public func saveModiferKey() {
         Defaults[.modiferKey] = modiferKey.rawValue
     }

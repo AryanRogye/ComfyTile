@@ -12,12 +12,6 @@ extension ComfyLogger {
     public static let WindowSplitManager = ComfyLogger.Name("WindowSplitManager")
 }
 
-enum WindowSplitStyle {
-    case primaryOnly
-    case primaryLeftStackedHorizontally
-    case primaryRightStackedHorizontally
-}
-
 class WindowSplitManager {
     
     var lastStartingPrimary : Int = -1
@@ -27,7 +21,7 @@ class WindowSplitManager {
         case right
     }
     
-    func splitWindows(window: [FetchedWindow], style: WindowSplitStyle) async {
+    func splitWindows(window: [FetchedWindow], style: LayoutMode) async {
         ComfyLogger.WindowSplitManager.insert("Called Split In Space: \(window.count)")
         switch style {
         case .primaryOnly:

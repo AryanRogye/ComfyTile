@@ -11,4 +11,7 @@ import Foundation
 @MainActor
 final class SettingsViewModel {
     var openMenuBar: () -> Void = {}
+    
+    var selectedTab: SettingsTab = .general
+    var isSidebarOpen = true
 }
