@@ -6,15 +6,24 @@
 //
 
 import SwiftUI
+import KeyboardShortcuts
 
 struct LayoutModeView: View {
     var body: some View {
-        ScrollView {
+        MenuBarContainer {
             ForEach(LayoutMode.allCases, id: \.self) { layout in
-                Text(layout.rawValue)
-                    .frame(maxWidth: .infinity)
+                ShortcutEditableRow(
+                    roundTop: layout == LayoutMode.allCases.first!,
+                    title: layout.rawValue,
+                    editLabel: "Shortcut for \(layout.rawValue)",
+                    hotkey: layout.hotkey,
+                    idPrefix: "layout-\(layout.rawValue)",
+                    icon: { EmptyView() },
+                    helpText: "Edit Shortcut"
+                )
+                .listRowInsets(.init())
+                .listRowBackground(Color.clear)
             }
         }
-        .frame(maxWidth: .infinity)
     }
 }

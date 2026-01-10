@@ -57,6 +57,10 @@ struct GeneralSettings: View {
                         CheckForUpdatesView(updater: updateController.updater)
                     }
                 }
+                
+                Button("Quit") {
+                    NSApplication.shared.terminate(self)
+                }
             }
         }
         .formStyle(.grouped)

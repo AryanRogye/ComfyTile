@@ -11,7 +11,7 @@ import SwiftUI
 @Observable
 @MainActor
 final class ComfyTileMenuBarViewModel {
-    var width: CGFloat = 400
+    var width: CGFloat = 350
     var height: CGFloat = 300
     
     var selectedTab: ComfyTileTabs = .tile
@@ -38,7 +38,7 @@ extension ComfyTileMenuBarViewModel {
                     }
                 } else {
                     withAnimation(.snappy) {
-                        self.width = 400
+                        self.width = 350
                         self.height = 300
                     }
                 }
