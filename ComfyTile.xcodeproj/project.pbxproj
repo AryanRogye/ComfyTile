@@ -75,6 +75,8 @@
 		9B8FC0B92F11FFC000CBF4B8 /* SettingsTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0B82F11FFBE00CBF4B8 /* SettingsTopBar.swift */; };
 		9B8FC0BB2F12019700CBF4B8 /* SettingsContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0BA2F12019500CBF4B8 /* SettingsContent.swift */; };
 		9B8FC0BD2F1201A700CBF4B8 /* SettingsSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0BC2F1201A500CBF4B8 /* SettingsSidebar.swift */; };
+		9B8FC0C12F12306D00CBF4B8 /* TileModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0C02F12306B00CBF4B8 /* TileModeView.swift */; };
+		9B8FC0C32F12307100CBF4B8 /* LayoutModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0C22F12306E00CBF4B8 /* LayoutModeView.swift */; };
 		9BF95F0E2E9326AE00776771 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
@@ -145,6 +147,8 @@
 		9B8FC0B82F11FFBE00CBF4B8 /* SettingsTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTopBar.swift; sourceTree = "<group>"; };
 		9B8FC0BA2F12019500CBF4B8 /* SettingsContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsContent.swift; sourceTree = "<group>"; };
 		9B8FC0BC2F1201A500CBF4B8 /* SettingsSidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSidebar.swift; sourceTree = "<group>"; };
+		9B8FC0C02F12306B00CBF4B8 /* TileModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileModeView.swift; sourceTree = "<group>"; };
+		9B8FC0C22F12306E00CBF4B8 /* LayoutModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutModeView.swift; sourceTree = "<group>"; };
 		9BF95ECE2E9321E000776771 /* ComfyTile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ComfyTile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -371,6 +375,8 @@
 		9B8FC0572F10B80D00CBF4B8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9B8FC0BF2F12306A00CBF4B8 /* TileMode */,
+				9B8FC0BE2F12305900CBF4B8 /* LayoutMode */,
 				9B8FC04C2F10B80D00CBF4B8 /* MenuBar */,
 				9B8FC04E2F10B80D00CBF4B8 /* Settings */,
 				9B8FC0522F10B80D00CBF4B8 /* ShortcutHUD */,
@@ -508,6 +514,22 @@
 			path = GeneralSettings;
 			sourceTree = "<group>";
 		};
+		9B8FC0BE2F12305900CBF4B8 /* LayoutMode */ = {
+			isa = PBXGroup;
+			children = (
+				9B8FC0C22F12306E00CBF4B8 /* LayoutModeView.swift */,
+			);
+			path = LayoutMode;
+			sourceTree = "<group>";
+		};
+		9B8FC0BF2F12306A00CBF4B8 /* TileMode */ = {
+			isa = PBXGroup;
+			children = (
+				9B8FC0C02F12306B00CBF4B8 /* TileModeView.swift */,
+			);
+			path = TileMode;
+			sourceTree = "<group>";
+		};
 		9BF95EC52E9321E000776771 = {
 			isa = PBXGroup;
 			children = (
@@ -621,7 +643,9 @@
 				9B8FC0632F10B80D00CBF4B8 /* WindowCoordinator.swift in Sources */,
 				9B8FC0AD2F11D7BE00CBF4B8 /* ComfyTileTabBar.swift in Sources */,
 				9B8FC0642F10B80D00CBF4B8 /* WindowTilingCoordinator.swift in Sources */,
+				9B8FC0C12F12306D00CBF4B8 /* TileModeView.swift in Sources */,
 				9B8FC0652F10B80D00CBF4B8 /* WindowViewerCoordinator.swift in Sources */,
+				9B8FC0C32F12307100CBF4B8 /* LayoutModeView.swift in Sources */,
 				9B8FC09E2F11A17800CBF4B8 /* AXPrivate.swift in Sources */,
 				9B8FC0662F10B80D00CBF4B8 /* Bundle.swift in Sources */,
 				9B8FC0672F10B80D00CBF4B8 /* CGImage+placeholder.swift in Sources */,

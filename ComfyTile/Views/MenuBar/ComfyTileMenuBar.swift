@@ -41,23 +41,22 @@ struct NewComfyTileMenuBarContent: View {
             if defaultsManager.comfyTileTabPlacement == .top {
                 ComfyTileTabBar(tabPlacement: $defaultsManager.comfyTileTabPlacement)
                     .transition(.move(edge: .top))
-                ComfyTileUpdateView(updateController: updateController)
             }
             VStack {
                 switch vm.selectedTab {
-                case .layout: Text("Nothing Yet")
+                case .layout: LayoutModeView()
                 case .settings: SettingsView()
-                case .tile: Text("Nothing Yet")
+                case .tile: TileModeView()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            ComfyTileUpdateView(updateController: updateController)
             if defaultsManager.comfyTileTabPlacement == .bottom {
-                ComfyTileUpdateView(updateController: updateController)
                 ComfyTileTabBar(tabPlacement: $defaultsManager.comfyTileTabPlacement)
                     .transition(.move(edge: .bottom))
             }
         }
-        .animation(.snappy, value: defaultsManager.comfyTileTabPlacement)
+        .animation(.snappy(duration: 0.25, extraBounce: 0.1), value: defaultsManager.comfyTileTabPlacement)
     }
 }
 

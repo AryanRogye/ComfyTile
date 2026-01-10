@@ -32,7 +32,7 @@ struct SettingsView: View {
                 SettingsTopBar() {
                     settingsVM.isSidebarOpen.toggle()
                 }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .transition(.move(edge: .bottom).combined(with: .slide))
             }
             
             HStack(spacing: 0) {
@@ -54,10 +54,10 @@ struct SettingsView: View {
                 SettingsTopBar() {
                     settingsVM.isSidebarOpen.toggle()
                 }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .transition(.move(edge: .bottom).combined(with: .slide))
             }
         }
-        .animation(.snappy, value: defaultsManager.comfyTileTabPlacement)
+        .animation(.snappy(duration: 0.15, extraBounce: 0.1), value: defaultsManager.comfyTileTabPlacement)
     }
 }
 
