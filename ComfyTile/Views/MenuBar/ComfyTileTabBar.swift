@@ -19,7 +19,7 @@ struct ComfyTileTabBar: View {
     }
     
     private var selectedColor: Color {
-        Color.secondary.opacity(0.5)
+        Color.secondary.opacity(0.3)
     }
     
     private var borderOpacity: Double {
@@ -65,7 +65,7 @@ struct ComfyTileTabBar: View {
     @ViewBuilder
     private func TabButton(tab: ComfyTileTabs, shape: some Shape, isSelected: Bool) -> some View {
         Button {
-            withAnimation(.snappy) {
+            withAnimation(.spring) {
                 comfyTileMenuBarVM.selectedTab = tab
             }
         } label: {
@@ -88,7 +88,7 @@ struct ComfyTileTabBar: View {
             if let icon = tab.icon {
                 icon
                     .renderingMode(.template)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .frame(width: 16, height: 16)
             }
             Text(tab.rawValue)

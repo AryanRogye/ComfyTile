@@ -12,7 +12,6 @@ struct ComfyTileMenuBarRootView: View {
     @Bindable var comfyTileMenuBarVM: ComfyTileMenuBarViewModel
     @Bindable var defaultsManager: DefaultsManager
     @Bindable var fetchedWindowManager: FetchedWindowManager
-    @Bindable var settingsCoordinator: SettingsCoordinator
     @Bindable var updateController: UpdateController
     
     var body: some View {
@@ -20,14 +19,11 @@ struct ComfyTileMenuBarRootView: View {
             NewComfyTileMenuBarContent()
                 .environment(defaultsManager)
                 .environment(fetchedWindowManager)
-                .environment(settingsCoordinator)
                 .environment(comfyTileMenuBarVM)
                 .environment(updateController)
                 .environment(settingsVM)
             
-            ComfyTileUpdateView(updateController: updateController)
         }
-        .frame(width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height)
         .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 12))
     }
 }
@@ -35,10 +31,18 @@ struct ComfyTileMenuBarRootView: View {
 // MARK: - New Copy
 struct NewComfyTileMenuBarContent: View {
     @Environment(ComfyTileMenuBarViewModel.self) var comfyTileMenuBarVM
+    @Environment(UpdateController.self) var updateController
+    @Environment(DefaultsManager.self) var defaultsManager
+    
     var body: some View {
+        @Bindable var defaultsManager = defaultsManager
         @Bindable var vm = comfyTileMenuBarVM
         VStack(spacing: 0) {
-            if vm.tabPlacement == .top { ComfyTileTabBar(tabPlacement: $vm.tabPlacement) }
+            if defaultsManager.comfyTileTabPlacement == .top {
+                ComfyTileTabBar(tabPlacement: $defaultsManager.comfyTileTabPlacement)
+                    .transition(.move(edge: .top))
+                ComfyTileUpdateView(updateController: updateController)
+            }
             VStack {
                 switch vm.selectedTab {
                 case .layout: Text("Nothing Yet")
@@ -47,8 +51,13 @@ struct NewComfyTileMenuBarContent: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            if vm.tabPlacement == .bottom { ComfyTileTabBar(tabPlacement: $vm.tabPlacement) }
+            if defaultsManager.comfyTileTabPlacement == .bottom {
+                ComfyTileUpdateView(updateController: updateController)
+                ComfyTileTabBar(tabPlacement: $defaultsManager.comfyTileTabPlacement)
+                    .transition(.move(edge: .bottom))
+            }
         }
+        .animation(.snappy, value: defaultsManager.comfyTileTabPlacement)
     }
 }
 
@@ -59,7 +68,6 @@ struct ComfyTileMenuBarContent: View {
     
     @Environment(DefaultsManager.self) var defaultsManager
     @Environment(FetchedWindowManager.self) var fetchedWindowManager
-    @Environment(SettingsCoordinator.self) var settingsCoordinator
     
     
     var body: some View {
@@ -127,7 +135,7 @@ struct ComfyTileMenuBarContent: View {
         .sectionBackground()
         
         Button(action: {
-            settingsCoordinator.openSettings()
+//            settingsCoordinator.openSettings()
         }) {
             Label("Settings", systemImage: "gear")
                 .foregroundStyle(.primary)
@@ -153,19 +161,11 @@ struct ComfyTileMenuBarContent: View {
     @Previewable @State var fetchedWindowManager = FetchedWindowManager()
     @Previewable @State var updateController = UpdateController()
     
-    lazy var settingsCoordinator = SettingsCoordinator(
-        settingsVM: SettingsViewModel(),
-        windowCoordinator: WindowCoordinator(),
-        updateController: updateController,
-        defaultsManager: defaultsManager
-    )
-    
     ComfyTileMenuBarRootView(
         settingsVM: SettingsViewModel(),
         comfyTileMenuBarVM: ComfyTileMenuBarViewModel(),
         defaultsManager: defaultsManager,
         fetchedWindowManager: fetchedWindowManager,
-        settingsCoordinator: settingsCoordinator,
         updateController: updateController,
     )
 }

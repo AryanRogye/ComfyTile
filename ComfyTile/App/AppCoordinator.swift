@@ -22,7 +22,6 @@ class AppCoordinator {
     private var windowViewerCoordinator : WindowViewerCoordinator
     private var windowCoordinator       = WindowCoordinator()
     private var menuBarCoordinator      = MenuBarCoordinator()
-    var settingsCoordinator             : SettingsCoordinator
 
     /// View Models
     private var comfyTileMenuBarVM     = ComfyTileMenuBarViewModel()
@@ -68,12 +67,6 @@ class AppCoordinator {
             windowViewerVM: windowViewerVM,
             fetchedWindowManager: fetchedWindowManager
         )
-        self.settingsCoordinator = SettingsCoordinator(
-            settingsVM: settingsVM,
-            windowCoordinator: windowCoordinator,
-            updateController: updateController,
-            defaultsManager: defaultsManager
-        )
 
         // Start the AppKit-based menu bar
         menuBarCoordinator.start(
@@ -81,7 +74,6 @@ class AppCoordinator {
             settingsVM: settingsVM,
             defaultsManager: defaultsManager,
             fetchedWindowManager: fetchedWindowManager,
-            settingsCoordinator: settingsCoordinator,
             updateController: updateController
         )
 

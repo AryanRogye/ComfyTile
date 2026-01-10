@@ -14,7 +14,6 @@ final class ComfyTileMenuBarViewModel {
     var width: CGFloat = 400
     var height: CGFloat = 300
     
-    var tabPlacement : ComfyTileTabPlacement = .bottom
     var selectedTab: ComfyTileTabs = .tile
     
     var panel: NSPanel?
@@ -31,19 +30,29 @@ extension ComfyTileMenuBarViewModel {
         } onChange: {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
+                guard let panel else { return }
                 if selectedTab == .settings {
                     withAnimation(.snappy) {
                         self.width = 600
                         self.height = 400
                     }
-                    self.panel?.setFrame(NSRect(x: 0, y: 0, width: self.width, height: self.height), display: true)
                 } else {
                     withAnimation(.snappy) {
                         self.width = 400
                         self.height = 300
                     }
-                    self.panel?.setFrame(NSRect(x: 0, y: 0, width: self.width, height: self.height), display: true)
                 }
+                
+                let old = panel.frame
+                let newFrame = NSRect(
+                    x: old.midX - self.width / 2,     // keep center X
+                    y: old.maxY - self.height,        // keep top Y fixed
+                    width: self.width,
+                    height: self.height
+                )
+                
+                panel.setFrame(newFrame, display: true, animate: true)
+                
                 self.observeTabs()
             }
         }
