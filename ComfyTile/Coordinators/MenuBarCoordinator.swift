@@ -21,6 +21,7 @@ class MenuBarCoordinator: NSObject {
     private var globalEventMonitor: Any?
 
     /// Dependencies
+    private var comfyTileMenuBarVM      : ComfyTileMenuBarViewModel?
     private var settingsVM     : SettingsViewModel?
     private var defaultsManager: DefaultsManager?
     private var fetchedWindowManager: FetchedWindowManager?
@@ -37,12 +38,14 @@ class MenuBarCoordinator: NSObject {
 
     /// Start the menu bar coordinator with required dependencies
     public func start(
+        comfyTileMenuBarVM      : ComfyTileMenuBarViewModel,
         settingsVM              : SettingsViewModel,
         defaultsManager         : DefaultsManager,
         fetchedWindowManager    : FetchedWindowManager,
         settingsCoordinator     : SettingsCoordinator,
         updateController        : UpdateController
     ) {
+        self.comfyTileMenuBarVM     = comfyTileMenuBarVM
         self.settingsVM             = settingsVM
         self.defaultsManager        = defaultsManager
         self.fetchedWindowManager   = fetchedWindowManager
@@ -97,14 +100,18 @@ class MenuBarCoordinator: NSObject {
     private func configurePanel() {
         guard let defaultsManager = defaultsManager,
             let fetchedWindowManager = fetchedWindowManager,
-            let settingsCoordinator = settingsCoordinator,
-            let updateController = updateController
+              let settingsCoordinator = settingsCoordinator,
+              let updateController = updateController,
+              let comfyTileMenuBarVM = comfyTileMenuBarVM,
+              let settingsVM = settingsVM
         else {
             return
         }
 
         // Create the SwiftUI content view
         let contentView = ComfyTileMenuBarRootView(
+            settingsVM: settingsVM,
+            comfyTileMenuBarVM: comfyTileMenuBarVM,
             defaultsManager: defaultsManager,
             fetchedWindowManager: fetchedWindowManager,
             settingsCoordinator: settingsCoordinator,

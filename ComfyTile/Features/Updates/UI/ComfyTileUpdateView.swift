@@ -222,6 +222,8 @@ private struct PermissionRow: View {
     )
     
     ComfyTileMenuBarRootView(
+        settingsVM: SettingsViewModel(),
+        comfyTileMenuBarVM: ComfyTileMenuBarViewModel(),
         defaultsManager: defaultsManager,
         fetchedWindowManager: fetchedWindowManager,
         settingsCoordinator: settingsCoordinator,

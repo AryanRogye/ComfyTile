@@ -7,49 +7,9 @@
 
 import SwiftUI
 
-#Preview {
-    
-    @Previewable @State var defaultsManager = DefaultsManager()
-    @Previewable @State var fetchedWindowManager = FetchedWindowManager()
-    @Previewable @State var updateController = UpdateController()
-    
-    lazy var settingsCoordinator = SettingsCoordinator(
-        settingsVM: SettingsViewModel(),
-        windowCoordinator: WindowCoordinator(),
-        updateController: updateController,
-        defaultsManager: defaultsManager
-    )
-    
-    ComfyTileMenuBarRootView(
-        defaultsManager: defaultsManager,
-        fetchedWindowManager: fetchedWindowManager,
-        settingsCoordinator: settingsCoordinator,
-        updateController: updateController,
-    )
-}
-
-struct ComfyTileMenuBar: Scene {
-    @Bindable var defaultsManager: DefaultsManager
-    @Bindable var fetchedWindowManager: FetchedWindowManager
-    @Bindable var settingsCoordinator: SettingsCoordinator
-    @Bindable var updateController: UpdateController
-    
-    var body: some Scene {
-        MenuBarExtra {
-            ComfyTileMenuBarRootView(
-                defaultsManager: defaultsManager,
-                fetchedWindowManager: fetchedWindowManager,
-                settingsCoordinator: settingsCoordinator,
-                updateController: updateController
-            )
-        } label: {
-            Image("ComfyTileMenuBar").renderingMode(.template)
-        }
-        .menuBarExtraStyle(.window)
-    }
-}
-
 struct ComfyTileMenuBarRootView: View {
+    @Bindable var settingsVM        : SettingsViewModel
+    @Bindable var comfyTileMenuBarVM: ComfyTileMenuBarViewModel
     @Bindable var defaultsManager: DefaultsManager
     @Bindable var fetchedWindowManager: FetchedWindowManager
     @Bindable var settingsCoordinator: SettingsCoordinator
@@ -57,24 +17,44 @@ struct ComfyTileMenuBarRootView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading) {
-                    ComfyTileMenuBarContent()
-                        .environment(defaultsManager)
-                        .environment(fetchedWindowManager)
-                        .environment(settingsCoordinator)
-                }
-                .padding()
-                .environment(\.controlSize, .small)
-            }
+            NewComfyTileMenuBarContent()
+                .environment(defaultsManager)
+                .environment(fetchedWindowManager)
+                .environment(settingsCoordinator)
+                .environment(comfyTileMenuBarVM)
+                .environment(updateController)
+                .environment(settingsVM)
+            
             ComfyTileUpdateView(updateController: updateController)
         }
-        .frame(minWidth: 400, minHeight: 300)
+        .frame(minWidth: comfyTileMenuBarVM.width, minHeight: comfyTileMenuBarVM.height)
         .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 12))
     }
 }
 
+// MARK: - New Copy
+struct NewComfyTileMenuBarContent: View {
+    @Environment(ComfyTileMenuBarViewModel.self) var comfyTileMenuBarVM
+    var body: some View {
+        @Bindable var vm = comfyTileMenuBarVM
+        VStack(spacing: 0) {
+            if vm.tabPlacement == .top { ComfyTileTabBar(tabPlacement: $vm.tabPlacement) }
+            VStack {
+                switch vm.selectedTab {
+                case .layout: Text("Nothing Yet")
+                case .settings: SettingsView()
+                case .tile: Text("Nothing Yet")
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            if vm.tabPlacement == .bottom { ComfyTileTabBar(tabPlacement: $vm.tabPlacement) }
+        }
+    }
+}
 
+
+
+// MARK: - Old Copy
 struct ComfyTileMenuBarContent: View {
     
     @Environment(DefaultsManager.self) var defaultsManager
@@ -164,4 +144,28 @@ struct ComfyTileMenuBarContent: View {
                 .padding(4)
         }
     }
+}
+
+
+#Preview {
+    
+    @Previewable @State var defaultsManager = DefaultsManager()
+    @Previewable @State var fetchedWindowManager = FetchedWindowManager()
+    @Previewable @State var updateController = UpdateController()
+    
+    lazy var settingsCoordinator = SettingsCoordinator(
+        settingsVM: SettingsViewModel(),
+        windowCoordinator: WindowCoordinator(),
+        updateController: updateController,
+        defaultsManager: defaultsManager
+    )
+    
+    ComfyTileMenuBarRootView(
+        settingsVM: SettingsViewModel(),
+        comfyTileMenuBarVM: ComfyTileMenuBarViewModel(),
+        defaultsManager: defaultsManager,
+        fetchedWindowManager: fetchedWindowManager,
+        settingsCoordinator: settingsCoordinator,
+        updateController: updateController,
+    )
 }
