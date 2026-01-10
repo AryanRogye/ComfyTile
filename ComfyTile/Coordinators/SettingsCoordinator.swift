@@ -14,19 +14,22 @@ class SettingsCoordinator {
     @ObservationIgnored
     let windowCoordinator: WindowCoordinator
     
+    let settingsVM       : SettingsViewModel
     let updateController : UpdateController
     let defaultsManager  : DefaultsManager
     
     var isOpen = false
     
     init(
-        windowCoordinator: WindowCoordinator,
-        updateController: UpdateController,
-        defaultsManager: DefaultsManager
+        settingsVM          : SettingsViewModel,
+        windowCoordinator   : WindowCoordinator,
+        updateController    : UpdateController,
+        defaultsManager     : DefaultsManager
     ) {
-        self.windowCoordinator = windowCoordinator
-        self.updateController = updateController
-        self.defaultsManager = defaultsManager
+        self.settingsVM         = settingsVM
+        self.windowCoordinator  = windowCoordinator
+        self.updateController   = updateController
+        self.defaultsManager    = defaultsManager
     }
     
     func openSettings() {
@@ -36,7 +39,8 @@ class SettingsCoordinator {
             title: "Settings",
             content: SettingsView()
                 .environment(defaultsManager)
-                .environment(updateController),
+                .environment(updateController)
+                .environment(settingsVM),
             onOpen: { [ weak self] in
                 guard let self else { return }
                 self.isOpen = true

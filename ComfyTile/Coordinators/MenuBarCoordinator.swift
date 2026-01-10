@@ -1,0 +1,276 @@
+//
+//  MenuBarCoordinator.swift
+//  ComfyTile
+//
+//  Created by Aryan Rogye on 1/9/26.
+//
+
+import Cocoa
+import SwiftUI
+
+@MainActor
+class MenuBarCoordinator: NSObject {
+
+    // MARK: - Properties
+    private var statusItem: NSStatusItem?
+    private var panel: NSPanel?
+    private var hostingController: NSHostingController<ComfyTileMenuBarRootView>?
+
+    /// Event monitors for auto-dismiss behavior
+    private var localEventMonitor: Any?
+    private var globalEventMonitor: Any?
+
+    /// Dependencies
+    private var settingsVM     : SettingsViewModel?
+    private var defaultsManager: DefaultsManager?
+    private var fetchedWindowManager: FetchedWindowManager?
+    private var settingsCoordinator: SettingsCoordinator?
+    private var updateController: UpdateController?
+
+    // MARK: - Initialization
+
+    override init() {
+        super.init()
+    }
+
+    // MARK: - Public Methods
+
+    /// Start the menu bar coordinator with required dependencies
+    public func start(
+        settingsVM              : SettingsViewModel,
+        defaultsManager         : DefaultsManager,
+        fetchedWindowManager    : FetchedWindowManager,
+        settingsCoordinator     : SettingsCoordinator,
+        updateController        : UpdateController
+    ) {
+        self.settingsVM             = settingsVM
+        self.defaultsManager        = defaultsManager
+        self.fetchedWindowManager   = fetchedWindowManager
+        self.settingsCoordinator    = settingsCoordinator
+        self.updateController       = updateController
+
+        configureClosures()
+        configureStatusItem()
+        configurePanel()
+    }
+
+    private func configureClosures() {
+        settingsVM?.openMenuBar = { [weak self] in
+            guard let self else { return }
+            self.showPanel()
+        }
+        updateController?.updaterVM.openMenuBar = { [weak self] in
+            guard let self else { return }
+            self.showPanel()
+        }
+        updateController?.updaterVM.closeMenuBar = { [weak self] in
+            guard let self else { return }
+            self.hidePanel()
+        }
+
+    }
+
+    // MARK: - Status Item Configuration
+
+    private func configureStatusItem() {
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+
+        guard let button = statusItem?.button else { return }
+
+        // Use the same icon as the SwiftUI MenuBarExtra
+        if let image = NSImage(named: "ComfyTileMenuBar") {
+            image.isTemplate = true
+            button.image = image
+        } else {
+            // Fallback to a system image
+            button.image = NSImage(
+                systemSymbolName: "square.grid.2x2", accessibilityDescription: "ComfyTile")
+        }
+
+        button.imagePosition = .imageLeading
+        button.target = self
+        button.action = #selector(togglePanel(_:))
+    }
+
+    // MARK: - Panel Configuration
+
+    private func configurePanel() {
+        guard let defaultsManager = defaultsManager,
+            let fetchedWindowManager = fetchedWindowManager,
+            let settingsCoordinator = settingsCoordinator,
+            let updateController = updateController
+        else {
+            return
+        }
+
+        // Create the SwiftUI content view
+        let contentView = ComfyTileMenuBarRootView(
+            defaultsManager: defaultsManager,
+            fetchedWindowManager: fetchedWindowManager,
+            settingsCoordinator: settingsCoordinator,
+            updateController: updateController
+        )
+
+        // Create hosting controller
+        hostingController = NSHostingController(rootView: contentView)
+
+        // Create a borderless, floating panel
+        let panel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
+            styleMask: [.nonactivatingPanel, .borderless],
+            backing: .buffered,
+            defer: false
+        )
+
+        panel.isFloatingPanel = true
+        panel.level = .popUpMenu
+        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = true
+
+        /// ContainerView can be .zero because SwiftUI decides the frame
+        let containerView = NSView(frame: .zero)
+        containerView.wantsLayer = true
+        containerView.layer?.masksToBounds = true
+
+        // Add the hosting controller's view on top
+        if let hostingView = hostingController?.view {
+            hostingView.frame = containerView.bounds
+            hostingView.autoresizingMask = [.width, .height]
+            containerView.addSubview(hostingView)
+        }
+
+        panel.contentView = containerView
+
+        self.panel = panel
+    }
+
+    // MARK: - Panel Toggle
+
+    @objc private func togglePanel(_ sender: Any?) {
+        guard let panel = panel else { return }
+
+        if panel.isVisible {
+            hidePanel()
+        } else {
+            showPanel()
+        }
+    }
+
+    private func showPanel() {
+        guard let panel = panel,
+            let button = statusItem?.button
+        else { return }
+
+        // Position the panel below the status item
+        let buttonRect =
+            button.window?.convertToScreen(button.convert(button.bounds, to: nil)) ?? .zero
+
+        let panelSize = panel.frame.size
+        let panelOrigin = NSPoint(
+            x: buttonRect.midX - panelSize.width / 2,
+            y: buttonRect.minY - panelSize.height - 4
+        )
+
+        // Make sure panel doesn't go off screen
+        if let screen = NSScreen.main {
+            var adjustedOrigin = panelOrigin
+
+            // Keep within horizontal bounds
+            if adjustedOrigin.x < screen.visibleFrame.minX {
+                adjustedOrigin.x = screen.visibleFrame.minX + 8
+            } else if adjustedOrigin.x + panelSize.width > screen.visibleFrame.maxX {
+                adjustedOrigin.x = screen.visibleFrame.maxX - panelSize.width - 8
+            }
+
+            panel.setFrameOrigin(adjustedOrigin)
+        } else {
+            panel.setFrameOrigin(panelOrigin)
+        }
+
+        panel.makeKeyAndOrderFront(nil)
+
+        // Add event monitors for auto-dismiss
+        addEventMonitors()
+    }
+
+    public func hidePanel() {
+        panel?.orderOut(nil)
+        removeEventMonitors()
+    }
+
+    // MARK: - Event Monitors
+
+    private func addEventMonitors() {
+        // Global event monitor - clicks outside the app
+        globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [
+            .leftMouseDown, .rightMouseDown,
+        ]) { [weak self] _ in
+            self?.hidePanel()
+        }
+
+        // Local event monitor - Escape key and clicks outside the panel
+        localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: [
+            .keyDown, .leftMouseDown, .rightMouseDown,
+        ]) { [weak self] event in
+            guard let self = self, let panel = self.panel else { return event }
+
+            // Escape key to close
+            if event.type == .keyDown && event.keyCode == 53 {
+                self.hidePanel()
+                return nil
+            }
+
+            // Click outside the panel (but inside the app)
+            if event.type == .leftMouseDown || event.type == .rightMouseDown {
+
+                // Check if click is in the status item button
+                if let button = self.statusItem?.button,
+                    let buttonWindow = button.window,
+                    event.window == buttonWindow
+                {
+                    // Let the toggle handle it
+                    return event
+                }
+
+                // Check if click is in the panel itself
+                if event.window == panel {
+                    return event
+                }
+
+                // Check if click is in a popover or child window (e.g., SwiftUI popover)
+                // SwiftUI popovers create separate windows with a higher level
+                if let clickedWindow = event.window {
+                    // Allow clicks in any window that appears to be a popover/child
+                    // Popovers have level >= panel level and are typically NSPanel subclasses
+                    if clickedWindow.level >= panel.level {
+                        return event
+                    }
+
+                    // Also check if it's a child window of the panel
+                    if panel.childWindows?.contains(clickedWindow) == true {
+                        return event
+                    }
+                }
+
+                // Click is outside all related windows - dismiss
+                self.hidePanel()
+            }
+
+            return event
+        }
+    }
+
+    private func removeEventMonitors() {
+        if let monitor = globalEventMonitor {
+            NSEvent.removeMonitor(monitor)
+            globalEventMonitor = nil
+        }
+
+        if let monitor = localEventMonitor {
+            NSEvent.removeMonitor(monitor)
+            localEventMonitor = nil
+        }
+    }
+}

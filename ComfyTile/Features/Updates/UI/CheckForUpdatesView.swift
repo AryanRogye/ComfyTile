@@ -20,6 +20,8 @@ final class Updater: ObservableObject {
 }
 
 struct CheckForUpdatesView: View {
+    
+    @Environment(SettingsViewModel.self) var settingsVM
     @ObservedObject private var checkForUpdatesViewModel: Updater
     private let updater: SPUUpdater
     
@@ -29,7 +31,10 @@ struct CheckForUpdatesView: View {
     }
     
     var body: some View {
-        Button("Check for Updates…", action: updater.checkForUpdates)
-            .disabled(!checkForUpdatesViewModel.canCheckForUpdates)
+        Button("Check for Updates…", action: {
+//            settingsVM.openMenuBar()
+            updater.checkForUpdates()
+        })
+        .disabled(!checkForUpdatesViewModel.canCheckForUpdates)
     }
 }

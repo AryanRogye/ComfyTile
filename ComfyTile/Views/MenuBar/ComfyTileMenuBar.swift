@@ -14,6 +14,7 @@ import SwiftUI
     @Previewable @State var updateController = UpdateController()
     
     lazy var settingsCoordinator = SettingsCoordinator(
+        settingsVM: SettingsViewModel(),
         windowCoordinator: WindowCoordinator(),
         updateController: updateController,
         defaultsManager: defaultsManager
@@ -69,6 +70,7 @@ struct ComfyTileMenuBarRootView: View {
             ComfyTileUpdateView(updateController: updateController)
         }
         .frame(minWidth: 400, minHeight: 300)
+        .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 12))
     }
 }
 
