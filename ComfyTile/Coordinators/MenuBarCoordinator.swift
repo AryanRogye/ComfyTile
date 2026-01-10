@@ -51,7 +51,8 @@ class MenuBarCoordinator: NSObject {
         self.fetchedWindowManager   = fetchedWindowManager
         self.settingsCoordinator    = settingsCoordinator
         self.updateController       = updateController
-
+        self.comfyTileMenuBarVM?.panel = panel
+        
         configureClosures()
         configureStatusItem()
         configurePanel()
@@ -98,16 +99,16 @@ class MenuBarCoordinator: NSObject {
     // MARK: - Panel Configuration
 
     private func configurePanel() {
-        guard let defaultsManager = defaultsManager,
-            let fetchedWindowManager = fetchedWindowManager,
+        guard let comfyTileMenuBarVM = comfyTileMenuBarVM,
+              let settingsVM = settingsVM,
+              let defaultsManager = defaultsManager,
+              let fetchedWindowManager = fetchedWindowManager,
               let settingsCoordinator = settingsCoordinator,
-              let updateController = updateController,
-              let comfyTileMenuBarVM = comfyTileMenuBarVM,
-              let settingsVM = settingsVM
+              let updateController = updateController
         else {
             return
         }
-
+        
         // Create the SwiftUI content view
         let contentView = ComfyTileMenuBarRootView(
             settingsVM: settingsVM,
@@ -117,39 +118,37 @@ class MenuBarCoordinator: NSObject {
             settingsCoordinator: settingsCoordinator,
             updateController: updateController
         )
-
+        
         // Create hosting controller
         hostingController = NSHostingController(rootView: contentView)
-
-        // Create a borderless, floating panel
+        
+        // Create a borderless, floating panel with size from comfyTileMenuBarVM
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
+            contentRect: NSRect(x: 0, y: 0, width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height),
             styleMask: [.nonactivatingPanel, .borderless],
             backing: .buffered,
             defer: false
         )
-
+        
         panel.isFloatingPanel = true
         panel.level = .popUpMenu
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = true
-
-        /// ContainerView can be .zero because SwiftUI decides the frame
-        let containerView = NSView(frame: .zero)
+        
+        let containerView = NSView(frame: NSRect(x: 0, y: 0, width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height))
         containerView.wantsLayer = true
         containerView.layer?.masksToBounds = true
-
-        // Add the hosting controller's view on top
+        
         if let hostingView = hostingController?.view {
             hostingView.frame = containerView.bounds
             hostingView.autoresizingMask = [.width, .height]
             containerView.addSubview(hostingView)
         }
-
+        
         panel.contentView = containerView
-
+        
         self.panel = panel
     }
 

@@ -27,7 +27,7 @@ struct ComfyTileMenuBarRootView: View {
             
             ComfyTileUpdateView(updateController: updateController)
         }
-        .frame(minWidth: comfyTileMenuBarVM.width, minHeight: comfyTileMenuBarVM.height)
+        .frame(width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height)
         .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 12))
     }
 }
@@ -169,3 +169,4 @@ struct ComfyTileMenuBarContent: View {
         updateController: updateController,
     )
 }
+

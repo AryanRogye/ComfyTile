@@ -119,7 +119,7 @@ struct GeneralSettings: View {
             }
         }
         .formStyle(.grouped)
-        .frame(minWidth: 500, minHeight: 500)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(.easeInOut, value: updateController.updaterVM.showUserInitiatedUpdate)
     }
 }
