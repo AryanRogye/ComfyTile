@@ -16,6 +16,8 @@ import SwiftUI
  */
 struct MenuBarModeRow<Content: View>: View {
     
+    @Binding var allowClick: Bool
+    let onClick: () -> Void
     var roundTop: Bool = false
     @Binding var hoveringOverSomethingElse: Bool
     
@@ -30,8 +32,19 @@ struct MenuBarModeRow<Content: View>: View {
             Spacer()
             shortcutButton()
         }
-        .modifier(MenuBarModeRowBackground(roundTop: roundTop, height: 35, hoveringOverSomethingElse: $hoveringOverSomethingElse))
-            
+        .modifier(
+            MenuBarModeRowBackground(
+                roundTop: roundTop,
+                height: 35,
+                hoveringOverSomethingElse: $hoveringOverSomethingElse,
+                allowClick: $allowClick
+            )
+        )
+        .onTapGesture {
+            if allowClick && !hoveringOverSomethingElse {
+                onClick()
+            }
+        }
     }
 }
 
@@ -40,11 +53,12 @@ struct MenuBarModeRowBackground: ViewModifier {
     let roundTop: Bool
     let height: CGFloat
     @Binding var hoveringOverSomethingElse: Bool
+    @Binding var allowClick: Bool
     @State private var isHovering: Bool = false
     @State private var lastHover: Bool = false
     
     var backgroundColor: Color {
-        isHovering
+        isHovering && allowClick
         ? .secondary.opacity(0.2)
         : .clear
     }
@@ -86,5 +100,6 @@ struct MenuBarModeRowBackground: ViewModifier {
                     self.isHovering = self.lastHover
                 }
             }
+            .animation(.snappy, value: isHovering)
     }
 }

@@ -97,6 +97,26 @@ final class WindowTilingCoordinator {
         self.defaultsManager      = defaultsManager
     }
     
+    public func action(for layout: LayoutMode) {
+        switch layout {
+        case .primaryOnly:                    primaryTile()
+        case .primaryLeftStackedHorizontally: primaryLeftStackedHorizontallyTile()
+        case .primaryRightStackedHorizontally: primaryRightStackedHorizontallyTile()
+        }
+    }
+    
+    public func action(for tile: TilingMode) {
+        switch tile {
+        case .rightHalf:       tileRight()
+        case .leftHalf:        tileLeft()
+        case .center:          tileCenter()
+        case .fullscreen:      tileFullScreen()
+        case .nudgeBottomUp:   nudgeBottomUp()
+        case .nudgeBottomDown: nudgeBottomDown()
+        case .nudgeTopDown:    nudgeTopDown()
+        case .nudgeTopUp:      nudgeTopUp()
+        }
+    }
     public func primaryTile() {
         Task {
             await self.fetchedWindowManager.loadWindows()

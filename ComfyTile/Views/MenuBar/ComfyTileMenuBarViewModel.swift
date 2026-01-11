@@ -11,6 +11,16 @@ import SwiftUI
 @Observable
 @MainActor
 final class ComfyTileMenuBarViewModel {
+    
+    let windowTilingCoordinator: WindowTilingCoordinator
+    let fetchedWindowManager   : FetchedWindowManager
+    
+    var lastFocusedWindow : FocusedWindow? = nil {
+        didSet {
+            print("Did Set: \(lastFocusedWindow)")
+        }
+    }
+    
     var width: CGFloat = 350
     var height: CGFloat = 300
     
@@ -18,8 +28,37 @@ final class ComfyTileMenuBarViewModel {
     
     var panel: NSPanel?
     
-    init() {
+    public func getLastFocusedWindow() {
+        self.lastFocusedWindow = WindowManagerHelpers.getFocusedWindow()
+    }
+    
+    init(
+        windowTilingCoordinator: WindowTilingCoordinator,
+        fetchedWindowManager: FetchedWindowManager
+    ) {
+        self.windowTilingCoordinator = windowTilingCoordinator
+        self.fetchedWindowManager = fetchedWindowManager
         observeTabs()
+    }
+    
+    public func onTap(for tile: TilingMode) async {
+        var fetchedWindow: FetchedWindow?
+        
+        if let lastFocusedWindow {
+            print("Found Window")
+            await fetchedWindowManager.loadWindows()
+            let fetchedWindows = fetchedWindowManager.fetchedWindows
+            /// Check if Window in Here
+            fetchedWindow = fetchedWindows.first(where: { $0.pid == lastFocusedWindow.pid })
+            if let fetchedWindow {
+                fetchedWindow.focusWindow()
+            }
+        }
+        
+        windowTilingCoordinator.action(for: tile)
+    }
+    public func onTap(for layout: LayoutMode) {
+        windowTilingCoordinator.action(for: layout)
     }
 }
 

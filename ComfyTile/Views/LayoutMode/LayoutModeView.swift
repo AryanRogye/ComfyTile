@@ -9,10 +9,16 @@ import SwiftUI
 import KeyboardShortcuts
 
 struct LayoutModeView: View {
+    
+    @Environment(ComfyTileMenuBarViewModel.self) var vm
+    
     var body: some View {
         MenuBarContainer {
             ForEach(LayoutMode.allCases, id: \.self) { layout in
                 ShortcutEditableRow(
+                    onClick: {
+                        vm.onTap(for: layout)
+                    },
                     roundTop: layout == LayoutMode.allCases.first!,
                     title: layout.rawValue,
                     editLabel: "Shortcut for \(layout.rawValue)",

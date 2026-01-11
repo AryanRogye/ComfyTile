@@ -24,7 +24,7 @@ class AppCoordinator {
     private var menuBarCoordinator      = MenuBarCoordinator()
 
     /// View Models
-    private var comfyTileMenuBarVM     = ComfyTileMenuBarViewModel()
+    private var comfyTileMenuBarVM     : ComfyTileMenuBarViewModel?
     private var tilingCoverVM          : TilingCoverViewModel
     private var shortcutHUDVM          : ShortcutHUDViewModel
     private var windowViewerVM         : WindowViewerViewModel
@@ -68,6 +68,20 @@ class AppCoordinator {
             fetchedWindowManager: fetchedWindowManager
         )
 
+        windowTilingCoordinator = WindowTilingCoordinator(
+            fetchedWindowManager: fetchedWindowManager,
+            windowSplitManager: windowSplitManager,
+            windowLayoutService: appEnv.windowLayoutService,
+            defaultsManager: defaultsManager
+        )
+        guard let windowTilingCoordinator else { return }
+        
+        self.comfyTileMenuBarVM = ComfyTileMenuBarViewModel(
+            windowTilingCoordinator: windowTilingCoordinator,
+            fetchedWindowManager: fetchedWindowManager
+        )
+        guard let comfyTileMenuBarVM else { return }
+
         // Start the AppKit-based menu bar
         menuBarCoordinator.start(
             comfyTileMenuBarVM: comfyTileMenuBarVM,
@@ -86,13 +100,6 @@ class AppCoordinator {
                 self.hotKeyCoordinator?.startModifier(with: self.defaultsManager.modiferKey)
             }
         }
-
-        windowTilingCoordinator = WindowTilingCoordinator(
-            fetchedWindowManager: fetchedWindowManager,
-            windowSplitManager: windowSplitManager,
-            windowLayoutService: appEnv.windowLayoutService,
-            defaultsManager: defaultsManager
-        )
 
         hotKeyCoordinator = HotKeyCoordinator(
             onPrimaryLeftStackedHorizontallyTile: {

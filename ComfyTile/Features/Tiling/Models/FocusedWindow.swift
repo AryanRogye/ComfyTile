@@ -12,9 +12,18 @@ class FocusedWindow {
     /// More stronger element
     var element: WindowElement
     var screen: NSScreen
+    let pid: pid_t
+    let bundleIdentifier: String?
     
-    init(element: WindowElement, screen: NSScreen) {
+    init(
+        element: WindowElement,
+        screen: NSScreen,
+        bundleIdentifier: String?,
+        pid: pid_t
+    ) {
         self.element = element
         self.screen = screen
+        self.bundleIdentifier = bundleIdentifier
+        self.pid = pid
     }
 }

@@ -9,6 +9,8 @@ import SwiftUI
 import KeyboardShortcuts
 
 struct ShortcutEditableRow<Icon: View>: View {
+    
+    let onClick: () -> Void
     let roundTop: Bool
     let title: String
     let editLabel: String
@@ -24,6 +26,12 @@ struct ShortcutEditableRow<Icon: View>: View {
     var body: some View {
         VStack(spacing: 0) {
             MenuBarModeRow(
+                allowClick: Binding(
+                    /// Allow Click if NOT allowEditHotkey
+                    get: { !allowEditHotkey },
+                    set: { _ in }
+                ),
+                onClick: onClick,
                 roundTop: roundTop,
                 hoveringOverSomethingElse: $hoveringOverSomethingElse,
                 icon: { AnyView(icon()) },

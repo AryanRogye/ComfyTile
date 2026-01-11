@@ -215,18 +215,20 @@ private struct PermissionRow: View {
     }
 }
 
-#Preview {
-    
-    @Previewable @State var defaultsManager = DefaultsManager()
-    @Previewable @State var fetchedWindowManager = FetchedWindowManager()
-    @Previewable @State var updateController = UpdateController()
-    
-    
-    ComfyTileMenuBarRootView(
-        settingsVM: SettingsViewModel(),
-        comfyTileMenuBarVM: ComfyTileMenuBarViewModel(),
-        defaultsManager: defaultsManager,
-        fetchedWindowManager: fetchedWindowManager,
-        updateController: updateController,
-    )
-}
+//#Preview {
+//    
+//    @Previewable @State var defaultsManager = DefaultsManager()
+//    @Previewable @State var fetchedWindowManager = FetchedWindowManager()
+//    @Previewable @State var updateController = UpdateController()
+//    
+//    
+//    ComfyTileMenuBarRootView(
+//        settingsVM: SettingsViewModel(),
+//        comfyTileMenuBarVM: ComfyTileMenuBarViewModel(
+//            windowTilingCoordinator: WindowTilingCoordinator(fetchedWindowManager: <#FetchedWindowManager#>, windowSplitManager: <#WindowSplitManager#>, windowLayoutService: <#any WindowLayoutProviding#>, defaultsManager: <#DefaultsManager#>)
+//        ),
+//        defaultsManager: defaultsManager,
+//        fetchedWindowManager: fetchedWindowManager,
+//        updateController: updateController,
+//    )
+//}

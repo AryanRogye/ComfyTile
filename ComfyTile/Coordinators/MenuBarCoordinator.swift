@@ -10,11 +10,13 @@ import SwiftUI
 
 @MainActor
 class MenuBarCoordinator: NSObject {
+    
+    typealias MenubarView = ComfyTileMenuBarRootView
 
     // MARK: - Properties
     private var statusItem: NSStatusItem?
     private var panel: NSPanel?
-    private var hostingController: NSHostingController<ComfyTileMenuBarRootView>?
+    private var hostingController: NSHostingController<MenubarView>?
 
     /// Event monitors for auto-dismiss behavior
     private var localEventMonitor: Any?
@@ -105,7 +107,7 @@ class MenuBarCoordinator: NSObject {
         }
 
         // Create the SwiftUI content view
-        let contentView = ComfyTileMenuBarRootView(
+        let contentView = MenubarView(
             settingsVM: settingsVM,
             comfyTileMenuBarVM: comfyTileMenuBarVM,
             defaultsManager: defaultsManager,
@@ -117,7 +119,7 @@ class MenuBarCoordinator: NSObject {
         hostingController = NSHostingController(rootView: contentView)
 
         // Create a borderless, floating panel with size from comfyTileMenuBarVM
-        let panel = NSPanel(
+        let panel = FocusablePanel(
             contentRect: NSRect(x: 0, y: 0, width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height),
             styleMask: [.nonactivatingPanel, .borderless],
             backing: .buffered,
@@ -137,7 +139,9 @@ class MenuBarCoordinator: NSObject {
 
         if let hostingView = hostingController?.view {
             hostingView.frame = containerView.bounds
-            hostingView.autoresizingMask = [.width, .height]
+            let width: AppKit.NSView.AutoresizingMask = .width
+            let height: AppKit.NSView.AutoresizingMask = .height
+            hostingView.autoresizingMask = [width, height]
             containerView.addSubview(hostingView)
         }
 
@@ -163,6 +167,8 @@ class MenuBarCoordinator: NSObject {
         guard let panel = panel,
             let button = statusItem?.button
         else { return }
+        
+        comfyTileMenuBarVM?.getLastFocusedWindow()
 
         // Position the panel below the status item
         let buttonRect =
@@ -190,6 +196,7 @@ class MenuBarCoordinator: NSObject {
             panel.setFrameOrigin(panelOrigin)
         }
 
+        NSApp.activate(ignoringOtherApps: true)
         panel.makeKeyAndOrderFront(nil)
 
         // Add event monitors for auto-dismiss
@@ -208,7 +215,20 @@ class MenuBarCoordinator: NSObject {
         globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [
             .leftMouseDown, .rightMouseDown,
         ]) { [weak self] _ in
-            self?.hidePanel()
+            guard let self = self, let panel = self.panel else { return }
+            let mouseLocation = NSEvent.mouseLocation
+            if panel.frame.contains(mouseLocation) {
+                return
+            }
+            if let button = self.statusItem?.button,
+               let buttonWindow = button.window
+            {
+                let buttonRect = buttonWindow.convertToScreen(button.convert(button.bounds, to: nil))
+                if buttonRect.contains(mouseLocation) {
+                    return
+                }
+            }
+            self.hidePanel()
         }
 
         // Local event monitor - Escape key and clicks outside the panel

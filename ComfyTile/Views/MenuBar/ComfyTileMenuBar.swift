@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-struct ComfyTileMenuBarRootView: View {
+public struct ComfyTileMenuBarRootView: View {
     @Bindable var settingsVM        : SettingsViewModel
     @Bindable var comfyTileMenuBarVM: ComfyTileMenuBarViewModel
     @Bindable var defaultsManager: DefaultsManager
     @Bindable var fetchedWindowManager: FetchedWindowManager
     @Bindable var updateController: UpdateController
     
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 0) {
             NewComfyTileMenuBarContent()
                 .environment(defaultsManager)
@@ -154,18 +154,18 @@ struct ComfyTileMenuBarContent: View {
 }
 
 
-#Preview {
-    
-    @Previewable @State var defaultsManager = DefaultsManager()
-    @Previewable @State var fetchedWindowManager = FetchedWindowManager()
-    @Previewable @State var updateController = UpdateController()
-    
-    ComfyTileMenuBarRootView(
-        settingsVM: SettingsViewModel(),
-        comfyTileMenuBarVM: ComfyTileMenuBarViewModel(),
-        defaultsManager: defaultsManager,
-        fetchedWindowManager: fetchedWindowManager,
-        updateController: updateController,
-    )
-}
+//#Preview {
+//    
+//    @Previewable @State var defaultsManager = DefaultsManager()
+//    @Previewable @State var fetchedWindowManager = FetchedWindowManager()
+//    @Previewable @State var updateController = UpdateController()
+//    
+//    ComfyTileMenuBarRootView(
+//        settingsVM: SettingsViewModel(),
+//        comfyTileMenuBarVM: ComfyTileMenuBarViewModel(),
+//        defaultsManager: defaultsManager,
+//        fetchedWindowManager: fetchedWindowManager,
+//        updateController: updateController,
+//    )
+//}
 
