@@ -10,21 +10,23 @@ import SwiftUI
 
 @MainActor
 class MenuBarCoordinator: NSObject {
+    
+    typealias MenubarView = ComfyTileMenuBarRootView
 
     // MARK: - Properties
     private var statusItem: NSStatusItem?
     private var panel: NSPanel?
-    private var hostingController: NSHostingController<ComfyTileMenuBarRootView>?
+    private var hostingController: NSHostingController<MenubarView>?
 
     /// Event monitors for auto-dismiss behavior
     private var localEventMonitor: Any?
     private var globalEventMonitor: Any?
 
     /// Dependencies
+    private var comfyTileMenuBarVM      : ComfyTileMenuBarViewModel?
     private var settingsVM     : SettingsViewModel?
     private var defaultsManager: DefaultsManager?
     private var fetchedWindowManager: FetchedWindowManager?
-    private var settingsCoordinator: SettingsCoordinator?
     private var updateController: UpdateController?
 
     // MARK: - Initialization
@@ -37,16 +39,16 @@ class MenuBarCoordinator: NSObject {
 
     /// Start the menu bar coordinator with required dependencies
     public func start(
+        comfyTileMenuBarVM      : ComfyTileMenuBarViewModel,
         settingsVM              : SettingsViewModel,
         defaultsManager         : DefaultsManager,
         fetchedWindowManager    : FetchedWindowManager,
-        settingsCoordinator     : SettingsCoordinator,
         updateController        : UpdateController
     ) {
+        self.comfyTileMenuBarVM     = comfyTileMenuBarVM
         self.settingsVM             = settingsVM
         self.defaultsManager        = defaultsManager
         self.fetchedWindowManager   = fetchedWindowManager
-        self.settingsCoordinator    = settingsCoordinator
         self.updateController       = updateController
 
         configureClosures()
@@ -95,28 +97,30 @@ class MenuBarCoordinator: NSObject {
     // MARK: - Panel Configuration
 
     private func configurePanel() {
-        guard let defaultsManager = defaultsManager,
-            let fetchedWindowManager = fetchedWindowManager,
-            let settingsCoordinator = settingsCoordinator,
-            let updateController = updateController
+        guard let comfyTileMenuBarVM = comfyTileMenuBarVM,
+              let settingsVM = settingsVM,
+              let defaultsManager = defaultsManager,
+              let fetchedWindowManager = fetchedWindowManager,
+              let updateController = updateController
         else {
             return
         }
 
         // Create the SwiftUI content view
-        let contentView = ComfyTileMenuBarRootView(
+        let contentView = MenubarView(
+            settingsVM: settingsVM,
+            comfyTileMenuBarVM: comfyTileMenuBarVM,
             defaultsManager: defaultsManager,
             fetchedWindowManager: fetchedWindowManager,
-            settingsCoordinator: settingsCoordinator,
             updateController: updateController
         )
 
         // Create hosting controller
         hostingController = NSHostingController(rootView: contentView)
 
-        // Create a borderless, floating panel
-        let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
+        // Create a borderless, floating panel with size from comfyTileMenuBarVM
+        let panel = FocusablePanel(
+            contentRect: NSRect(x: 0, y: 0, width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height),
             styleMask: [.nonactivatingPanel, .borderless],
             backing: .buffered,
             defer: false
@@ -129,21 +133,22 @@ class MenuBarCoordinator: NSObject {
         panel.backgroundColor = .clear
         panel.hasShadow = true
 
-        /// ContainerView can be .zero because SwiftUI decides the frame
-        let containerView = NSView(frame: .zero)
+        let containerView = NSView(frame: NSRect(x: 0, y: 0, width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height))
         containerView.wantsLayer = true
         containerView.layer?.masksToBounds = true
 
-        // Add the hosting controller's view on top
         if let hostingView = hostingController?.view {
             hostingView.frame = containerView.bounds
-            hostingView.autoresizingMask = [.width, .height]
+            let width: AppKit.NSView.AutoresizingMask = .width
+            let height: AppKit.NSView.AutoresizingMask = .height
+            hostingView.autoresizingMask = [width, height]
             containerView.addSubview(hostingView)
         }
 
         panel.contentView = containerView
 
         self.panel = panel
+        self.comfyTileMenuBarVM?.panel = panel
     }
 
     // MARK: - Panel Toggle
@@ -162,6 +167,8 @@ class MenuBarCoordinator: NSObject {
         guard let panel = panel,
             let button = statusItem?.button
         else { return }
+        
+        comfyTileMenuBarVM?.getLastFocusedWindow()
 
         // Position the panel below the status item
         let buttonRect =
@@ -189,6 +196,7 @@ class MenuBarCoordinator: NSObject {
             panel.setFrameOrigin(panelOrigin)
         }
 
+        NSApp.activate(ignoringOtherApps: true)
         panel.makeKeyAndOrderFront(nil)
 
         // Add event monitors for auto-dismiss
@@ -207,7 +215,20 @@ class MenuBarCoordinator: NSObject {
         globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [
             .leftMouseDown, .rightMouseDown,
         ]) { [weak self] _ in
-            self?.hidePanel()
+            guard let self = self, let panel = self.panel else { return }
+            let mouseLocation = NSEvent.mouseLocation
+            if panel.frame.contains(mouseLocation) {
+                return
+            }
+            if let button = self.statusItem?.button,
+               let buttonWindow = button.window
+            {
+                let buttonRect = buttonWindow.convertToScreen(button.convert(button.bounds, to: nil))
+                if buttonRect.contains(mouseLocation) {
+                    return
+                }
+            }
+            self.hidePanel()
         }
 
         // Local event monitor - Escape key and clicks outside the panel

@@ -131,6 +131,8 @@ struct UpdateRing: View {
 }
 private struct BannerRow<Content: View>: View {
     @ViewBuilder var content: Content
+    @Environment(DefaultsManager.self) var defaultsManager
+    @Environment(ComfyTileMenuBarViewModel.self) var comfyTileMenuBarVM
     
     var body: some View {
         HStack {
@@ -141,8 +143,13 @@ private struct BannerRow<Content: View>: View {
         .frame(maxWidth: .infinity)
         .padding(8)
         .background {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.accentColor)
+            UnevenRoundedRectangle(
+                topLeadingRadius: defaultsManager.comfyTileTabPlacement == .top ? 0 : 12,
+                bottomLeadingRadius: defaultsManager.comfyTileTabPlacement == .bottom ? 0 : 12,
+                bottomTrailingRadius: defaultsManager.comfyTileTabPlacement == .bottom ? 0 : 12,
+                topTrailingRadius: defaultsManager.comfyTileTabPlacement == .top ? 0 : 12
+            )
+            .fill(Color.accentColor)
         }
     }
 }
@@ -208,23 +215,20 @@ private struct PermissionRow: View {
     }
 }
 
-#Preview {
-    
-    @Previewable @State var defaultsManager = DefaultsManager()
-    @Previewable @State var fetchedWindowManager = FetchedWindowManager()
-    @Previewable @State var updateController = UpdateController()
-    
-    lazy var settingsCoordinator = SettingsCoordinator(
-        settingsVM: SettingsViewModel(),
-        windowCoordinator: WindowCoordinator(),
-        updateController: updateController,
-        defaultsManager: defaultsManager
-    )
-    
-    ComfyTileMenuBarRootView(
-        defaultsManager: defaultsManager,
-        fetchedWindowManager: fetchedWindowManager,
-        settingsCoordinator: settingsCoordinator,
-        updateController: updateController,
-    )
-}
+//#Preview {
+//    
+//    @Previewable @State var defaultsManager = DefaultsManager()
+//    @Previewable @State var fetchedWindowManager = FetchedWindowManager()
+//    @Previewable @State var updateController = UpdateController()
+//    
+//    
+//    ComfyTileMenuBarRootView(
+//        settingsVM: SettingsViewModel(),
+//        comfyTileMenuBarVM: ComfyTileMenuBarViewModel(
+//            windowTilingCoordinator: WindowTilingCoordinator(fetchedWindowManager: <#FetchedWindowManager#>, windowSplitManager: <#WindowSplitManager#>, windowLayoutService: <#any WindowLayoutProviding#>, defaultsManager: <#DefaultsManager#>)
+//        ),
+//        defaultsManager: defaultsManager,
+//        fetchedWindowManager: fetchedWindowManager,
+//        updateController: updateController,
+//    )
+//}

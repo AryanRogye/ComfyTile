@@ -22,9 +22,9 @@ class AppCoordinator {
     private var windowViewerCoordinator : WindowViewerCoordinator
     private var windowCoordinator       = WindowCoordinator()
     private var menuBarCoordinator      = MenuBarCoordinator()
-    var settingsCoordinator             : SettingsCoordinator
 
     /// View Models
+    private var comfyTileMenuBarVM     : ComfyTileMenuBarViewModel?
     private var tilingCoverVM          : TilingCoverViewModel
     private var shortcutHUDVM          : ShortcutHUDViewModel
     private var windowViewerVM         : WindowViewerViewModel
@@ -67,19 +67,27 @@ class AppCoordinator {
             windowViewerVM: windowViewerVM,
             fetchedWindowManager: fetchedWindowManager
         )
-        self.settingsCoordinator = SettingsCoordinator(
-            settingsVM: settingsVM,
-            windowCoordinator: windowCoordinator,
-            updateController: updateController,
+
+        windowTilingCoordinator = WindowTilingCoordinator(
+            fetchedWindowManager: fetchedWindowManager,
+            windowSplitManager: windowSplitManager,
+            windowLayoutService: appEnv.windowLayoutService,
             defaultsManager: defaultsManager
         )
+        guard let windowTilingCoordinator else { return }
+        
+        self.comfyTileMenuBarVM = ComfyTileMenuBarViewModel(
+            windowTilingCoordinator: windowTilingCoordinator,
+            fetchedWindowManager: fetchedWindowManager
+        )
+        guard let comfyTileMenuBarVM else { return }
 
         // Start the AppKit-based menu bar
         menuBarCoordinator.start(
+            comfyTileMenuBarVM: comfyTileMenuBarVM,
             settingsVM: settingsVM,
             defaultsManager: defaultsManager,
             fetchedWindowManager: fetchedWindowManager,
-            settingsCoordinator: settingsCoordinator,
             updateController: updateController
         )
 
@@ -92,13 +100,6 @@ class AppCoordinator {
                 self.hotKeyCoordinator?.startModifier(with: self.defaultsManager.modiferKey)
             }
         }
-
-        windowTilingCoordinator = WindowTilingCoordinator(
-            fetchedWindowManager: fetchedWindowManager,
-            windowSplitManager: windowSplitManager,
-            windowLayoutService: appEnv.windowLayoutService,
-            defaultsManager: defaultsManager
-        )
 
         hotKeyCoordinator = HotKeyCoordinator(
             onPrimaryLeftStackedHorizontallyTile: {

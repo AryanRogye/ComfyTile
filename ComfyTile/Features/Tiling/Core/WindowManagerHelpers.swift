@@ -52,7 +52,12 @@ struct WindowManagerHelpers {
         }
         
         let windowElement = focusedWindow as! AXUIElement
-        return FocusedWindow(element: WindowElement(element: windowElement), screen: screen)
+        return FocusedWindow(
+            element: WindowElement(element: windowElement),
+            screen: screen,
+            bundleIdentifier: app.bundleIdentifier,
+            pid: app.processIdentifier
+        )
     }
     
     public static func screenUnderMouse() -> NSScreen? {
