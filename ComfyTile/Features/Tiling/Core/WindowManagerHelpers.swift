@@ -52,11 +52,16 @@ struct WindowManagerHelpers {
         }
         
         let windowElement = focusedWindow as! AXUIElement
+        let element = WindowElement(element: windowElement)
         return FocusedWindow(
-            element: WindowElement(element: windowElement),
+            windowID: element.cgWindowID,
+            windowTitle: element.title,
+            element: element,
             screen: screen,
             bundleIdentifier: app.bundleIdentifier,
-            pid: app.processIdentifier
+            pid: app.processIdentifier,
+            /// Most Likely Focused will always be in space
+            isInSpace: true
         )
     }
     

@@ -104,6 +104,13 @@ extension AXUIElement {
         return results
     }
     
+    func _cgWindowID() -> CGWindowID? {
+        var id: CGWindowID = 0
+        let err = _AXUIElementGetWindow(self, &id)
+        guard err == .success, id != 0 else { return nil }
+        return id
+    }
+    
     func title() throws -> String? {
         try attribute(kAXTitleAttribute, String.self)
     }

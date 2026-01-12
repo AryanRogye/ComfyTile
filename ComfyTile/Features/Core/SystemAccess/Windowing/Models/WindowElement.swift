@@ -19,9 +19,21 @@ class WindowElement {
         self.element = element
     }
     
+    var title: String? {
+        get {
+            return element?.getWrappedValue(.title)
+        }
+    }
+    
     var frame: CGRect {
         guard let position = position, let size = size else { return .null }
         return .init(origin: position, size: size)
+    }
+    
+    var cgWindowID: CGWindowID? {
+        get {
+            return element?._cgWindowID()
+        }
     }
     
     var size: CGSize? {
@@ -66,5 +78,30 @@ class WindowElement {
         }
         position = frame.origin
         size = frame.size
+    }
+    
+    public func focusWindow(with pid: pid_t) {
+        if let axElement = element {
+            // Precise window focus
+            activateApp(pid: pid)
+            
+            // Raise specific window using AX
+            AXUIElementPerformAction(axElement, kAXRaiseAction as CFString)
+            AXUIElementSetAttributeValue(
+                axElement,
+                kAXMainAttribute as CFString,
+                true as CFTypeRef
+            )
+        } else {
+            // Fallback: just activate the app
+            activateApp(pid: pid)
+        }
+    }
+    
+    private func activateApp(pid: pid_t) {
+        let apps = NSWorkspace.shared.runningApplications
+        if let app = apps.first(where: { $0.processIdentifier == pid }) {
+            app.activate(options: [.activateIgnoringOtherApps])
+        }
     }
 }

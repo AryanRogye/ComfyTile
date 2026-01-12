@@ -9,11 +9,10 @@ import Cocoa
 
 @MainActor
 struct AXUtils {
+    
     public static func findMatchingAXWindow(
         pid: pid_t,
-        targetCGSWindowID: CGWindowID,
         targetCGSFrame: CGRect,
-        targetCGSTitle: String?
     ) -> AXUIElement? {
         
         let appAX = AXUIElementCreateApplication(pid)

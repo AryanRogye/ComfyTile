@@ -43,7 +43,6 @@ final class FetchedWindowManager {
         fetchedWindows = merged
     }
     
-    
     /// Gets ALL User Windows
     public func getUserWindows() async -> [FetchedWindow]? {
         do {
@@ -79,9 +78,7 @@ final class FetchedWindowManager {
                 /// Get AXElement, Doesnt matter if nil
                 let axElement = AXUtils.findMatchingAXWindow(
                     pid: pid,
-                    targetCGSWindowID: window.windowID,
-                    targetCGSFrame: bounds,
-                    targetCGSTitle: windowTitle
+                    targetCGSFrame: bounds
                 )
                 
                 /// Get Screenshot
@@ -94,12 +91,17 @@ final class FetchedWindowManager {
                 
                 let spaces = spacesForWindow(window.windowID)
                 let isInSpace = !spaces.isEmpty
+                
+                
+                let windowElement = WindowElement(element: axElement)
+                print("SCFrameworkID: \(window.windowID), ELEMENT_ID: \(windowElement.cgWindowID, default: "nil")")
+                
                 /// Add
                 focusedWindows.append(FetchedWindow(
                     windowID: window.windowID,
                     windowTitle: windowTitle,
                     pid: pid,
-                    element: WindowElement(element: axElement),
+                    element: windowElement,
                     bundleIdentifier: app.bundleIdentifier,
                     screenshot: screenshot,
                     isInSpace: isInSpace
