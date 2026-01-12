@@ -1,0 +1,32 @@
+⮕ nm CoreGraphics | rg "Focus"
+0000000187251fa8 t ___RIPStyleFocusRing_block_invoke
+00000001875fd0e4 T _CGContextSetFocusRingWithColor
+0000000000000000 I _CGSSetMouseFocusWindow
+00000001875e7c34 T _CGStyleCreateFocusRing
+00000001878a93f0 r _CGStyleCreateFocusRing.focus_ring_color
+0000000187251ecc T _CGStyleCreateFocusRingWithColor
+0000000000000000 I _CPSGetKeyFocusProcess
+0000000000000000 I _CPSReleaseKeyFocus
+0000000000000000 I _CPSReleaseKeyFocusOnConnection
+0000000000000000 I _CPSReleaseKeyFocusWithID
+0000000000000000 I _CPSStealKeyFocus
+0000000000000000 I _CPSStealKeyFocusOnConnection
+0000000000000000 I _CPSStealKeyFocusReturningID
+00000001eaf039e8 b _RIPStyleFocusRing.predicate
+00000001eaf03940 b _RIPStyleFocusRing.rips_f_cls
+                 U _SLPSGetKeyFocusProcess
+                 U _SLPSReleaseKeyFocus
+                 U _SLPSReleaseKeyFocusOnConnection
+                 U _SLPSReleaseKeyFocusWithID
+                 U _SLPSStealKeyFocus
+                 U _SLPSStealKeyFocusOnConnection
+                 U _SLPSStealKeyFocusReturningID
+                 U _SLSSetMouseFocusWindow
+aryanrogye: A/
+⮕ nm CoreGraphics | rg "Activate"
+0000000000000000 I _CGSWindowBackdropActivate
+0000000000000000 I _CGSWindowBackdropActivateAll
+                 U _SLSWindowBackdropActivate
+                 U _SLSWindowBackdropActivateAll
+aryanrogye: A/
+⮕

@@ -21,7 +21,7 @@ struct WindowManagerHelpers {
     ///
     /// - Returns: `FocusedWindow` if both the screen and focused window are found.
     ///   Otherwise returns `nil` and logs why.
-    public static func getFocusedWindow() -> FocusedWindow? {
+    public static func getFocusedWindow() -> UserWindow? {
         
         // If we can't get the screen under the mouse, stop.
         guard let screen = screenUnderMouse() else {
@@ -53,7 +53,7 @@ struct WindowManagerHelpers {
         
         let windowElement = focusedWindow as! AXUIElement
         let element = WindowElement(element: windowElement)
-        return FocusedWindow(
+        return UserWindow(
             windowID: element.cgWindowID,
             windowTitle: element.title,
             element: element,

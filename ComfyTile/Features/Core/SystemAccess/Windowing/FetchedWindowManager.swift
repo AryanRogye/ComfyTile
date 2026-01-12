@@ -10,7 +10,7 @@ import ScreenCaptureKit
 @Observable @MainActor
 final class FetchedWindowManager {
     /// Seed Fetched Windows At Start
-    var fetchedWindows : [FetchedWindow] = []
+    var fetchedWindows : [UserWindow] = []
     
     init() {
         Task {
@@ -24,7 +24,7 @@ final class FetchedWindowManager {
         // fast lookup of the newest snapshot by windowID
         let newByID = Dictionary(uniqueKeysWithValues: fw.map { ($0.windowID, $0) })
         
-        var merged: [FetchedWindow] = []
+        var merged: [UserWindow] = []
         merged.reserveCapacity(fw.count)
         
         // 1) keep current (rearranged) order, but replace each element with the fresh snapshot
@@ -44,11 +44,11 @@ final class FetchedWindowManager {
     }
     
     /// Gets ALL User Windows
-    public func getUserWindows() async -> [FetchedWindow]? {
+    public func getUserWindows() async -> [UserWindow]? {
         do {
             let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
             let allOnScreenWindows = content.windows
-            var focusedWindows: [FetchedWindow] = []
+            var focusedWindows: [UserWindow] = []
             
             /// Loop Through all screens for windows
             for window in allOnScreenWindows {
@@ -97,12 +97,12 @@ final class FetchedWindowManager {
                 print("SCFrameworkID: \(window.windowID), ELEMENT_ID: \(windowElement.cgWindowID, default: "nil")")
                 
                 /// Add
-                focusedWindows.append(FetchedWindow(
+                focusedWindows.append(UserWindow(
                     windowID: window.windowID,
                     windowTitle: windowTitle,
-                    pid: pid,
                     element: windowElement,
                     bundleIdentifier: app.bundleIdentifier,
+                    pid: pid,
                     screenshot: screenshot,
                     isInSpace: isInSpace
                 ))

@@ -14,7 +14,7 @@ import LocalShortcuts
 class WindowViewerViewModel {
     var isShown = false
     
-    var onEscape: (() -> Void)?
+    var onEscape: (() -> Void) = { }
     
     var selected: Int = 0
 }
@@ -126,12 +126,12 @@ class WindowViewerCoordinator: NSObject {
                         fetchedWindowManager.fetchedWindows.insert(focused, at: 0)
                     }
                     
-                    self.windowViewerVM.onEscape?()
+                    self.windowViewerVM.onEscape()
                 }
             } else {
                 let key = LocalShortcuts.Key.activeKeys(event: e)
                 if key == [.escape] {
-                    self.windowViewerVM.onEscape?()
+                    self.windowViewerVM.onEscape()
                     return nil // swallow
                 }
             }

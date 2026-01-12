@@ -1,5 +1,5 @@
 //
-//  FocusedWindow.swift
+//  UserWindow.swift
 //  ComfyTile
 //
 //  Created by Aryan Rogye on 1/6/26.
@@ -7,7 +7,7 @@
 
 import Cocoa
 
-class FocusedWindow: Identifiable {
+struct UserWindow: Identifiable {
     var id: String { "\(pid):\(windowID ?? 0)" }
     
     let windowID : CGWindowID?
@@ -15,7 +15,7 @@ class FocusedWindow: Identifiable {
     
     /// More stronger element
     var element: WindowElement
-    var screen: NSScreen
+    var screen: NSScreen?
     let pid: pid_t
     let bundleIdentifier: String?
     let screenshot : CGImage?
@@ -25,7 +25,7 @@ class FocusedWindow: Identifiable {
         windowID: CGWindowID?,
         windowTitle     : String?,
         element: WindowElement,
-        screen: NSScreen,
+        screen: NSScreen? = nil,
         bundleIdentifier: String?,
         pid: pid_t,
         screenshot: CGImage? = nil,
@@ -42,6 +42,7 @@ class FocusedWindow: Identifiable {
     }
     
     public func focusWindow() {
-        element.focusWindow(with: pid)
+        element.focusWindow(with: pid, for: windowID)
     }
+
 }
