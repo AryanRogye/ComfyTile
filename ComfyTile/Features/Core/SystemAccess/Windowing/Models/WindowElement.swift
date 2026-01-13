@@ -88,10 +88,12 @@ class WindowElement {
         if let window {
             SkylightHelpers.setFrontProcess(pid, window, mode: SLPSMode.allWindows)
         } else {
+            
+            /// Activate App
+            activateApp(pid: pid)
+            
+            /// Then Check Element and bring above
             if let axElement = element {
-                // Precise window focus
-                activateApp(pid: pid)
-                
                 // Raise specific window using AX
                 AXUIElementPerformAction(axElement, kAXRaiseAction as CFString)
                 AXUIElementSetAttributeValue(
@@ -99,9 +101,6 @@ class WindowElement {
                     kAXMainAttribute as CFString,
                     true as CFTypeRef
                 )
-            } else {
-                // Fallback: just activate the app
-                activateApp(pid: pid)
             }
         }
     }

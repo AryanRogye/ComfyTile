@@ -144,4 +144,7 @@ enum SLPSMode: UInt32 {
 
 /// Get process serial number from PID
 @_silgen_name("GetProcessForPID") @discardableResult
-func GetProcessForPID(_ pid: pid_t, _ psn: UnsafeMutablePointer<ProcessSerialNumber>) -> OSStatus
+func GetProcessForPID(
+    _ pid: pid_t,
+    _ psn: UnsafeMutablePointer<ProcessSerialNumber>
+) -> OSStatus
