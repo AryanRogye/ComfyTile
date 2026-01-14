@@ -21,7 +21,7 @@ class WindowSplitManager {
         case right
     }
     
-    func splitWindows(window: [FetchedWindow], style: LayoutMode) async {
+    func splitWindows(window: [UserWindow], style: LayoutMode) async {
         ComfyLogger.WindowSplitManager.insert("Called Split In Space: \(window.count)")
         switch style {
         case .primaryOnly:
@@ -45,7 +45,7 @@ class WindowSplitManager {
         }
     }
     
-    private func primaryOnlySplit(on window: [FetchedWindow]) async {
+    private func primaryOnlySplit(on window: [UserWindow]) async {
         if window.isEmpty {
             print("Window is Empty")
             return
@@ -79,7 +79,7 @@ class WindowSplitManager {
 
     /// Calculate Horizontal Split Going Down
     /// Direction is if placing on left or right
-    private func calculateAndSetStacked(on window: [FetchedWindow], direction: SplitDirection, avoid avoidRect: CGRect) async {
+    private func calculateAndSetStacked(on window: [UserWindow], direction: SplitDirection, avoid avoidRect: CGRect) async {
         if window.isEmpty {
             print("Window is Empty")
             return
@@ -127,18 +127,18 @@ class WindowSplitManager {
             try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
             
             ComfyLogger.WindowSplitManager.insert(
-                "\(w.bundleIdentifier) (Size) (Postion) Requested: (width: \(width), height: \(height))|(x: \(x), y: \(y))"
+                "\(w.bundleIdentifier, default: "Nil") (Size) (Postion) Requested: (width: \(width), height: \(height))|(x: \(x), y: \(y))"
             )
             let appliedRect = foc.element.frame
             let appliedPos = appliedRect.axPosition(on: screen)
             
             ComfyLogger.WindowSplitManager.insert(
-                "\(w.bundleIdentifier) Applied  : (width: \(appliedRect.width), height: \(appliedRect.height)) | (x: \(appliedPos.x), y: \(appliedPos.y))"
+                "\(w.bundleIdentifier, default: "Nil") Applied  : (width: \(appliedRect.width), height: \(appliedRect.height)) | (x: \(appliedPos.x), y: \(appliedPos.y))"
             )
         }
     }
     
-    private func createPrimarySplit(on window: [FetchedWindow], direction: SplitDirection) async -> (FocusedWindow?, FetchedWindow?) {
+    private func createPrimarySplit(on window: [UserWindow], direction: SplitDirection) async -> (UserWindow?, UserWindow?) {
         if window.isEmpty {
             print("Window is Empty")
             return (nil, nil)

@@ -36,8 +36,7 @@
 		9B8FC0742F10B80D00CBF4B8 /* UpdaterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC02F2F10B80D00CBF4B8 /* UpdaterViewModel.swift */; };
 		9B8FC0752F10B80D00CBF4B8 /* AXUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0322F10B80D00CBF4B8 /* AXUtils.swift */; };
 		9B8FC0762F10B80D00CBF4B8 /* FetchedWindowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0362F10B80D00CBF4B8 /* FetchedWindowManager.swift */; };
-		9B8FC0782F10B80D00CBF4B8 /* FetchedWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0392F10B80D00CBF4B8 /* FetchedWindow.swift */; };
-		9B8FC0792F10B80D00CBF4B8 /* FocusedWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC03A2F10B80D00CBF4B8 /* FocusedWindow.swift */; };
+		9B8FC0792F10B80D00CBF4B8 /* UserWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC03A2F10B80D00CBF4B8 /* UserWindow.swift */; };
 		9B8FC07A2F10B80D00CBF4B8 /* Modifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC03B2F10B80D00CBF4B8 /* Modifiers.swift */; };
 		9B8FC07B2F10B80D00CBF4B8 /* WindowElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC03C2F10B80D00CBF4B8 /* WindowElement.swift */; };
 		9B8FC07C2F10B80D00CBF4B8 /* WindowLayoutProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC03E2F10B80D00CBF4B8 /* WindowLayoutProviding.swift */; };
@@ -81,6 +80,7 @@
 		9B8FC0CA2F12EF5C00CBF4B8 /* MenuBarModeContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0C92F12EF5900CBF4B8 /* MenuBarModeContainer.swift */; };
 		9B8FC0D52F130B7700CBF4B8 /* HotKeyOrClose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */; };
 		9B8FC0D72F130E7500CBF4B8 /* ShortcutEditableRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */; };
+		9B8FC0DB2F1578EF00CBF4B8 /* SkylightHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0DA2F1578E900CBF4B8 /* SkylightHelpers.swift */; };
 		9BF95F0E2E9326AE00776771 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
@@ -110,8 +110,7 @@
 		9B8FC02F2F10B80D00CBF4B8 /* UpdaterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterViewModel.swift; sourceTree = "<group>"; };
 		9B8FC0322F10B80D00CBF4B8 /* AXUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AXUtils.swift; sourceTree = "<group>"; };
 		9B8FC0362F10B80D00CBF4B8 /* FetchedWindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchedWindowManager.swift; sourceTree = "<group>"; };
-		9B8FC0392F10B80D00CBF4B8 /* FetchedWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchedWindow.swift; sourceTree = "<group>"; };
-		9B8FC03A2F10B80D00CBF4B8 /* FocusedWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedWindow.swift; sourceTree = "<group>"; };
+		9B8FC03A2F10B80D00CBF4B8 /* UserWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserWindow.swift; sourceTree = "<group>"; };
 		9B8FC03B2F10B80D00CBF4B8 /* Modifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modifiers.swift; sourceTree = "<group>"; };
 		9B8FC03C2F10B80D00CBF4B8 /* WindowElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowElement.swift; sourceTree = "<group>"; };
 		9B8FC03E2F10B80D00CBF4B8 /* WindowLayoutProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutProviding.swift; sourceTree = "<group>"; };
@@ -157,6 +156,7 @@
 		9B8FC0C92F12EF5900CBF4B8 /* MenuBarModeContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarModeContainer.swift; sourceTree = "<group>"; };
 		9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyOrClose.swift; sourceTree = "<group>"; };
 		9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutEditableRow.swift; sourceTree = "<group>"; };
+		9B8FC0DA2F1578E900CBF4B8 /* SkylightHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkylightHelpers.swift; sourceTree = "<group>"; };
 		9BF95ECE2E9321E000776771 /* ComfyTile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ComfyTile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -239,7 +239,6 @@
 		9B8FC0282F10B80D00CBF4B8 /* Tiling */ = {
 			isa = PBXGroup;
 			children = (
-				9B8FC08F2F10C1D400CBF4B8 /* Models */,
 				9B8FC0272F10B80D00CBF4B8 /* Core */,
 			);
 			path = Tiling;
@@ -293,7 +292,6 @@
 		9B8FC0342F10B80D00CBF4B8 /* Windows */ = {
 			isa = PBXGroup;
 			children = (
-				9B8FC0902F10C1DC00CBF4B8 /* Models */,
 				9B8FC0332F10B80D00CBF4B8 /* Core */,
 			);
 			path = Windows;
@@ -411,22 +409,6 @@
 			path = ComfyTile;
 			sourceTree = "<group>";
 		};
-		9B8FC08F2F10C1D400CBF4B8 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				9B8FC03A2F10B80D00CBF4B8 /* FocusedWindow.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		9B8FC0902F10C1DC00CBF4B8 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				9B8FC0392F10B80D00CBF4B8 /* FetchedWindow.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 		9B8FC0912F10C1F600CBF4B8 /* Input */ = {
 			isa = PBXGroup;
 			children = (
@@ -456,6 +438,7 @@
 		9B8FC0962F11A09E00CBF4B8 /* Private */ = {
 			isa = PBXGroup;
 			children = (
+				9B8FC0D92F1578E700CBF4B8 /* Skylight */,
 				9B8FC09C2F11A17300CBF4B8 /* AX */,
 				9B8FC0972F11A0E500CBF4B8 /* CGS */,
 			);
@@ -502,6 +485,7 @@
 			isa = PBXGroup;
 			children = (
 				9B8FC03C2F10B80D00CBF4B8 /* WindowElement.swift */,
+				9B8FC03A2F10B80D00CBF4B8 /* UserWindow.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -548,6 +532,14 @@
 				9B8FC0C72F12ECFA00CBF4B8 /* MenuBarModeRow.swift */,
 			);
 			path = Component;
+			sourceTree = "<group>";
+		};
+		9B8FC0D92F1578E700CBF4B8 /* Skylight */ = {
+			isa = PBXGroup;
+			children = (
+				9B8FC0DA2F1578E900CBF4B8 /* SkylightHelpers.swift */,
+			);
+			path = Skylight;
 			sourceTree = "<group>";
 		};
 		9BF95EC52E9321E000776771 = {
@@ -694,9 +686,8 @@
 				9B8FC0BB2F12019700CBF4B8 /* SettingsContent.swift in Sources */,
 				9B8FC0762F10B80D00CBF4B8 /* FetchedWindowManager.swift in Sources */,
 				9B8FC0C82F12ECFB00CBF4B8 /* MenuBarModeRow.swift in Sources */,
-				9B8FC0782F10B80D00CBF4B8 /* FetchedWindow.swift in Sources */,
 				9B8FC0AB2F11B08400CBF4B8 /* SettingsViewModel.swift in Sources */,
-				9B8FC0792F10B80D00CBF4B8 /* FocusedWindow.swift in Sources */,
+				9B8FC0792F10B80D00CBF4B8 /* UserWindow.swift in Sources */,
 				9B8FC0A02F11A2DE00CBF4B8 /* AXHelpers.swift in Sources */,
 				9B8FC07A2F10B80D00CBF4B8 /* Modifiers.swift in Sources */,
 				9B8FC0A32F11A43500CBF4B8 /* DefaultsKeys.swift in Sources */,
@@ -715,6 +706,7 @@
 				9B8FC0852F10B80D00CBF4B8 /* ComfyTileMenuBar.swift in Sources */,
 				9B8FC0862F10B80D00CBF4B8 /* SettingsView.swift in Sources */,
 				9B8FC0872F10B80D00CBF4B8 /* ShortcutHUD.swift in Sources */,
+				9B8FC0DB2F1578EF00CBF4B8 /* SkylightHelpers.swift in Sources */,
 				9B8FC0882F10B80D00CBF4B8 /* ShortcutHUDBackground.swift in Sources */,
 				9B8FC0892F10B80D00CBF4B8 /* ShortcutHUDKeyboardListener.swift in Sources */,
 				9B8FC08A2F10B80D00CBF4B8 /* TilingCover.swift in Sources */,

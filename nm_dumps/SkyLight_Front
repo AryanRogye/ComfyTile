@@ -1,0 +1,149 @@
+⮕ nm SkyLight | rg "Front"
+0000000186e87128 t ___56-[CPXEntryPointsService client:addToPermittedFrontList:]_block_invoke
+0000000186e86da4 t ___61-[CPXEntryPointsService client:removeFromPermittedFrontList:]_block_invoke
+0000000186f27d78 t ___getFUSBProcessSetFrontmostSymbolLoc_block_invoke
+0000000186eb997c t ___getSLCPSFrontTrackingLog_block_invoke
+0000000186d6d404 t ___PKGManagedSpaceInitializeFrontConnectionForWindowManager_block_invoke
+0000000186ed7774 t ___PKGMenuBarDivestConnectionAsFrontmost_block_invoke
+0000000186ed7670 t ___PKGMenuBarDivestFrontmostConnectionOnSpace_block_invoke
+0000000186f0c2d0 t ___PKGSetFrontProcessForCurrentSpaceSwitch_block_invoke
+0000000186e4734c t ___SLSSetFrontProcessWithInfo_block_invoke
+0000000186c83cb4 t __BringNextApplicationToFrontInternal
+0000000186c533dc t __CGSSpaceSetFrontPSN
+0000000186e3a328 t __CGXOrderFrontConditionally
+0000000186c8199c t __CGXSetFrontProcess
+                 U __kLSAllowedToBecomeFrontmostKey
+                 U __kLSApplicationReadyToBeFrontableKey
+                 U __kLSExpectedFrontApplicationASNKey
+                 U __kLSFrontReservationExistsKey
+                 U __kLSPermittedFrontASNsArrayKey
+                 U __LSCopyApplicationArrayInFrontToBackOrder
+                 U __LSCopyFrontApplication
+                 U __LSCopyFrontUIApplication
+                 U __LSGetFrontApplicationSeed
+                 U __LSSetFrontApplication
+00000001870ecd08 t __OBJC_$_CLASS_METHODS_SLSBridgedSpaceSetFrontPSNOperation
+00000001870f0268 t __OBJC_$_INSTANCE_METHODS_SLSBridgedSpaceSetFrontPSNOperation
+00000001eec10630 d __OBJC_$_INSTANCE_VARIABLES_SLSBridgedSpaceSetFrontPSNOperation
+00000001eec10678 d __OBJC_$_PROP_LIST_SLSBridgedSpaceSetFrontPSNOperation
+00000001eec106a0 d __OBJC_CLASS_RO_$_SLSBridgedSpaceSetFrontPSNOperation
+00000001eec105e8 d __OBJC_METACLASS_RO_$_SLSBridgedSpaceSetFrontPSNOperation
+0000000186f27bf0 t __PKGSystemShellProcessFrontmostChangeHandler
+0000000186e46db4 T __SLPSGetFrontProcess
+0000000186e46e20 T __SLPSSetFrontProcessWithOptions
+0000000186e479c0 t __SLPSUpdatePermittedFrontPSNList
+00000001870db538 t __XBringNextToFront
+00000001870db5b0 t __XGetNextToFrontProcess
+00000001870c36b4 t __XGetSurfaceFrontBufferID
+00000001870da0f4 t __XOrderFrontConditionally
+00000001870ddd14 t __XSetFrontProcess
+00000001870bba98 t __XSetFrontProcessWithInfo
+00000001870d9b20 t __XSetFrontWindow
+00000001870cd4c8 t __XSpaceSetFrontPSN
+00000001870b8ccc t __XUpdatePermittedFrontPSNList
+0000000186e3a3d4 t __ZL19_safeFrontWithClick16CPSProcessSerNumyP9CGXWindow
+0000000186c82240 t __ZL19isAncestorFrontmostii
+0000000186c7f9d4 t __ZL23SetFrontProcessInternalP10CGXSessionP13CPSProcessRecPK14SLSEventRecordjm
+0000000186c81a0c t __ZL28isProcessEligibleForSetFrontj16CPSProcessSerNumbPb
+0000000186fee624 t __ZL48PKGTransactionOrderWindowGroupFrontConditionallyP22_PKGTransactionContext
+0000000186c82010 t __ZL54doesFrontProcessOrCurrentKeyThiefHaveSecureTextEnabledv
+00000001eaef1d38 b __ZZ24getSLCPSFrontTrackingLogE5sOnce
+00000001eaef1d30 b __ZZ24getSLCPSFrontTrackingLogE7sResult
+0000000186c82ebc t _bringNextProcessToFront
+0000000186c816d4 t _CPXGetFrontProcess
+0000000186c82084 t _CPXGetFrontProcessesConnectionID
+0000000186c8194c t _CPXIsProcessPermittedToBeFrontmost
+0000000186c818c4 t _CPXIsProcessPermittedToReorderFrontWhileInactive
+0000000186c8173c t _CPXSetFrontProcess
+0000000186ed2654 t _GetEligibleFrontProcessRecFromPermittedList
+0000000186ed250c t _GetFrontVisibleProcessRec
+00000001eaef2ce0 b _getFUSBProcessSetFrontmostSymbolLoc.ptr
+00000001e702dce0 D _kSLSSetFrontProcessActivationCountKey
+00000001e702dd08 D _kSLSSetFrontProcessActivationTokenTargetBundleID
+00000001e702dcf8 D _kSLSSetFrontProcessApplicationHasVisibleWindows
+00000001e702dcd8 D _kSLSSetFrontProcessEventSeedKey
+00000001e702dd00 D _kSLSSetFrontProcessFirstActivationPreventionDuration
+00000001e702dcf0 D _kSLSSetFrontProcessIgnoringOtherApps
+00000001e702dce8 D _kSLSSetFrontProcessLatestActivationTimestampKey
+00000001e702dcd0 D _kSLSSetFrontProcessRequestorPidKey
+00000001e702dcc8 D _kSLSSetFrontProcessRequestTimestampKey
+00000001e702dcc0 D _kSLSSetFrontProcessValidatedKey
+00000001edbbd598 D _OBJC_CLASS_$_SLSBridgedSpaceSetFrontPSNOperation
+00000001eaee440c d _OBJC_IVAR_$_CPXFocusManager._fixingFrontProcess
+00000001eaee43d8 d _OBJC_IVAR_$_CPXFocusManagerDataSourceLaunchServices._gpFrontProc
+00000001eaee43dc d _OBJC_IVAR_$_CPXFocusManagerDataSourceLaunchServices._permittedFrontList
+00000001eaee4798 d _OBJC_IVAR_$_SLSBridgedSpaceSetFrontPSNOperation._psn
+00000001eaee4794 d _OBJC_IVAR_$_SLSBridgedSpaceSetFrontPSNOperation._spaceID
+00000001edbbd5c0 D _OBJC_METACLASS_$_SLSBridgedSpaceSetFrontPSNOperation
+00000001871c1780 T _objc_msgSend$_sanitizeFrontmost:
+00000001871c19e0 T _objc_msgSend$actionForOrderingAllWindowsFrontWithInfo:fences:
+00000001871c1d60 T _objc_msgSend$addToPermittedFrontASNList:
+00000001871c1d80 T _objc_msgSend$addToPermittedFrontList:
+00000001871c26e0 T _objc_msgSend$bringNextApplicationToFrontInternal:
+00000001871c2700 T _objc_msgSend$bringNextProcessToFront:
+00000001871c2a80 T _objc_msgSend$client:addToPermittedFrontList:
+00000001871c2aa0 T _objc_msgSend$client:removeFromPermittedFrontList:
+00000001871c6f80 T _objc_msgSend$isProcessPermittedToBeFrontmost:
+00000001871c92e0 T _objc_msgSend$releaseAllKeyThiefInstancesNotPermittedFrontmost
+00000001871c9480 T _objc_msgSend$removeFromPermittedFrontASNList:
+00000001871c94a0 T _objc_msgSend$removeFromPermittedFrontList:
+00000001871cafa0 T _objc_msgSend$setFrontApplication:
+00000001871cafc0 T _objc_msgSend$setFrontFacingWinding:
+00000001871cafe0 T _objc_msgSend$setFrontmostProcess:
+00000001871cd020 T _objc_msgSend$spaceWindowManager:changedFrontConnection:flags:
+00000001871cd040 T _objc_msgSend$spaceWindowManager:changedFrontConnection:flags:timestamp:
+00000001871cd060 T _objc_msgSend$spaceWindowManager:changedFrontConnection:pid:flags:timestamp:
+00000001871cd1e0 T _objc_msgSend$spaceWindowManager:space:changedFrontConnection:
+00000001871cd200 T _objc_msgSend$spaceWindowManager:space:changedFrontConnection:pid:
+0000000186d6d17c t _PKGManagedSpaceAcceptsFrontConnection
+0000000186d67df0 t _PKGManagedSpaceSetFrontConnection
+0000000186d6ead8 t _PKGManagedSpaceSetFrontPSN
+0000000186ed76d8 t _PKGMenuBarDivestConnectionAsFrontmost
+0000000186ed74b8 t _PKGMenuBarDivestFrontmostConnectionOnSpace
+0000000186f0c0b8 t _PKGSetFrontProcessForCurrentSpaceSwitch
+0000000186e478bc T _SLPSAddToPermittedFrontPSNList
+0000000186e4af68 T _SLPSBringNextToFront
+0000000186e46e1c T _SLPSGetFrontProcess
+0000000186e4ada8 T _SLPSGetNextToFrontProcess
+0000000186e47b90 T _SLPSRemoveFromPermittedFrontPSNList
+0000000186e478b0 T _SLPSSetFrontProcess
+0000000186e478ac T _SLPSSetFrontProcessWithOptions
+0000000186f54e98 T _SLSGetSurfaceFrontBufferID
+0000000186e5a64c T _SLSOrderFrontConditionally
+0000000186e470e8 T _SLSSetFrontProcessWithInfo
+000000018708da3c T _SLSSetFrontWindow
+000000018708daec T _SLSSetIgnoreAsFrontWindow
+0000000186f16128 T _SLSSpaceSetFrontPSN
+0000000186d03b24 T _SLSTransactionOrderWindowGroupFrontConditionally
+                 U _swift_arrayInitWithTakeBackToFront
+                 U _swift_arrayInitWithTakeFrontToBack
+0000000186e6a4a8 t _WSCurrentSessionAllowsConnectionToOrderItselfFront
+0000000186ed8f2c t _WSSetFrontWindow
+0000000186dd1298 t _WSTouchBarSetFrontmostOnManagedSpace
+0000000186cbf164 t -[_CPXFocusPolicy bringNextApplicationToFrontInternal:]
+0000000186cbf170 t -[_CPXFocusPolicy bringNextProcessToFront:]
+0000000186e86dc8 t -[CPXEntryPointsService _client:updatePermittedFrontList:debugUpdateType:updateBlock:]
+0000000186e8707c t -[CPXEntryPointsService client:addToPermittedFrontList:]
+0000000186e86cf8 t -[CPXEntryPointsService client:removeFromPermittedFrontList:]
+0000000187009b84 t -[CPXEventDeferringPolicySanitizer _sanitizeFrontmost:]
+0000000186cbf9cc t -[CPXFocusManager addToPermittedFrontList:]
+0000000186cbfecc t -[CPXFocusManager isProcessPermittedToBeFrontmost:]
+0000000186cbfe4c t -[CPXFocusManager releaseAllKeyThiefInstancesNotPermittedFrontmost]
+0000000186cbf8fc t -[CPXFocusManager removeFromPermittedFrontList:]
+0000000186cbfbb8 t -[CPXFocusManager setFrontmostProcess:]
+0000000186cbe028 t -[CPXFocusManagerDataSourceLaunchServices addToPermittedFrontList:]
+0000000186cbd6c8 t -[CPXFocusManagerDataSourceLaunchServices isProcessPermittedToBeFrontmost:]
+0000000186cbdae8 t -[CPXFocusManagerDataSourceLaunchServices removeFromPermittedFrontList:]
+0000000186cbe568 t -[CPXFocusManagerDataSourceLaunchServices setFrontmostProcess:]
+0000000186fb1724 t -[CPXLaunchServicesInterface addToPermittedFrontASNList:]
+0000000186fb1734 t -[CPXLaunchServicesInterface permittedFrontApplications]
+0000000186fb1714 t -[CPXLaunchServicesInterface removeFromPermittedFrontASNList:]
+0000000186fb17a4 t -[CPXLaunchServicesInterface setFrontApplication:]
+0000000186c975bc t -[CPXMutableEventDeferringPolicy setFrontmostProcess:]
+0000000186e2fba4 t -[SLSBridgedSpaceSetFrontPSNOperation encodeWithCoder:]
+0000000186e2fcd0 t -[SLSBridgedSpaceSetFrontPSNOperation initWithCoder:]
+0000000186e2fed4 t -[SLSBridgedSpaceSetFrontPSNOperation initWithSpaceID:psn:]
+0000000186e2fb44 t -[SLSBridgedSpaceSetFrontPSNOperation invokeFallback]
+0000000186e2fac4 t -[SLSBridgedSpaceSetFrontPSNOperation psn]
+0000000186e2fb34 t -[SLSBridgedSpaceSetFrontPSNOperation spaceID]
+0000000186e2ff68 t +[SLSBridgedSpaceSetFrontPSNOperation supportsSecureCoding]

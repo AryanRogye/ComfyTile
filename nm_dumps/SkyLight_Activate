@@ -1,0 +1,14 @@
+⮕ nm SkyLight | rg "Activate"
+0000000186cb945c t ____ZL41getHIDDisplayIOReportingActivateSymbolLocv_block_invoke
+0000000186cc4ad0 t ___WSWatchdogActivate_block_invoke
+0000000186e80338 t __ZL26waitCursorActivateCallbackPvd
+0000000186ce34dc t __ZN12MetalBacking22ActivateAsRenderTargetEP12MetalContextb
+0000000186ce9938 t __ZN17MetalTiledBacking22ActivateAsRenderTargetEP12MetalContextb
+00000001eaef02e8 b __ZZL41getHIDDisplayIOReportingActivateSymbolLocvE3ptr.0
+0000000186e1c8dc t _CGXActivateSurfaces
+0000000186f0c54c t _CGXPseudoActivateWindow
+                 U _IOHIDEventSystemClientActivate
+0000000186e8c504 T _SLSWindowBackdropActivate
+0000000186e8c61c T _SLSWindowBackdropActivateAll
+0000000186dc3744 t _WSCompositorActivateDefault
+0000000186cc4a94 t _WSWatchdogActivate

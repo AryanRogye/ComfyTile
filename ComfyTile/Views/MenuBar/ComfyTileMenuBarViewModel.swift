@@ -15,7 +15,7 @@ final class ComfyTileMenuBarViewModel {
     let windowTilingCoordinator: WindowTilingCoordinator
     let fetchedWindowManager   : FetchedWindowManager
     
-    var lastFocusedWindow : FocusedWindow? = nil {
+    var lastFocusedWindow : UserWindow? = nil {
         didSet {
             print("Did Set: \(lastFocusedWindow)")
         }
@@ -42,7 +42,7 @@ final class ComfyTileMenuBarViewModel {
     }
     
     public func onTap(for tile: TilingMode) async {
-        var fetchedWindow: FetchedWindow?
+        var fetchedWindow: UserWindow?
         
         if let lastFocusedWindow {
             print("Found Window")

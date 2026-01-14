@@ -80,21 +80,28 @@ class WindowElement {
         size = frame.size
     }
     
-    public func focusWindow(with pid: pid_t) {
-        if let axElement = element {
-            // Precise window focus
+    public func focusWindow(
+        with pid: pid_t,
+        for window: CGWindowID? = nil
+    ) {
+        /// if window == nil do bottom
+        if let window {
+            SkylightHelpers.setFrontProcess(pid, window, mode: SLPSMode.allWindows)
+        } else {
+            
+            /// Activate App
             activateApp(pid: pid)
             
-            // Raise specific window using AX
-            AXUIElementPerformAction(axElement, kAXRaiseAction as CFString)
-            AXUIElementSetAttributeValue(
-                axElement,
-                kAXMainAttribute as CFString,
-                true as CFTypeRef
-            )
-        } else {
-            // Fallback: just activate the app
-            activateApp(pid: pid)
+            /// Then Check Element and bring above
+            if let axElement = element {
+                // Raise specific window using AX
+                AXUIElementPerformAction(axElement, kAXRaiseAction as CFString)
+                AXUIElementSetAttributeValue(
+                    axElement,
+                    kAXMainAttribute as CFString,
+                    true as CFTypeRef
+                )
+            }
         }
     }
     

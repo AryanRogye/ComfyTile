@@ -23,6 +23,8 @@ struct WindowViewer: View {
                         
                         let focused = fetchedWindowManager.fetchedWindows.remove(at: index)
                         fetchedWindowManager.fetchedWindows.insert(focused, at: 0)
+                        
+                        windowViewerVM.onEscape()
                     }) {
                         VStack {
                             if let sc = window.screenshot {
@@ -31,7 +33,9 @@ struct WindowViewer: View {
                                     .scaledToFit()
                                     .frame(width: 200, height: 150)
                             }
-                            Text(window.windowTitle)
+                            if let title = window.windowTitle {
+                                Text(title)
+                            }
                         }
                         .padding()
                         .background {

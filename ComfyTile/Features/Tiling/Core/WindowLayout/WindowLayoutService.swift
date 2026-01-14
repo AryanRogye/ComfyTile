@@ -65,9 +65,9 @@ class WindowLayoutService: WindowLayoutProviding {
     }
     
     func fullScreen() {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return }
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+        let screen = focusedWindow.screen else { return }
         
-        let screen = focusedWindow.screen
         let frame = screen.visibleFrame
         
         let pos = frame.axPosition(on: screen)
@@ -81,9 +81,8 @@ class WindowLayoutService: WindowLayoutProviding {
     }
     
     func center() {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return }
-        
-        let screen = focusedWindow.screen
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+              let screen = focusedWindow.screen else { return }
         
         /// This is padding around all sides of the window
         let padding : CGFloat = 40
@@ -114,9 +113,8 @@ class WindowLayoutService: WindowLayoutProviding {
     
     // MARK: - Move Left
     func moveLeft() {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return }
-        
-        let screen = focusedWindow.screen
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+        let screen = focusedWindow.screen else { return }
         
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
@@ -141,10 +139,9 @@ class WindowLayoutService: WindowLayoutProviding {
     // MARK: - Move Right
     func moveRight() {
         
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return }
-        
-        let screen = focusedWindow.screen
-        
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+              let screen = focusedWindow.screen else { return }
+
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
         
@@ -186,10 +183,9 @@ class WindowLayoutService: WindowLayoutProviding {
     }
     
     func getFullScreenDimensions() -> CGRect? {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return nil }
-        
-        let screen = focusedWindow.screen
-        
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+              let screen = focusedWindow.screen else { return nil }
+
         let frame = screen.visibleFrame
         
         return CGRect(
@@ -200,9 +196,8 @@ class WindowLayoutService: WindowLayoutProviding {
         )
     }
     func getLeftDimensions() -> CGRect? {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return nil }
-        
-        let screen = focusedWindow.screen
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+            let screen = focusedWindow.screen else { return nil }
         
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
@@ -218,10 +213,9 @@ class WindowLayoutService: WindowLayoutProviding {
         
     }
     func getRightDimensions() -> CGRect? {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return nil }
-        
-        let screen = focusedWindow.screen
-        
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+              let screen = focusedWindow.screen else { return nil }
+
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
         
@@ -236,10 +230,9 @@ class WindowLayoutService: WindowLayoutProviding {
     }
     
     func getCenterDimensions() -> CGRect? {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow() else { return nil }
-        
-        let screen = focusedWindow.screen
-        
+        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+              let screen = focusedWindow.screen else { return nil }
+
         /// This is padding around all sides of the window
         let padding : CGFloat = 40
         

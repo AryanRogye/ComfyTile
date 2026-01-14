@@ -19,7 +19,7 @@ final class WindowAnimator {
     private var duration: TimeInterval = 0.12
     
     func animate(
-        focusedWindow: FocusedWindow,
+        focusedWindow: UserWindow,
         to target: CGPoint,
         duration: TimeInterval = 0.12,
         completion: @escaping () -> Void = {}
