@@ -85,28 +85,13 @@ extension AXUIElement {
         return try axCallWhichCanThrow(AXUIElementCopyAttributeValue(self, key as CFString, &value), &value) as? T
     }
     
-    static func windowsByBruteForce(_ pid: pid_t) -> [AXUIElement] {
-        var token = Data(count: 20)
-        token.replaceSubrange(0 ..< 4, with: withUnsafeBytes(of: pid) { Data($0) })
-        token.replaceSubrange(4 ..< 8, with: withUnsafeBytes(of: Int32(0)) { Data($0) })
-        token.replaceSubrange(8 ..< 12, with: withUnsafeBytes(of: Int32(0x636F_636F)) { Data($0) })
-        
-        var results: [AXUIElement] = []
-        for axId: AXUIElementID in 0 ..< 1000 {
-            token.replaceSubrange(12 ..< 20, with: withUnsafeBytes(of: axId) { Data($0) })
-            if let el = _AXUIElementCreateWithRemoteToken(token as CFData)?.takeRetainedValue(),
-               let subrole = try? el.subrole(),
-               [kAXStandardWindowSubrole, kAXDialogSubrole].contains(subrole)
-            {
-                results.append(el)
-            }
-        }
-        return results
-    }
-    
+    @MainActor
     func _cgWindowID() -> CGWindowID? {
         var id: CGWindowID = 0
-        let err = _AXUIElementGetWindow(self, &id)
+        guard let axUIElementGetWindow = WindowServerBridge.shared.axUIElementGetWindow else {
+            return nil
+        }
+        let err = axUIElementGetWindow(self, &id)
         guard err == .success, id != 0 else { return nil }
         return id
     }

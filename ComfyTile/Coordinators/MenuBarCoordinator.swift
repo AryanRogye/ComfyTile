@@ -26,7 +26,7 @@ class MenuBarCoordinator: NSObject {
     private var comfyTileMenuBarVM      : ComfyTileMenuBarViewModel?
     private var settingsVM     : SettingsViewModel?
     private var defaultsManager: DefaultsManager?
-    private var fetchedWindowManager: FetchedWindowManager?
+    private var windowCore: WindowCore?
     private var updateController: UpdateController?
 
     // MARK: - Initialization
@@ -42,13 +42,13 @@ class MenuBarCoordinator: NSObject {
         comfyTileMenuBarVM      : ComfyTileMenuBarViewModel,
         settingsVM              : SettingsViewModel,
         defaultsManager         : DefaultsManager,
-        fetchedWindowManager    : FetchedWindowManager,
+        windowCore              : WindowCore,
         updateController        : UpdateController
     ) {
         self.comfyTileMenuBarVM     = comfyTileMenuBarVM
         self.settingsVM             = settingsVM
         self.defaultsManager        = defaultsManager
-        self.fetchedWindowManager   = fetchedWindowManager
+        self.windowCore             = windowCore
         self.updateController       = updateController
 
         configureClosures()
@@ -100,7 +100,7 @@ class MenuBarCoordinator: NSObject {
         guard let comfyTileMenuBarVM = comfyTileMenuBarVM,
               let settingsVM = settingsVM,
               let defaultsManager = defaultsManager,
-              let fetchedWindowManager = fetchedWindowManager,
+              let windowCore = windowCore,
               let updateController = updateController
         else {
             return
@@ -111,7 +111,7 @@ class MenuBarCoordinator: NSObject {
             settingsVM: settingsVM,
             comfyTileMenuBarVM: comfyTileMenuBarVM,
             defaultsManager: defaultsManager,
-            fetchedWindowManager: fetchedWindowManager,
+            windowCore: windowCore,
             updateController: updateController
         )
 

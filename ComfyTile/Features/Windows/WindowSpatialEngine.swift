@@ -1,5 +1,5 @@
 //
-//  WindowTilingCoordinator.swift
+//  WindowSpatialEngine.swift
 //  ComfyTile
 //
 //  Created by Aryan Rogye on 1/7/26.
@@ -78,22 +78,22 @@ enum LayoutMode: String, CaseIterable {
     }
 }
 
-final class WindowTilingCoordinator {
+final class WindowSpatialEngine {
     
-    let fetchedWindowManager : FetchedWindowManager
-    let windowSplitManager   : WindowSplitManager
+    let windowCore : WindowCore
+    let windowTilingService  : WindowTilingProviding
     let windowLayoutService  : WindowLayoutProviding
     let defaultsManager      : DefaultsManager
     
     init(
-        fetchedWindowManager: FetchedWindowManager,
-        windowSplitManager  : WindowSplitManager,
+        windowCore          : WindowCore,
         windowLayoutService : WindowLayoutProviding,
+        windowTilingService : WindowTilingProviding,
         defaultsManager     : DefaultsManager
     ) {
-        self.fetchedWindowManager = fetchedWindowManager
-        self.windowSplitManager   = windowSplitManager
-        self.windowLayoutService  = windowLayoutService
+        self.windowCore = windowCore
+        self.windowLayoutService = windowLayoutService
+        self.windowTilingService  = windowTilingService
         self.defaultsManager      = defaultsManager
     }
     
@@ -119,70 +119,67 @@ final class WindowTilingCoordinator {
     }
     public func primaryTile() {
         Task {
-            await self.fetchedWindowManager.loadWindows()
-            let inSpace = self.fetchedWindowManager.fetchedWindows.filter(\.isInSpace)
-            await self.windowSplitManager.splitWindows(
-                window: inSpace,
-                style: .primaryOnly
+            await self.windowCore.loadWindows()
+            let inSpace = self.windowCore.windows.filter(\.isInSpace)
+            await self.windowLayoutService.primaryLayout(
+                window: inSpace
             )
         }
     }
     
     public func primaryLeftStackedHorizontallyTile() {
         Task {
-            await self.fetchedWindowManager.loadWindows()
-            let inSpace = self.fetchedWindowManager.fetchedWindows.filter(\.isInSpace)
-            await self.windowSplitManager.splitWindows(
-                window: inSpace,
-                style: .primaryLeftStackedHorizontally
+            await self.windowCore.loadWindows()
+            let inSpace = self.windowCore.windows.filter(\.isInSpace)
+            await self.windowLayoutService.primaryLeftStackedHorizontally(
+                window: inSpace
             )
         }
     }
     
     public func primaryRightStackedHorizontallyTile() {
         Task {
-            await self.fetchedWindowManager.loadWindows()
-            let inSpace = self.fetchedWindowManager.fetchedWindows.filter(\.isInSpace)
-            await self.windowSplitManager.splitWindows(
-                window: inSpace,
-                style: .primaryRightStackedHorizontally
+            await self.windowCore.loadWindows()
+            let inSpace = self.windowCore.windows.filter(\.isInSpace)
+            await self.windowLayoutService.primaryRightStackedHorizontally(
+                window: inSpace
             )
         }
     }
     
     public func tileRight() {
-        self.windowLayoutService.moveRight()
+        self.windowTilingService.moveRight()
     }
     
     public func tileLeft() {
-        self.windowLayoutService.moveLeft()
+        self.windowTilingService.moveLeft()
     }
     
     public func tileCenter() {
-        self.windowLayoutService.center()
+        self.windowTilingService.center()
     }
     
     public func tileFullScreen() {
-        self.windowLayoutService.fullScreen()
+        self.windowTilingService.fullScreen()
     }
     
     public func nudgeBottomDown() {
-        self.windowLayoutService.nudgeBottomDown(
+        self.windowTilingService.nudgeBottomDown(
             with: self.defaultsManager.nudgeStep
         )
     }
     public func nudgeBottomUp() {
-        self.windowLayoutService.nudgeBottomUp(
+        self.windowTilingService.nudgeBottomUp(
             with: self.defaultsManager.nudgeStep
         )
     }
     public func nudgeTopUp() {
-        self.windowLayoutService.nudgeTopUp(
+        self.windowTilingService.nudgeTopUp(
             with: self.defaultsManager.nudgeStep
         )
     }
     public func nudgeTopDown() {
-        self.windowLayoutService.nudgeTopDown(
+        self.windowTilingService.nudgeTopDown(
             with: self.defaultsManager.nudgeStep
         )
     }

@@ -5,7 +5,7 @@
 //  Created by Aryan Rogye on 10/5/25.
 //
 
-@preconcurrency import SwiftUI
+import SwiftUI
 
 enum Ease {
     static func easeInOut(_ t: CGFloat) -> CGFloat {
@@ -19,7 +19,7 @@ final class WindowAnimator {
     private var duration: TimeInterval = 0.12
     
     func animate(
-        focusedWindow: UserWindow,
+        focusedWindow: ComfyWindow,
         to target: CGPoint,
         duration: TimeInterval = 0.12,
         completion: @escaping () -> Void = {}
@@ -46,7 +46,8 @@ final class WindowAnimator {
             
             let x = lerp(start.x, target.x, tt)
             let y = lerp(start.y, target.y, tt)
-            focusedWindow.element.setPosition(x: x, y: y)
+            
+            setElement(focusedWindow: focusedWindow, x: x, y: y)
             
             if raw >= 1 {
                 t.invalidate()
@@ -54,6 +55,10 @@ final class WindowAnimator {
             }
         }
         RunLoop.main.add(timer!, forMode: .common)
+    }
+    
+    public func setElement(focusedWindow: ComfyWindow, x: CGFloat, y: CGFloat) {
+        focusedWindow.element.setPosition(x: x, y: y)
     }
 
     func cancel() {

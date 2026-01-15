@@ -11,18 +11,18 @@ import LocalShortcuts
 struct WindowViewer: View {
     
     @Bindable var windowViewerVM : WindowViewerViewModel
-    @Bindable var fetchedWindowManager : FetchedWindowManager
+    @Bindable var windowCore : WindowCore
     
     var body: some View {
         VStack {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 200))], spacing: 16) {
-                ForEach(fetchedWindowManager.fetchedWindows, id: \.windowID) { window in
+                ForEach(windowCore.windows, id: \.windowID) { window in
                     Button(action: {
                         let index = windowViewerVM.selected
-                        fetchedWindowManager.fetchedWindows[index].focusWindow()
+                        windowCore.windows[index].focusWindow()
                         
-                        let focused = fetchedWindowManager.fetchedWindows.remove(at: index)
-                        fetchedWindowManager.fetchedWindows.insert(focused, at: 0)
+                        let focused = windowCore.windows.remove(at: index)
+                        windowCore.windows.insert(focused, at: 0)
                         
                         windowViewerVM.onEscape()
                     }) {
@@ -39,7 +39,7 @@ struct WindowViewer: View {
                         }
                         .padding()
                         .background {
-                            if window.id == fetchedWindowManager.fetchedWindows[windowViewerVM.selected].id {
+                            if window.id == windowCore.windows[windowViewerVM.selected].id {
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(Color.accentColor)
                             }

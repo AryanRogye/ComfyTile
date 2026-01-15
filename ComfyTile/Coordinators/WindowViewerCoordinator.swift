@@ -24,14 +24,14 @@ class WindowViewerCoordinator: NSObject {
     
     var panel : NSPanel!
     var windowViewerVM: WindowViewerViewModel
-    var fetchedWindowManager : FetchedWindowManager
+    var windowCore    : WindowCore
     
     private var localKeyMonitor: Any?
     private var globalKeyMonitor: Any?
     
-    init(windowViewerVM : WindowViewerViewModel, fetchedWindowManager : FetchedWindowManager) {
+    init(windowViewerVM : WindowViewerViewModel, windowCore : WindowCore) {
         self.windowViewerVM = windowViewerVM
-        self.fetchedWindowManager = fetchedWindowManager
+        self.windowCore = windowCore
         super.init()
         
         /// Set Escape
@@ -42,7 +42,7 @@ class WindowViewerCoordinator: NSObject {
     }
     
     public func setupPanel() {
-        guard let screen = WindowManagerHelpers.screenUnderMouse() else { return }
+        guard let screen = WindowCore.screenUnderMouse() else { return }
         panel = FocusablePanel(
             contentRect: .zero,
             styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
@@ -76,7 +76,7 @@ class WindowViewerCoordinator: NSObject {
         let view: NSView = NSHostingView(
             rootView: WindowViewer(
                 windowViewerVM: windowViewerVM,
-                fetchedWindowManager: fetchedWindowManager
+                windowCore: windowCore
             )
         )
         
@@ -117,13 +117,13 @@ class WindowViewerCoordinator: NSObject {
                 if modifier == [] {
                     let index = windowViewerVM.selected
                     
-                    if fetchedWindowManager.fetchedWindows.indices.contains(index) {
-                        let windows = fetchedWindowManager.fetchedWindows
+                    if windowCore.windows.indices.contains(index) {
+                        let windows = windowCore.windows
                         
                         windows[index].focusWindow()
                         
-                        let focused = fetchedWindowManager.fetchedWindows.remove(at: index)
-                        fetchedWindowManager.fetchedWindows.insert(focused, at: 0)
+                        let focused = windowCore.windows.remove(at: index)
+                        windowCore.windows.insert(focused, at: 0)
                     }
                     
                     self.windowViewerVM.onEscape()
