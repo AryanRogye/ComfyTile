@@ -15,6 +15,9 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			publicHeaders = (
 				ComfyTileCore.h,
+				UserWindow.h,
+				WindowFetcher.h,
+				WindowServerBridge.h,
 			);
 			target = 9B9BCEAF2F184AF40020F3AD /* ComfyTileCore */;
 		};
@@ -176,6 +179,7 @@
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -207,6 +211,7 @@
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

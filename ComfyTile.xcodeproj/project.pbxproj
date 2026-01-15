@@ -81,8 +81,37 @@
 		9B8FC0D52F130B7700CBF4B8 /* HotKeyOrClose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */; };
 		9B8FC0D72F130E7500CBF4B8 /* ShortcutEditableRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */; };
 		9B8FC0DB2F1578EF00CBF4B8 /* SkylightHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0DA2F1578E900CBF4B8 /* SkylightHelpers.swift */; };
+		9B9BCED32F184DE00020F3AD /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED22F184DE00020F3AD /* LocalShortcuts */; };
+		9B9BCED62F184DEC0020F3AD /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED52F184DEC0020F3AD /* ComfyLogger */; };
+		9B9BCEE42F184E1D0020F3AD /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCEE22F184E1D0020F3AD /* main.swift */; };
+		9B9BCEE72F184EAA0020F3AD /* ComfyTileCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B9BCEE62F184EAA0020F3AD /* ComfyTileCore.framework */; };
+		9B9BCEE82F184EAA0020F3AD /* ComfyTileCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9B9BCEE62F184EAA0020F3AD /* ComfyTileCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9B9BCEEB2F184EAF0020F3AD /* ComfyTileCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B9BCEEA2F184EAF0020F3AD /* ComfyTileCore.framework */; };
 		9BF95F0E2E9326AE00776771 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9B9BCED92F184E180020F3AD /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		9B9BCEE92F184EAA0020F3AD /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9B9BCEE82F184EAA0020F3AD /* ComfyTileCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		9B436CED2ED7824E00D79941 /* ComfyTile.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = ComfyTile.icon; sourceTree = "<group>"; };
@@ -157,14 +186,31 @@
 		9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyOrClose.swift; sourceTree = "<group>"; };
 		9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutEditableRow.swift; sourceTree = "<group>"; };
 		9B8FC0DA2F1578E900CBF4B8 /* SkylightHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkylightHelpers.swift; sourceTree = "<group>"; };
+		9B9BCEC12F184D290020F3AD /* ComfyLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ComfyLogger; sourceTree = "<group>"; };
+		9B9BCEC22F184D290020F3AD /* LocalShortcuts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LocalShortcuts; sourceTree = "<group>"; };
+		9B9BCEDB2F184E180020F3AD /* ComfyTileCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ComfyTileCLI; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B9BCEE22F184E1D0020F3AD /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		9B9BCEE62F184EAA0020F3AD /* ComfyTileCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ComfyTileCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B9BCEEA2F184EAF0020F3AD /* ComfyTileCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ComfyTileCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BF95ECE2E9321E000776771 /* ComfyTile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ComfyTile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9B9BCED82F184E180020F3AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B9BCEEB2F184EAF0020F3AD /* ComfyTileCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9BF95ECB2E9321E000776771 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B9BCEE72F184EAA0020F3AD /* ComfyTileCore.framework in Frameworks */,
+				9B9BCED62F184DEC0020F3AD /* ComfyLogger in Frameworks */,
+				9B9BCED32F184DE00020F3AD /* LocalShortcuts in Frameworks */,
 				9B8FBF1B2F1039BF00CBF4B8 /* Sparkle in Frameworks */,
 				9B490C752F0B5FFF00963D05 /* LocalShortcuts in Frameworks */,
 				9B8FBD922F0F033400CBF4B8 /* ComfyLogger in Frameworks */,
@@ -542,11 +588,32 @@
 			path = Skylight;
 			sourceTree = "<group>";
 		};
+		9B9BCEE32F184E1D0020F3AD /* ComfyTileCLI */ = {
+			isa = PBXGroup;
+			children = (
+				9B9BCEE22F184E1D0020F3AD /* main.swift */,
+			);
+			path = ComfyTileCLI;
+			sourceTree = "<group>";
+		};
+		9B9BCEE52F184EAA0020F3AD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9B9BCEEA2F184EAF0020F3AD /* ComfyTileCore.framework */,
+				9B9BCEE62F184EAA0020F3AD /* ComfyTileCore.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		9BF95EC52E9321E000776771 = {
 			isa = PBXGroup;
 			children = (
 				9B436CED2ED7824E00D79941 /* ComfyTile.icon */,
+				9B9BCEE32F184E1D0020F3AD /* ComfyTileCLI */,
 				9B8FC05C2F10B80D00CBF4B8 /* ComfyTile */,
+				9B9BCEC12F184D290020F3AD /* ComfyLogger */,
+				9B9BCEC22F184D290020F3AD /* LocalShortcuts */,
+				9B9BCEE52F184EAA0020F3AD /* Frameworks */,
 				9BF95ECF2E9321E000776771 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -555,6 +622,7 @@
 			isa = PBXGroup;
 			children = (
 				9BF95ECE2E9321E000776771 /* ComfyTile.app */,
+				9B9BCEDB2F184E180020F3AD /* ComfyTileCLI */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -562,6 +630,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		9B9BCEDA2F184E180020F3AD /* ComfyTileCLI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B9BCEDF2F184E180020F3AD /* Build configuration list for PBXNativeTarget "ComfyTileCLI" */;
+			buildPhases = (
+				9B9BCED72F184E180020F3AD /* Sources */,
+				9B9BCED82F184E180020F3AD /* Frameworks */,
+				9B9BCED92F184E180020F3AD /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ComfyTileCLI;
+			packageProductDependencies = (
+			);
+			productName = ComfyTileCLI;
+			productReference = 9B9BCEDB2F184E180020F3AD /* ComfyTileCLI */;
+			productType = "com.apple.product-type.tool";
+		};
 		9BF95ECD2E9321E000776771 /* ComfyTile */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9BF95ED92E9321E200776771 /* Build configuration list for PBXNativeTarget "ComfyTile" */;
@@ -569,6 +656,7 @@
 				9BF95ECA2E9321E000776771 /* Sources */,
 				9BF95ECB2E9321E000776771 /* Frameworks */,
 				9BF95ECC2E9321E000776771 /* Resources */,
+				9B9BCEE92F184EAA0020F3AD /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -581,6 +669,8 @@
 				9B490C742F0B5FFF00963D05 /* LocalShortcuts */,
 				9B8FBD912F0F033400CBF4B8 /* ComfyLogger */,
 				9B8FBF1A2F1039BF00CBF4B8 /* Sparkle */,
+				9B9BCED22F184DE00020F3AD /* LocalShortcuts */,
+				9B9BCED52F184DEC0020F3AD /* ComfyLogger */,
 			);
 			productName = TilingWIndowManager_Test;
 			productReference = 9BF95ECE2E9321E000776771 /* ComfyTile.app */;
@@ -596,6 +686,9 @@
 				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					9B9BCEDA2F184E180020F3AD = {
+						CreatedOnToolsVersion = 26.0;
+					};
 					9BF95ECD2E9321E000776771 = {
 						CreatedOnToolsVersion = 26.0;
 					};
@@ -613,9 +706,9 @@
 			packageReferences = (
 				9BF95F0C2E9326AE00776771 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				9B4E04B62E934B05001CF411 /* XCRemoteSwiftPackageReference "Defaults" */,
-				9B490C732F0B5FFF00963D05 /* XCLocalSwiftPackageReference "LocalShortcuts" */,
-				9B8FBD902F0F033400CBF4B8 /* XCLocalSwiftPackageReference "ComfyLogger" */,
 				9B8FBF192F1039BF00CBF4B8 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				9B9BCED12F184DE00020F3AD /* XCLocalSwiftPackageReference "LocalShortcuts" */,
+				9B9BCED42F184DEC0020F3AD /* XCLocalSwiftPackageReference "ComfyLogger" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9BF95ECF2E9321E000776771 /* Products */;
@@ -623,6 +716,7 @@
 			projectRoot = "";
 			targets = (
 				9BF95ECD2E9321E000776771 /* ComfyTile */,
+				9B9BCEDA2F184E180020F3AD /* ComfyTileCLI */,
 			);
 		};
 /* End PBXProject section */
@@ -640,6 +734,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9B9BCED72F184E180020F3AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B9BCEE42F184E1D0020F3AD /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9BF95ECA2E9321E000776771 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -718,6 +820,32 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		9B9BCEE02F184E180020F3AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = B9P888266K;
+				ENABLE_HARDENED_RUNTIME = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9B9BCEE12F184E180020F3AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = B9P888266K;
+				ENABLE_HARDENED_RUNTIME = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		9BF95ED72E9321E200776771 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -935,6 +1063,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9B9BCEDF2F184E180020F3AD /* Build configuration list for PBXNativeTarget "ComfyTileCLI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B9BCEE02F184E180020F3AD /* Debug */,
+				9B9BCEE12F184E180020F3AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9BF95EC92E9321E000776771 /* Build configuration list for PBXProject "ComfyTile" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -956,11 +1093,11 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		9B490C732F0B5FFF00963D05 /* XCLocalSwiftPackageReference "LocalShortcuts" */ = {
+		9B9BCED12F184DE00020F3AD /* XCLocalSwiftPackageReference "LocalShortcuts" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = LocalShortcuts;
 		};
-		9B8FBD902F0F033400CBF4B8 /* XCLocalSwiftPackageReference "ComfyLogger" */ = {
+		9B9BCED42F184DEC0020F3AD /* XCLocalSwiftPackageReference "ComfyLogger" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ComfyLogger;
 		};
@@ -1011,6 +1148,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9B8FBF192F1039BF00CBF4B8 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		9B9BCED22F184DE00020F3AD /* LocalShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LocalShortcuts;
+		};
+		9B9BCED52F184DEC0020F3AD /* ComfyLogger */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ComfyLogger;
 		};
 		9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;

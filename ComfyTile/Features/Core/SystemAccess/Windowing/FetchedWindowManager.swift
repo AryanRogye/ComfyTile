@@ -6,11 +6,13 @@
 //
 
 import ScreenCaptureKit
+import ComfyTileCore
 
 @Observable @MainActor
 final class FetchedWindowManager {
     /// Seed Fetched Windows At Start
     var fetchedWindows : [UserWindow] = []
+    let windowServerBridge = WindowServerBridge()
     
     init() {
         Task {
@@ -76,10 +78,9 @@ final class FetchedWindowManager {
                 let bounds = CGRect(x: x, y: y, width: width, height: height)
                 
                 /// Get AXElement, Doesnt matter if nil
-                let axElement = AXUtils.findMatchingAXWindow(
-                    pid: pid,
-                    targetCGSFrame: bounds
-                )
+                let unmanaged = windowServerBridge.findMatchingAXWindow(withPid: pid, targetWindowID: window.windowID)
+                
+                let axElement : AXUIElement? = unmanaged?.takeRetainedValue()
                 
                 /// Get Screenshot
                 var screenshot: CGImage? = nil
@@ -91,7 +92,6 @@ final class FetchedWindowManager {
                 
                 let spaces = spacesForWindow(window.windowID)
                 let isInSpace = !spaces.isEmpty
-                
                 
                 let windowElement = WindowElement(element: axElement)
                 print("SCFrameworkID: \(window.windowID), ELEMENT_ID: \(windowElement.cgWindowID, default: "nil")")

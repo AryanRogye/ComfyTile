@@ -14,3 +14,7 @@ FOUNDATION_EXPORT double ComfyTileCoreVersionNumber;
 FOUNDATION_EXPORT const unsigned char ComfyTileCoreVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <ComfyTileCore/PublicHeader.h>
+
+#import <ComfyTileCore/WindowFetcher.h>
+#import <ComfyTileCore/WindowServerBridge.h>
+#import <ComfyTileCore/UserWindow.h>
