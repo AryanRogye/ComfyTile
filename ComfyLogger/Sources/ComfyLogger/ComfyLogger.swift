@@ -88,22 +88,113 @@ extension ComfyLogger.Name {
 }
 #endif
 
-@MainActor
 public enum ComfyLogger {
     
-    public struct ComfyLoggerView: View {
-        var names: [ComfyLogger.Name]
-        @State private var filterText: String = ""
+    private static let maxEntriesPerLogger = 1_000
+    private static let maxEntriesTotal = 5_000
+    
+    private struct GlobalEntryRef: Hashable {
+        let nameID: UUID
+        let entryID: UUID
+    }
+    
+    private final class WeakName {
+        weak var value: Name?
+        init(_ value: Name) { self.value = value }
+    }
+    
+    private static let registryLock = NSLock()
+    private static var nameRegistry: [UUID: WeakName] = [:]
+    private static var globalEntries: [GlobalEntryRef] = []
+    
+    private static func withRegistryLock<T>(_ body: () -> T) -> T {
+        registryLock.lock()
+        defer { registryLock.unlock() }
+        return body()
+    }
+    
+    private static func registerName(_ name: Name) {
+        withRegistryLock {
+            nameRegistry[name.id] = WeakName(name)
+        }
+    }
+    
+    private static func unregisterName(_ name: Name) {
+        withRegistryLock {
+            nameRegistry[name.id] = nil
+        }
+    }
+    
+    private static func trackInsert(for name: Name, entry: Entry) {
+        withRegistryLock {
+            nameRegistry[name.id] = WeakName(name)
+            name.content.append(entry)
+            globalEntries.append(.init(nameID: name.id, entryID: entry.id))
+            trimNameIfNeededLocked(name)
+            trimGlobalIfNeededLocked()
+        }
+    }
+    
+    private static func trimNameIfNeededLocked(_ name: Name) {
+        let overflow = name.content.count - maxEntriesPerLogger
+        guard overflow > 0 else { return }
         
+        let removed = name.content.prefix(overflow)
+        let removedIDs = Set(removed.map(\.id))
+        name.content.removeFirst(overflow)
+        
+        globalEntries.removeAll { ref in
+            ref.nameID == name.id && removedIDs.contains(ref.entryID)
+        }
+    }
+    
+    private static func trimGlobalIfNeededLocked() {
+        let overflow = globalEntries.count - maxEntriesTotal
+        guard overflow > 0 else { return }
+        
+        let removed = globalEntries.prefix(overflow)
+        globalEntries.removeFirst(overflow)
+        
+        for ref in removed {
+            guard let name = nameRegistry[ref.nameID]?.value else { continue }
+            if let index = name.content.firstIndex(where: { $0.id == ref.entryID }) {
+                name.content.remove(at: index)
+            }
+        }
+        
+        nameRegistry = nameRegistry.filter { $0.value.value != nil }
+    }
+    
+    public struct ComfyLoggerView: View {
+        public var names: [ComfyLogger.Name]
+        
+        // 1. Internal storage (fallback)
+        @State private var internalFilter: String = ""
+        
+        // 2. External storage (optional)
+        private var externalFilter: Binding<String>?
+        
+        // 3. Computed Binding: Decides which source to use
+        private var activeFilter: Binding<String> {
+            externalFilter ?? $internalFilter
+        }
+        
+        // MARK: - Init 1: Self-Managed (Default)
         public init(names: [ComfyLogger.Name]) {
             self.names = names
+            self.externalFilter = nil
+        }
+        
+        // MARK: - Init 2: Externally Managed
+        public init(names: [ComfyLogger.Name], filter: Binding<String>) {
+            self.names = names
+            self.externalFilter = filter
         }
         
         public var body: some View {
-            // Pass the filter text into the AppKit wrapper
-            OutlineLogView(names: names, filter: filterText)
-                .frame(minWidth: 760, minHeight: 420)
-                .searchable(text: $filterText, placement: .automatic, prompt: "Filter by Name")
+            OutlineLogView(names: names, filter: activeFilter.wrappedValue)
+            // .searchable works with the computed binding, updating whichever source is active
+                .searchable(text: activeFilter, placement: .automatic, prompt: "Filter by Name")
         }
     }
 
@@ -123,6 +214,7 @@ public enum ComfyLogger {
     
     @Observable
     public final class Name: @unchecked Sendable, Identifiable, Hashable {
+        private static let maxEntries = 1_000
         
         public static func == (lhs: ComfyLogger.Name, rhs: ComfyLogger.Name) -> Bool {
             lhs.id == rhs.id &&
@@ -145,21 +237,25 @@ public enum ComfyLogger {
 
         public init(_ name: String) {
             self.name = name
+            ComfyLogger.registerName(self)
         }
-
+        
+        deinit {
+            ComfyLogger.unregisterName(self)
+        }
+        
         public func insert(
             _ message: @autoclosure () -> Any,
             useDebug: Bool = false,
             level: Entry.Level = .info
         ) {
-            content.append(
-                .init(
-                    name: name,
-                    date: .now,
-                    level: level,
-                    message: "\(message())"
-                )
+            let entry = Entry(
+                name: name,
+                date: .now,
+                level: level,
+                message: "\(message())"
             )
+            ComfyLogger.trackInsert(for: self, entry: entry)
         }
     }
     

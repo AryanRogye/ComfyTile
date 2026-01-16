@@ -9,13 +9,12 @@ import Foundation
 import SwiftUI
 import AppKit
 
-// MARK: - Color Extension
 extension ComfyLogger.Entry.Level {
     var color: NSColor {
         switch self {
-        case .info: return .labelColor
+        case .info:  return .labelColor
         case .debug: return .secondaryLabelColor
-        case .warn: return .systemOrange
+        case .warn:  return .systemRed
         case .error: return .systemRed
         }
     }
@@ -24,6 +23,7 @@ extension ComfyLogger.Entry.Level {
 extension ComfyLogger {
     
     public struct OutlineLogView: NSViewRepresentable {
+        fileprivate static let baseRowHeight: CGFloat = 20
         
         public var names: [ComfyLogger.Name]
         public var filter: String
@@ -33,385 +33,400 @@ extension ComfyLogger {
             self.filter = filter
         }
         
-        public func makeCoordinator() -> Coordinator { Coordinator() }
+        public func makeCoordinator() -> Coordinator { .init() }
         
         public func makeNSView(context: Context) -> NSScrollView {
-            // Use our custom subclass that supports Copy/Paste
             let outline = LogOutlineView()
+            outline.wantsLayer = true
             
-            // Layout & Style
+            // Style (keep your values)
             outline.columnAutoresizingStyle = .uniformColumnAutoresizingStyle
-            outline.rowHeight = 24
+            outline.rowHeight = Self.baseRowHeight
             outline.floatsGroupRows = true
             outline.usesAlternatingRowBackgroundColors = true
             outline.selectionHighlightStyle = .regular
             outline.allowsMultipleSelection = true
             outline.autosaveExpandedItems = true
-            outline.headerView = NSTableHeaderView()
+            outline.intercellSpacing = NSSize(width: 0, height: 0)
             
-            // Columns
-            let (colLevel, colMsg, colTime) = createColumns()
-            outline.addTableColumn(colLevel)
-            outline.addTableColumn(colMsg)
-            outline.addTableColumn(colTime)
-            outline.outlineTableColumn = colMsg
+            // Header (explicit frame helps in tight containers)
+            outline.headerView = NSTableHeaderView(frame: NSRect(x: 0, y: 0, width: 0, height: 24))
             
-            // Data Connection
+            // Columns (keep your values)
+            let cols = Columns()
+            outline.addTableColumn(cols.level)
+            outline.addTableColumn(cols.message)
+            outline.addTableColumn(cols.time)
+            outline.outlineTableColumn = cols.message
+            
+            // Data hookup
             outline.delegate = context.coordinator
             outline.dataSource = context.coordinator
+            outline.menu = context.coordinator.makeMenu()
             
-            // Hook up the context menu
-            outline.menu = context.coordinator.createContextMenu()
-            
+            // ScrollView setup (NO manual outline.frame)
             let scroll = NSScrollView()
             scroll.hasVerticalScroller = true
+            scroll.hasHorizontalScroller = true
+            scroll.autohidesScrollers = true
+            scroll.borderType = .noBorder
+            scroll.drawsBackground = false
+            
+            // This combo prevents header/content fighting in small frames
+            scroll.automaticallyAdjustsContentInsets = false
+            scroll.contentInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+            
             scroll.documentView = outline
             
             context.coordinator.outlineView = outline
-            
-            // Initial update
             context.coordinator.update(names: names, filter: filter)
+            outline.reloadData()
+            
+            // Helps header settle correctly when embedded in SwiftUI
+            DispatchQueue.main.async {
+                outline.headerView?.needsLayout = true
+                outline.headerView?.layoutSubtreeIfNeeded()
+            }
             
             return scroll
-        }
-        
-        private func createColumns() -> (NSTableColumn, NSTableColumn, NSTableColumn) {
-            let colLevel = NSTableColumn(identifier: .init("level"))
-            colLevel.title = "Lvl"
-            colLevel.width = 45
-            colLevel.minWidth = 40
-            colLevel.maxWidth = 60
-            colLevel.resizingMask = .userResizingMask
-            
-            let colMsg = NSTableColumn(identifier: .init("message"))
-            colMsg.title = "Message"
-            colMsg.width = 500
-            colMsg.minWidth = 200
-            colMsg.resizingMask = [.autoresizingMask, .userResizingMask]
-            
-            let colTime = NSTableColumn(identifier: .init("time"))
-            colTime.title = "Time"
-            colTime.width = 90
-            colTime.minWidth = 80
-            colTime.maxWidth = 120
-            colTime.resizingMask = .userResizingMask
-            
-            return (colLevel, colMsg, colTime)
         }
         
         public func updateNSView(_ nsView: NSScrollView, context: Context) {
             context.coordinator.update(names: names, filter: filter)
             
-            // Reload logic
-            context.coordinator.outlineView?.reloadData()
+            guard let outline = context.coordinator.outlineView else { return }
+            outline.reloadData()
             
-            // Auto-expand if searching
-            if !filter.isEmpty {
-                context.coordinator.outlineView?.expandItem(nil, expandChildren: true)
-            }
-        }
-        
-        // MARK: - Coordinator
-        
-        @MainActor
-        public final class Coordinator: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate, NSMenuItemValidation {
-            
-            weak var outlineView: LogOutlineView?
-            
-            // Data
-            private var names: [ComfyLogger.Name] = []
-            private var namesByID: [UUID: ComfyLogger.Name] = [:]
-            private var entriesByKey: [UUID: [UUID: ComfyLogger.Entry]] = [:]
-            
-            // State
-            private var expandedEntryIDs: Set<UUID> = []
-            
-            // Font cache for height calculation
-            private let msgFont = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
-            
-            func update(names: [ComfyLogger.Name], filter: String) {
-                if filter.isEmpty {
-                    self.names = names
-                } else {
-                    // Filter categories by name or by any entry's message, but keep original instances
-                    self.names = names.filter { cat in
-                        if cat.name.localizedCaseInsensitiveContains(filter) { return true }
-                        return cat.content.contains { $0.message.localizedCaseInsensitiveContains(filter) }
-                    }
-                }
-                
-                self.namesByID = Dictionary(uniqueKeysWithValues: self.names.map { ($0.id, $0) })
-                self.entriesByKey = Dictionary(uniqueKeysWithValues: self.names.map { n in
-                    (n.id, Dictionary(uniqueKeysWithValues: n.content.map { ($0.id, $0) }))
-                })
-            }
-            
-            // MARK: - Context Menu & Copy
-            
-            func createContextMenu() -> NSMenu {
-                let menu = NSMenu()
-                menu.addItem(NSMenuItem(title: "Copy Message", action: #selector(copyMessage(_:)), keyEquivalent: "c"))
-                menu.addItem(NSMenuItem(title: "Copy All Info", action: #selector(copyAllInfo(_:)), keyEquivalent: ""))
-                return menu
-            }
-            
-            // Handle standard Cmd+C from the custom view
-            @objc func copy(_ sender: Any?) {
-                copyMessage(sender)
-            }
-            
-            @objc func copyMessage(_ sender: Any?) {
-                copyToClipboard(fullDetails: false)
-            }
-            
-            @objc func copyAllInfo(_ sender: Any?) {
-                copyToClipboard(fullDetails: true)
-            }
-            
-            private func copyToClipboard(fullDetails: Bool) {
-                guard let outlineView = outlineView else { return }
-                let selectedRows = outlineView.selectedRowIndexes
-                guard !selectedRows.isEmpty else { return }
-                
-                var strings: [String] = []
-                
-                selectedRows.forEach { row in
-                    if let item = outlineView.item(atRow: row) as? LogNode {
-                        switch item {
-                        case .category(let id):
-                            if let name = namesByID[id]?.name {
-                                strings.append("[\(name)]")
-                            }
-                        case .entry(let nameID, let entryID):
-                            if let entry = entriesByKey[nameID]?[entryID] {
-                                if fullDetails {
-                                    strings.append("\(entry.date.formatted()) [\(entry.level.rawValue.uppercased())] \(entry.message)")
-                                } else {
-                                    strings.append(entry.message)
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                let fullString = strings.joined(separator: "\n")
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(fullString, forType: .string)
-            }
-            
-            public func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
-                return outlineView?.selectedRow ?? -1 >= 0
-            }
-            
-            // MARK: - DataSource
-            
-            public func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
-                if item == nil { return names.count }
-                guard let node = item as? LogNode else { return 0 }
-                
-                switch node {
-                case .category(let nameID):
-                    return namesByID[nameID]?.content.count ?? 0
-                case .entry:
-                    return 0
-                }
-            }
-            
-            public func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-                if case .category = item as? LogNode { return true }
-                return false
-            }
-            
-            public func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
-                if item == nil { return LogNode.category(names[index].id) }
-                
-                guard let node = item as? LogNode else { return LogNode.category(UUID()) }
-                
-                if case .category(let nameID) = node {
-                    if let cat = namesByID[nameID], index < cat.content.count {
-                        return LogNode.entry(nameID, cat.content[index].id)
-                    }
-                }
-                return LogNode.category(UUID())
-            }
-            
-            // MARK: - Delegate: Height (The Anti-Jank Logic)
-            
-            public func outlineView(_ outlineView: NSOutlineView, heightOfRowByItem item: Any) -> CGFloat {
-                guard let node = item as? LogNode else { return 24 }
-                
-                switch node {
-                case .category:
-                    return 24
-                case .entry(let nameID, let entryID):
-                    if !expandedEntryIDs.contains(entryID) { return 24 }
-                    
-                    guard let entry = entriesByKey[nameID]?[entryID] else { return 24 }
-                    
-                    // Calculate precise height using TextKit logic (faster/smoother than dummy views)
-                    let colIndex = outlineView.column(withIdentifier: NSUserInterfaceItemIdentifier("message"))
-                    let width = colIndex >= 0 ? outlineView.tableColumns[colIndex].width : 400
-                    let availableWidth = width - 12 // Padding
-                    
-                    let text = entry.message as NSString
-                    let rect = text.boundingRect(
-                        with: NSSize(width: availableWidth, height: .greatestFiniteMagnitude),
-                        options: [.usesLineFragmentOrigin, .usesFontLeading],
-                        attributes: [.font: msgFont]
-                    )
-                    
-                    return max(24, rect.height + 16) // +16 for vertical padding
-                }
-            }
-            
-            // MARK: - Delegate: Views
-            
-            public func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
-                guard let node = item as? LogNode else { return nil }
-                
-                // --- Group Row ---
-                if case .category(let nameID) = node {
-                    let cellID = NSUserInterfaceItemIdentifier("GroupCell")
-                    var cell = outlineView.makeView(withIdentifier: cellID, owner: self) as? NSTableCellView
-                    if cell == nil {
-                        cell = makeCell(identifier: cellID)
-                        cell?.textField?.font = NSFont.systemFont(ofSize: 13, weight: .semibold)
-                        cell?.textField?.textColor = .labelColor
-                    }
-                    cell?.textField?.stringValue = namesByID[nameID]?.name ?? "Unknown"
-                    return cell
-                }
-                
-                // --- Entry Row ---
-                guard let tableColumn = tableColumn,
-                      case .entry(let nameID, let entryID) = node,
-                      let entry = entriesByKey[nameID]?[entryID] else { return nil }
-                
-                let cellID = NSUserInterfaceItemIdentifier("cell.\(tableColumn.identifier.rawValue)")
-                var cell = outlineView.makeView(withIdentifier: cellID, owner: self) as? NSTableCellView
-                if cell == nil {
-                    cell = makeCell(identifier: cellID)
-                    
-                    // Specific styling per column
-                    if tableColumn.identifier.rawValue == "message" {
-                        cell?.textField?.font = msgFont // Monospaced
-                        cell?.textField?.lineBreakMode = .byWordWrapping
-                        cell?.textField?.maximumNumberOfLines = 0
-                    } else if tableColumn.identifier.rawValue == "level" {
-                        cell?.textField?.font = NSFont.monospacedSystemFont(ofSize: 11, weight: .bold)
-                    } else {
-                        cell?.textField?.font = NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .regular)
-                        cell?.textField?.textColor = .tertiaryLabelColor
-                    }
-                }
-                
-                switch tableColumn.identifier.rawValue {
-                case "level":
-                    cell?.textField?.stringValue = entry.level.rawValue.uppercased()
-                    cell?.textField?.textColor = entry.level.color
-                case "message":
-                    cell?.textField?.stringValue = entry.message
-                    cell?.textField?.textColor = .labelColor
-                case "time":
-                    cell?.textField?.stringValue = entry.date.formatted(date: .omitted, time: .standard)
-                default:
-                    break
-                }
-                
-                return cell
-            }
-            
-            public func outlineView(_ outlineView: NSOutlineView, isGroupItem item: Any) -> Bool {
-                if case .category = item as? LogNode { return true }
-                return false
-            }
-            
-            // MARK: - Interaction
-            
-            public func outlineViewSelectionDidChange(_ notification: Notification) {
-                guard let outlineView = notification.object as? NSOutlineView else { return }
-                
-                let selectedIndex = outlineView.selectedRow
-                if selectedIndex < 0 { return }
-                
-                // If it's a click (not a drag-select), toggle expansion
-                // Note: In a real app, you might differentiate between selection and expansion interactions
-                // For now, let's say "Double Click" expands? Or single click?
-                // Single click is easier for discovery.
-                
-                guard let item = outlineView.item(atRow: selectedIndex) as? LogNode else { return }
-                
-                if case .entry(_, let entryID) = item {
-                    let isExpanding = !expandedEntryIDs.contains(entryID)
-                    
-                    if isExpanding {
-                        expandedEntryIDs.insert(entryID)
-                    } else {
-                        expandedEntryIDs.remove(entryID)
-                    }
-                    
-                    NSAnimationContext.runAnimationGroup { context in
-                        context.duration = 0.2
-                        context.allowsImplicitAnimation = true
-                        outlineView.noteHeightOfRows(withIndexesChanged: IndexSet(integer: selectedIndex))
-                    }
-                }
-            }
-            
-            private func makeCell(identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
-                let cell = NSTableCellView()
-                cell.identifier = identifier
-                
-                let tf = NSTextField(labelWithString: "")
-                tf.translatesAutoresizingMaskIntoConstraints = false
-                tf.drawsBackground = false
-                tf.isBordered = false
-                tf.isEditable = false
-                tf.isSelectable = false // Row selection handles copy
-                
-                cell.addSubview(tf)
-                cell.textField = tf
-                
-                NSLayoutConstraint.activate([
-                    tf.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 4),
-                    tf.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -4),
-                    tf.topAnchor.constraint(equalTo: cell.topAnchor, constant: 2),
-                    tf.bottomAnchor.constraint(equalTo: cell.bottomAnchor, constant: -2)
-                ])
-                
-                return cell
+            if !filter.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                outline.expandItem(nil, expandChildren: true)
             }
         }
     }
     
-    // MARK: - Custom Outline View (For Copy Support)
+    // MARK: - Columns
+    
+    @MainActor
+    private struct Columns {
+        let level: NSTableColumn = {
+            let c = NSTableColumn(identifier: .init("level"))
+            c.title = "Lvl"
+            c.width = 45
+            c.minWidth = 40
+            c.maxWidth = 60
+            c.resizingMask = .userResizingMask
+            return c
+        }()
+        
+        let message: NSTableColumn = {
+            let c = NSTableColumn(identifier: .init("message"))
+            c.title = "Message"
+            c.width = 500
+            c.minWidth = 200
+            c.resizingMask = [.autoresizingMask, .userResizingMask]
+            return c
+        }()
+        
+        let time: NSTableColumn = {
+            let c = NSTableColumn(identifier: .init("time"))
+            c.title = "Time"
+            c.width = 90
+            c.minWidth = 80
+            c.maxWidth = 120
+            c.resizingMask = .userResizingMask
+            return c
+        }()
+    }
+    
+    // MARK: - Coordinator
+    
+    @MainActor
+    public final class Coordinator: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate, NSMenuItemValidation {
+        
+        weak var outlineView: LogOutlineView?
+        
+        // Data
+        private var visibleNames: [ComfyLogger.Name] = []
+        private var namesByID: [UUID: ComfyLogger.Name] = [:]
+        private var entriesByNameID: [UUID: [UUID: ComfyLogger.Entry]] = [:]
+        private var visibleEntryIDsByNameID: [UUID: [UUID]] = [:]
+        
+        // State
+        private var expandedEntryIDs: Set<UUID> = []
+        
+        // Fonts (keep your values)
+        private let msgFont = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
+        
+        // Search helper
+        private let timeFormatter: DateFormatter = {
+            let f = DateFormatter()
+            f.dateStyle = .none
+            f.timeStyle = .medium
+            return f
+        }()
+        
+        func update(names: [ComfyLogger.Name], filter: String) {
+            let f = filter.trimmingCharacters(in: .whitespacesAndNewlines)
+            let searching = !f.isEmpty
+            
+            func entryMatches(_ e: ComfyLogger.Entry) -> Bool {
+                if e.message.localizedCaseInsensitiveContains(f) { return true }
+                if e.level.rawValue.localizedCaseInsensitiveContains(f) { return true }
+                if timeFormatter.string(from: e.date).localizedCaseInsensitiveContains(f) { return true }
+                return false
+            }
+            
+            var kept: [ComfyLogger.Name] = []
+            var visible: [UUID: [UUID]] = [:]
+            
+            for n in names {
+                let allIDs = n.content.map(\.id)
+                
+                if !searching {
+                    kept.append(n)
+                    visible[n.id] = allIDs
+                    continue
+                }
+                
+                let nameMatch = n.name.localizedCaseInsensitiveContains(f)
+                let matchedIDs = nameMatch ? allIDs : n.content.filter(entryMatches).map(\.id)
+                
+                if nameMatch || !matchedIDs.isEmpty {
+                    kept.append(n)
+                    visible[n.id] = matchedIDs
+                }
+            }
+            
+            visibleNames = kept
+            visibleEntryIDsByNameID = visible
+            
+            namesByID = Dictionary(uniqueKeysWithValues: kept.map { ($0.id, $0) })
+            entriesByNameID = Dictionary(uniqueKeysWithValues: kept.map { n in
+                (n.id, Dictionary(uniqueKeysWithValues: n.content.map { ($0.id, $0) }))
+            })
+        }
+        
+        // MARK: Menu + Copy
+        
+        func makeMenu() -> NSMenu {
+            let menu = NSMenu()
+            menu.addItem(NSMenuItem(title: "Copy Message", action: #selector(copyMessage(_:)), keyEquivalent: "c"))
+            menu.addItem(NSMenuItem(title: "Copy All Info", action: #selector(copyAllInfo(_:)), keyEquivalent: ""))
+            return menu
+        }
+        
+        public func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+            (outlineView?.selectedRow ?? -1) >= 0
+        }
+        
+        @objc func copy(_ sender: Any?) { copyMessage(sender) }
+        
+        @objc func copyMessage(_ sender: Any?) { copyToClipboard(fullDetails: false) }
+        
+        @objc func copyAllInfo(_ sender: Any?) { copyToClipboard(fullDetails: true) }
+        
+        private func copyToClipboard(fullDetails: Bool) {
+            guard let outlineView else { return }
+            let rows = outlineView.selectedRowIndexes
+            guard !rows.isEmpty else { return }
+            
+            var out: [String] = []
+            out.reserveCapacity(rows.count)
+            
+            rows.forEach { row in
+                guard let node = outlineView.item(atRow: row) as? LogNode else { return }
+                
+                switch node {
+                case .category(let id):
+                    if let name = namesByID[id]?.name { out.append("[\(name)]") }
+                    
+                case .entry(let nameID, let entryID):
+                    guard let entry = entriesByNameID[nameID]?[entryID] else { return }
+                    if fullDetails {
+                        out.append("\(entry.date.formatted()) [\(entry.level.rawValue.uppercased())] \(entry.message)")
+                    } else {
+                        out.append(entry.message)
+                    }
+                }
+            }
+            
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(out.joined(separator: "\n"), forType: .string)
+        }
+        
+        // MARK: DataSource
+        
+        public func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
+            guard let node = item as? LogNode else { return visibleNames.count }
+            switch node {
+            case .category(let nameID):
+                return visibleEntryIDsByNameID[nameID]?.count ?? 0
+            case .entry:
+                return 0
+            }
+        }
+        
+        public func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
+            guard let node = item as? LogNode else { return LogNode.category(visibleNames[index].id) }
+            
+            if case .category(let nameID) = node,
+               let ids = visibleEntryIDsByNameID[nameID],
+               index < ids.count {
+                return LogNode.entry(nameID, ids[index])
+            }
+            
+            return LogNode.category(UUID())
+        }
+        
+        public func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
+            guard let node = item as? LogNode else { return false }
+            if case .category = node { return true }
+            return false
+        }
+        
+        public func outlineView(_ outlineView: NSOutlineView, isGroupItem item: Any) -> Bool {
+            if case .category = item as? LogNode { return true }
+            return false
+        }
+        
+        // MARK: Height
+        
+        public func outlineView(_ outlineView: NSOutlineView, heightOfRowByItem item: Any) -> CGFloat {
+            guard let node = item as? LogNode else { return OutlineLogView.baseRowHeight }
+            
+            switch node {
+            case .category:
+                return OutlineLogView.baseRowHeight
+                
+            case .entry(let nameID, let entryID):
+                guard expandedEntryIDs.contains(entryID),
+                      let entry = entriesByNameID[nameID]?[entryID] else {
+                    return OutlineLogView.baseRowHeight
+                }
+                
+                let colIndex = outlineView.column(withIdentifier: .init("message"))
+                let width = colIndex >= 0 ? outlineView.tableColumns[colIndex].width : 400
+                let availableWidth = width - 12
+                
+                let rect = (entry.message as NSString).boundingRect(
+                    with: NSSize(width: availableWidth, height: .greatestFiniteMagnitude),
+                    options: [.usesLineFragmentOrigin, .usesFontLeading],
+                    attributes: [.font: msgFont]
+                )
+                
+                return max(OutlineLogView.baseRowHeight, rect.height + 12)
+            }
+        }
+        
+        // MARK: Cells
+        
+        public func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
+            guard let node = item as? LogNode else { return nil }
+            
+            if case .category(let nameID) = node {
+                return groupCell(outlineView, title: namesByID[nameID]?.name ?? "Unknown")
+            }
+            
+            guard let tableColumn,
+                  case .entry(let nameID, let entryID) = node,
+                  let entry = entriesByNameID[nameID]?[entryID] else { return nil }
+            
+            let key = tableColumn.identifier.rawValue
+            let cell = makeCell(outlineView, id: "cell.\(key)")
+            
+            switch key {
+            case "level":
+                cell.textField?.font = .monospacedSystemFont(ofSize: 11, weight: .bold)
+                cell.textField?.stringValue = entry.level.rawValue.uppercased()
+                cell.textField?.textColor = entry.level.color
+                
+            case "message":
+                cell.textField?.font = msgFont
+                cell.textField?.lineBreakMode = .byWordWrapping
+                cell.textField?.maximumNumberOfLines = 0
+                cell.textField?.textColor = .labelColor
+                cell.textField?.stringValue = entry.message
+                
+            case "time":
+                cell.textField?.font = .monospacedDigitSystemFont(ofSize: 11, weight: .regular)
+                cell.textField?.textColor = .tertiaryLabelColor
+                cell.textField?.stringValue = entry.date.formatted(date: .omitted, time: .standard)
+                
+            default:
+                break
+            }
+            
+            return cell
+        }
+        
+        private func groupCell(_ outline: NSOutlineView, title: String) -> NSTableCellView {
+            let cell = makeCell(outline, id: "GroupCell")
+            cell.textField?.font = .systemFont(ofSize: 13, weight: .semibold)
+            cell.textField?.textColor = .labelColor
+            cell.textField?.stringValue = title
+            return cell
+        }
+        
+        private func makeCell(_ outline: NSOutlineView, id: String) -> NSTableCellView {
+            let ident = NSUserInterfaceItemIdentifier(id)
+            if let existing = outline.makeView(withIdentifier: ident, owner: self) as? NSTableCellView {
+                return existing
+            }
+            
+            let cell = NSTableCellView()
+            cell.identifier = ident
+            
+            let tf = NSTextField(labelWithString: "")
+            tf.translatesAutoresizingMaskIntoConstraints = false
+            tf.isSelectable = false
+            
+            cell.addSubview(tf)
+            cell.textField = tf
+            
+            NSLayoutConstraint.activate([
+                tf.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 4),
+                tf.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -4),
+                tf.topAnchor.constraint(equalTo: cell.topAnchor, constant: 2),
+                tf.bottomAnchor.constraint(equalTo: cell.bottomAnchor, constant: -2)
+            ])
+            
+            return cell
+        }
+        
+        // MARK: Expand-on-select
+        
+        public func outlineViewSelectionDidChange(_ notification: Notification) {
+            guard let outline = notification.object as? NSOutlineView else { return }
+            let row = outline.selectedRow
+            guard row >= 0, let node = outline.item(atRow: row) as? LogNode else { return }
+            
+            if case .entry(_, let entryID) = node {
+                if expandedEntryIDs.contains(entryID) { expandedEntryIDs.remove(entryID) }
+                else { expandedEntryIDs.insert(entryID) }
+                
+                outline.noteHeightOfRows(withIndexesChanged: IndexSet(integer: row))
+            }
+        }
+    }
+    
+    // MARK: - Custom Outline View (Copy + Right Click selection)
     
     public class LogOutlineView: NSOutlineView {
         
-        // This enables standard "Copy" via menu or Cmd+C
         public override func validateProposedFirstResponder(_ responder: NSResponder, for event: NSEvent?) -> Bool {
-            return true
+            true
         }
         
-        // Trap the copy command and send it to our delegate (Coordinator)
         @objc func copy(_ sender: Any?) {
-            if let delegate = self.delegate as? OutlineLogView.Coordinator {
-                delegate.copy(sender)
-            }
+            (delegate as? ComfyLogger.Coordinator)?.copy(sender)
         }
         
-        // Ensure right-click works for the whole row
         public override func menu(for event: NSEvent) -> NSMenu? {
-            let point = self.convert(event.locationInWindow, from: nil)
+            let point = convert(event.locationInWindow, from: nil)
             let row = self.row(at: point)
-            
-            // If the user right-clicks a row that isn't selected, select it first
-            if row >= 0 && !self.selectedRowIndexes.contains(row) {
-                self.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
+            if row >= 0 && !selectedRowIndexes.contains(row) {
+                selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
             }
-            
             return super.menu(for: event)
         }
     }
 }
-

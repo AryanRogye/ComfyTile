@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ComfyLogger
 
 struct SettingsContent: View {
     
@@ -14,16 +15,36 @@ struct SettingsContent: View {
     
     var body: some View {
         switch settingsVM.selectedTab {
+        case .log:
+            LogSettings()
         case .general:
             GeneralSettings(defaultsManager: defaultsManager)
-            //                case .logs:
-            //                    ComfyLogger.ComfyLoggerView(
-            //                        names: [
-            //                            ComfyLogger.WindowSplitManager,
-            //                            ComfyLogger.Updater,
-            //                            ComfyLogger.WindowElement
-            //                        ]
-            //                    )
         }
+    }
+}
+
+struct LogSettings: View {
+    
+    @State private var searchText: String = ""
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                TextField("Search For Title", text: $searchText)
+                    .textFieldStyle(.plain)
+                    .padding(8)
+                    .background {
+                        Rectangle()
+                            .fill(.clear)
+                            .stroke(.secondary.opacity(0.2), style: .init(lineWidth: 0.5))
+                    }
+            }
+            ComfyLogger.ComfyLoggerView(names: [
+                ComfyLogger.Updater,
+                ComfyLogger.WindowServerBridge,
+                ComfyLogger.WindowSplitManager,
+            ], filter: $searchText)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

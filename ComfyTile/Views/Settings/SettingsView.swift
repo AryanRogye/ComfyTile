@@ -11,6 +11,7 @@ import Sparkle
 
 enum SettingsTab: String, CaseIterable {
     case general = "General"
+    case log = "Log"
 }
 
 struct SettingsView: View {

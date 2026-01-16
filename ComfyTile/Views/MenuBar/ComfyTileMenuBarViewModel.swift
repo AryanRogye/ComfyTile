@@ -15,11 +15,7 @@ final class ComfyTileMenuBarViewModel {
     let windowSpatialEngine: WindowSpatialEngine
     let windowCore   : WindowCore
     
-    var lastFocusedWindow : ComfyWindow? = nil {
-        didSet {
-            print("Did Set: \(lastFocusedWindow)")
-        }
-    }
+    var lastFocusedWindow : ComfyWindow? = nil
     
     var width: CGFloat = 350
     var height: CGFloat = 300

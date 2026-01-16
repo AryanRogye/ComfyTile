@@ -6,6 +6,11 @@
 //
 
 import Cocoa
+import ComfyLogger
+
+extension ComfyLogger {
+    static let WindowServerBridge = ComfyLogger.Name("WindowServerBridge")
+}
 
 @MainActor
 public class WindowServerBridge {
@@ -58,22 +63,34 @@ public class WindowServerBridge {
     
     public func focusApp(forUserWindowID windowID: UInt32, pid: pid_t, element: AXUIElement?) {
         guard let getProcessForPID else {
-            NSLog("\u{001B}[1;31mGetProcessForPID fn nil\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "GetProcessForPID fn nil",
+                level: .error
+            )
             return
         }
         guard let setFrontProcessWithOptions else {
-            NSLog("\u{001B}[1;31mSLPSSetFrontProcessWithOptions fn nil\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "SLPSSetFrontProcessWithOptions fn nil",
+                level: .error
+            )
             return
         }
         guard let _ = postEventRecordTo else {
-            NSLog("\u{001B}[1;31mSLPSPostEventRecordTo fn nil\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "SLPSPostEventRecordTo fn nil",
+                level: .error
+            )
             return
         }
         
         var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: 0)
         let status = getProcessForPID(pid, &psn)
         if status != noErr {
-            NSLog("\u{001B}[1;31mCould Not Get Process For PID\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "Could Not Get Process For PID",
+                level: .error
+            )
             // keep behavior: don't hard-fail
             return
         }
@@ -82,29 +99,49 @@ public class WindowServerBridge {
         withUnsafePointer(to: psn) { psnPtr in
             setFrontProcessWithOptions(psnPtr, windowID, 0x200)
         }
-        NSLog("\u{001B}[1;32mSet Front Process With Options\u{001B}[0m")
+        ComfyLogger.WindowServerBridge.insert(
+            "Set Front Process With Options",
+            level: .info
+        )
         
         makeKeyWindow(forWindowID: windowID, psn: &psn)
-        NSLog("\u{001B}[1;32mMade Key Window For WindowID\u{001B}[0m")
+        ComfyLogger.WindowServerBridge.insert(
+            "Made Key Window For WindowID",
+            level: .info
+        )
         
         if let element {
-            NSLog("\u{001B}[1;32mAXElement Exists, Attempting To Raise\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "AXElement Exists, Attempting To Raise",
+                level: .debug
+            )
             AXUIElementPerformAction(element, kAXRaiseAction as CFString)
-            NSLog("\u{001B}[1;32mRaising Done\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "Raising Done",
+                level: .info
+            )
         } else {
             for attempt in 0..<3 {
                 if let found = findAXUIElement(forWindowID: windowID, pid: pid) {
-                    NSLog("\u{001B}[1;32mAXElement Found, Raising\u{001B}[0m")
+                    ComfyLogger.WindowServerBridge.insert(
+                        "AXElement Found, Raising",
+                        level: .info
+                    )
                     AXUIElementPerformAction(found, kAXRaiseAction as CFString)
                     // AXUIElement is CFType; ARC does not automatically release if created via remote token.
                     // We created it; release it.
                     break
                 } else {
-                    NSLog("\u{001B}[1;31mAXElement Not Found On Try: \(attempt)\u{001B}[0m")
+                    ComfyLogger.WindowServerBridge.insert(
+                        "AXElement Not Found On Try: \(attempt)",
+                        level: .warn
+                    )
                 }
             }
         }
-        pid_focus(pid: pid)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.pid_focus(pid: pid)
+        }
     }
     
     func pid_focus(pid :pid_t) {
@@ -226,24 +263,33 @@ public class WindowServerBridge {
     private func openHandle() {
         skylightHandle = dlopen(skylightPath, RTLD_LAZY | RTLD_GLOBAL)
         guard skylightHandle != nil else {
-            NSLog("\u{001B}[1;31mSkyLight Handle is Null\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "SkyLight Handle is Null",
+                level: .error
+            )
             exit(1)
         }
         
         hiServicesHandle = dlopen(hiServicesPath, RTLD_LAZY | RTLD_GLOBAL)
         guard hiServicesHandle != nil else {
-            NSLog("\u{001B}[1;31mHIServices Handle is Null\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "HIServices Handle is Null",
+                level: .error
+            )
             exit(1)
         }
         
-        NSLog("✅ Handles are Ready")
+        ComfyLogger.WindowServerBridge.insert("✅ Handles are Ready", level: .info)
     }
     
     private func sym<T>(_ handle: UnsafeMutableRawPointer?,
                         primary: String,
                         fallback: String) -> T {
         guard let handle else {
-            NSLog("\u{001B}[1;31mHandle nil for \(primary)\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "Handle nil for \(primary)",
+                level: .error
+            )
             exit(1)
         }
         
@@ -256,61 +302,85 @@ public class WindowServerBridge {
         }
         
         if let err = dlerror() {
-            NSLog("\u{001B}[1;31mdlsym Cant be Found: \(String(cString: err))\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "dlsym Cant be Found: \(String(cString: err))",
+                level: .error
+            )
         } else {
-            NSLog("\u{001B}[1;31mdlsym Cant be Found: \(primary) / \(fallback)\u{001B}[0m")
+            ComfyLogger.WindowServerBridge.insert(
+                "dlsym Cant be Found: \(primary) / \(fallback)",
+                level: .error
+            )
         }
         exit(1)
     }
     
     private func setAXUIElementCreateWithRemoteToken() {
-        NSLog("Attempting AXUIElementCreateWithRemoteToken")
+        ComfyLogger.WindowServerBridge.insert(
+            "Attempting AXUIElementCreateWithRemoteToken",
+            level: .debug
+        )
         axUIElementCreateWithRemoteToken = sym(
             hiServicesHandle,
             primary: "AXUIElementCreateWithRemoteToken",
             fallback: "_AXUIElementCreateWithRemoteToken"
         )
-        NSLog("✅ AXUIElementCreateWithRemoteToken (or _) Success")
+        ComfyLogger.WindowServerBridge.insert(
+            "✅ AXUIElementCreateWithRemoteToken (or _) Success",
+            level: .info
+        )
     }
     
     private func setAXUIElementGetWindow() {
-        NSLog("Attempting AXUIElementGetWindow")
+        ComfyLogger.WindowServerBridge.insert("Attempting AXUIElementGetWindow", level: .debug)
         axUIElementGetWindow = sym(
             hiServicesHandle,
             primary: "AXUIElementGetWindow",
             fallback: "_AXUIElementGetWindow"
         )
-        NSLog("✅ AXUIElementGetWindow (or _) Success")
+        ComfyLogger.WindowServerBridge.insert(
+            "✅ AXUIElementGetWindow (or _) Success",
+            level: .info
+        )
     }
     
     private func setGetProcessForPID() {
-        NSLog("Attempting GetProcessForPID")
+        ComfyLogger.WindowServerBridge.insert("Attempting GetProcessForPID", level: .debug)
         getProcessForPID = sym(
             hiServicesHandle,
             primary: "GetProcessForPID",
             fallback: "_GetProcessForPID"
         )
-        NSLog("✅ GetProcessForPID (or _) Success")
+        ComfyLogger.WindowServerBridge.insert("✅ GetProcessForPID (or _) Success", level: .info)
     }
     
     private func setSLPSSetFrontProcessWithOptions() {
-        NSLog("Attempting SLPSSetFrontProcessWithOptions")
+        ComfyLogger.WindowServerBridge.insert(
+            "Attempting SLPSSetFrontProcessWithOptions",
+            level: .debug
+        )
         setFrontProcessWithOptions = sym(
             skylightHandle,
             primary: "SLPSSetFrontProcessWithOptions",
             fallback: "_SLPSSetFrontProcessWithOptions"
         )
-        NSLog("✅ SLPSSetFrontProcessWithOptions (or _) Success")
+        ComfyLogger.WindowServerBridge.insert(
+            "✅ SLPSSetFrontProcessWithOptions (or _) Success",
+            level: .info
+        )
     }
     
     private func setSLPSPostEventRecordTo() {
-        NSLog("Attempting SLPSPostEventRecordTo")
+        ComfyLogger.WindowServerBridge.insert("Attempting SLPSPostEventRecordTo", level: .debug)
         postEventRecordTo = sym(
             skylightHandle,
             primary: "SLPSPostEventRecordTo",
             fallback: "_SLPSPostEventRecordTo"
         )
-        NSLog("✅ SLPSPostEventRecordTo (or _) Success")
+        ComfyLogger.WindowServerBridge.insert(
+            "✅ SLPSPostEventRecordTo (or _) Success",
+            level: .info
+        )
     }
 }
 

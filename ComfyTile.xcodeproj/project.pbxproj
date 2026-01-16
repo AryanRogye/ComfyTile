@@ -55,7 +55,6 @@
 		9B8FC0D72F130E7500CBF4B8 /* ShortcutEditableRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */; };
 		9B9BCED32F184DE00020F3AD /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED22F184DE00020F3AD /* LocalShortcuts */; };
 		9B9BCED62F184DEC0020F3AD /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED52F184DEC0020F3AD /* ComfyLogger */; };
-		9B9BCEE42F184E1D0020F3AD /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCEE22F184E1D0020F3AD /* main.swift */; };
 		9B9BCFC72F1971ED0020F3AD /* CheckForUpdatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCFC12F1971ED0020F3AD /* CheckForUpdatesView.swift */; };
 		9B9BCFC82F1971ED0020F3AD /* UpdateUserDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCFBF2F1971ED0020F3AD /* UpdateUserDriver.swift */; };
 		9B9BCFC92F1971ED0020F3AD /* ComfyTileUpdateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCFC22F1971ED0020F3AD /* ComfyTileUpdateView.swift */; };
@@ -82,15 +81,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		9B9BCED92F184E180020F3AD /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
 		9B9BCEE92F184EAA0020F3AD /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -150,8 +140,6 @@
 		9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutEditableRow.swift; sourceTree = "<group>"; };
 		9B9BCEC12F184D290020F3AD /* ComfyLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ComfyLogger; sourceTree = "<group>"; };
 		9B9BCEC22F184D290020F3AD /* LocalShortcuts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LocalShortcuts; sourceTree = "<group>"; };
-		9B9BCEDB2F184E180020F3AD /* ComfyTileCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ComfyTileCLI; sourceTree = BUILT_PRODUCTS_DIR; };
-		9B9BCEE22F184E1D0020F3AD /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		9B9BCFBE2F1971ED0020F3AD /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		9B9BCFBF2F1971ED0020F3AD /* UpdateUserDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateUserDriver.swift; sourceTree = "<group>"; };
 		9B9BCFC12F1971ED0020F3AD /* CheckForUpdatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckForUpdatesView.swift; sourceTree = "<group>"; };
@@ -178,13 +166,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		9B9BCED82F184E180020F3AD /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		9BF95ECB2E9321E000776771 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -364,14 +345,6 @@
 			path = Component;
 			sourceTree = "<group>";
 		};
-		9B9BCEE32F184E1D0020F3AD /* ComfyTileCLI */ = {
-			isa = PBXGroup;
-			children = (
-				9B9BCEE22F184E1D0020F3AD /* main.swift */,
-			);
-			path = ComfyTileCLI;
-			sourceTree = "<group>";
-		};
 		9B9BCFBD2F1971EB0020F3AD /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -423,7 +396,6 @@
 			children = (
 				9B9BCFE82F1973BF0020F3AD /* Utils */,
 				9B9BCFE32F1973660020F3AD /* Models */,
-				9BAF4AA42F197C6C006536D2 /* Calculation */,
 				9BAF4A9F2F1978B8006536D2 /* Layout */,
 				9B9BCFDA2F1972FD0020F3AD /* Tiling */,
 				9B9BCFE92F1973C60020F3AD /* WindowServerBridge.swift */,
@@ -523,18 +495,10 @@
 			path = Layout;
 			sourceTree = "<group>";
 		};
-		9BAF4AA42F197C6C006536D2 /* Calculation */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Calculation;
-			sourceTree = "<group>";
-		};
 		9BF95EC52E9321E000776771 = {
 			isa = PBXGroup;
 			children = (
 				9B436CED2ED7824E00D79941 /* ComfyTile.icon */,
-				9B9BCEE32F184E1D0020F3AD /* ComfyTileCLI */,
 				9B8FC05C2F10B80D00CBF4B8 /* ComfyTile */,
 				9B9BCEC12F184D290020F3AD /* ComfyLogger */,
 				9B9BCEC22F184D290020F3AD /* LocalShortcuts */,
@@ -546,7 +510,6 @@
 			isa = PBXGroup;
 			children = (
 				9BF95ECE2E9321E000776771 /* ComfyTile.app */,
-				9B9BCEDB2F184E180020F3AD /* ComfyTileCLI */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -554,25 +517,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9B9BCEDA2F184E180020F3AD /* ComfyTileCLI */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9B9BCEDF2F184E180020F3AD /* Build configuration list for PBXNativeTarget "ComfyTileCLI" */;
-			buildPhases = (
-				9B9BCED72F184E180020F3AD /* Sources */,
-				9B9BCED82F184E180020F3AD /* Frameworks */,
-				9B9BCED92F184E180020F3AD /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = ComfyTileCLI;
-			packageProductDependencies = (
-			);
-			productName = ComfyTileCLI;
-			productReference = 9B9BCEDB2F184E180020F3AD /* ComfyTileCLI */;
-			productType = "com.apple.product-type.tool";
-		};
 		9BF95ECD2E9321E000776771 /* ComfyTile */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9BF95ED92E9321E200776771 /* Build configuration list for PBXNativeTarget "ComfyTile" */;
@@ -610,9 +554,6 @@
 				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
-					9B9BCEDA2F184E180020F3AD = {
-						CreatedOnToolsVersion = 26.0;
-					};
 					9BF95ECD2E9321E000776771 = {
 						CreatedOnToolsVersion = 26.0;
 					};
@@ -640,7 +581,6 @@
 			projectRoot = "";
 			targets = (
 				9BF95ECD2E9321E000776771 /* ComfyTile */,
-				9B9BCEDA2F184E180020F3AD /* ComfyTileCLI */,
 			);
 		};
 /* End PBXProject section */
@@ -658,14 +598,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		9B9BCED72F184E180020F3AD /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9B9BCEE42F184E1D0020F3AD /* main.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		9BF95ECA2E9321E000776771 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -738,32 +670,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		9B9BCEE02F184E180020F3AD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = B9P888266K;
-				ENABLE_HARDENED_RUNTIME = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		9B9BCEE12F184E180020F3AD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = B9P888266K;
-				ENABLE_HARDENED_RUNTIME = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
 		9BF95ED72E9321E200776771 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -893,7 +799,7 @@
 				CODE_SIGN_ENTITLEMENTS = ComfyTile/ComfyTile.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = B9P888266K;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -911,7 +817,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4;
+				MARKETING_VERSION = 0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aryanrogye.ComfyTile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -940,7 +846,7 @@
 				CODE_SIGN_ENTITLEMENTS = ComfyTile/ComfyTile.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = B9P888266K;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -958,7 +864,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4;
+				MARKETING_VERSION = 0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aryanrogye.ComfyTile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -981,15 +887,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9B9BCEDF2F184E180020F3AD /* Build configuration list for PBXNativeTarget "ComfyTileCLI" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9B9BCEE02F184E180020F3AD /* Debug */,
-				9B9BCEE12F184E180020F3AD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		9BF95EC92E9321E000776771 /* Build configuration list for PBXProject "ComfyTile" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
