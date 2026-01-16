@@ -11,10 +11,22 @@ import ScreenCaptureKit
 @MainActor
 public final class ComfyWindow {
     
-    public var id: String { "\(pid):\(windowID ?? 0)" }
+    public var id: String {
+        if let wid = windowID {
+            return "\(pid):\(wid)"
+        }
+        
+        // UI-only fallback: title + frame fingerprint (stable-ish)
+        let fx = Int(element.frame.origin.x.rounded())
+        let fy = Int(element.frame.origin.y.rounded())
+        let fw = Int(element.frame.size.width.rounded())
+        let fh = Int(element.frame.size.height.rounded())
+        
+        return "\(pid):\(windowTitle):\(fx),\(fy),\(fw),\(fh)"
+    }
     
     public let windowID : CGWindowID?
-    public let windowTitle : String?
+    public let windowTitle : String
     
     /// More stronger element
     public var element: WindowElement
@@ -48,8 +60,7 @@ public final class ComfyWindow {
         guard let windowInfo = CGWindowListCopyWindowInfo([.optionIncludingWindow], window.windowID) as? [[String: Any]],
               let firstWindow = windowInfo.first,
               let windowTitle = firstWindow["kCGWindowName"] as? String,
-              let pid = firstWindow["kCGWindowOwnerPID"] as? pid_t,
-              let boundsDict = firstWindow["kCGWindowBounds"] as? [String: CGFloat]
+              let pid = firstWindow["kCGWindowOwnerPID"] as? pid_t
         else { return nil }
         
         /// Get AXElement, Doesnt matter if nil
@@ -87,7 +98,7 @@ public final class ComfyWindow {
     
     init(
         windowID: CGWindowID?,
-        windowTitle     : String?,
+        windowTitle     : String,
         element: WindowElement,
         screen: NSScreen? = nil,
         bundleIdentifier: String?,

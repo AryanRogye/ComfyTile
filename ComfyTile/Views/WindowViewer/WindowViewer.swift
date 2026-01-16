@@ -33,9 +33,7 @@ struct WindowViewer: View {
                                     .scaledToFit()
                                     .frame(width: 200, height: 150)
                             }
-                            if let title = window.windowTitle {
-                                Text(title)
-                            }
+                            Text(window.windowTitle)
                         }
                         .padding()
                         .background {

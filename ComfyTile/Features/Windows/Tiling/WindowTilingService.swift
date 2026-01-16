@@ -26,7 +26,6 @@ class WindowTilingService: WindowTilingProviding {
         frame.origin.y -= delta
         frame.size.height += delta
         
-        
         f.element.setPosition(x: frame.origin.x, y: frame.origin.y)
         f.element.setSize(width: frame.width, height: frame.height)
     }

@@ -15,7 +15,9 @@ public final class WindowCore {
     private var elements: [CGWindowID: WindowElement] = [:]
     
     public init() {
-        
+        Task {
+            await self.loadWindows()
+        }
     }
     
     @ObservationIgnored
@@ -36,24 +38,27 @@ public final class WindowCore {
                 }
             }
             
-            
             // fast lookup of the newest snapshot by windowID
             let newByID = Dictionary(uniqueKeysWithValues: userWindows.map { ($0.windowID, $0) })
             
             var merged: [ComfyWindow] = []
             merged.reserveCapacity(userWindows.count)
             
-            // 1) keep current (rearranged) order, but replace each element with the fresh snapshot
-            for old in userWindows {
+            // 1) preserve previous order (self.windows), refreshing data when present
+            var seen = Set<String>()
+            seen.reserveCapacity(userWindows.count)
+            
+            for old in self.windows {
                 if let updated = newByID[old.windowID] {
                     merged.append(updated)
+                    seen.insert(old.id)
                 }
             }
             
-            // 2) append brand new windows that weren't already in your list
-            let existingIDs = Set(merged.map { $0.windowID })
-            for w in userWindows where !existingIDs.contains(w.windowID) {
+            // 2) append any brand-new windows (order = snapshot order for new ones)
+            for w in userWindows where !seen.contains(w.id) {
                 merged.append(w)
+                seen.insert(w.id)
             }
             
             self.windows = merged
@@ -95,7 +100,7 @@ public final class WindowCore {
         let element = WindowElement(element: windowElement)
         return ComfyWindow(
             windowID: element.cgWindowID,
-            windowTitle: element.title,
+            windowTitle: element.title ?? "Unamed",
             element: element,
             screen: screen,
             bundleIdentifier: app.bundleIdentifier,
