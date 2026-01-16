@@ -20,13 +20,5 @@ struct ComfyTileApp: App {
     var body: some Scene {
 
         WindowGroup { EmptyView().destroyViewWindow() }
-
-        // MARK: - AppKit MenuBar is now used via MenuBarCoordinator (initialized in AppCoordinator)
-        // ComfyTileMenuBar(
-        //     defaultsManager: appDelegate.appCoordinator.defaultsManager,
-        //     fetchedWindowManager: appDelegate.appCoordinator.fetchedWindowManager,
-        //     settingsCoordinator : appDelegate.appCoordinator.settingsCoordinator,
-        //     updateController: appDelegate.appCoordinator.updateController
-        // )
     }
 }

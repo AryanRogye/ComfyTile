@@ -11,14 +11,14 @@ public struct ComfyTileMenuBarRootView: View {
     @Bindable var settingsVM        : SettingsViewModel
     @Bindable var comfyTileMenuBarVM: ComfyTileMenuBarViewModel
     @Bindable var defaultsManager: DefaultsManager
-    @Bindable var fetchedWindowManager: FetchedWindowManager
+    @Bindable var windowCore: WindowCore
     @Bindable var updateController: UpdateController
     
     public var body: some View {
         VStack(spacing: 0) {
             NewComfyTileMenuBarContent()
                 .environment(defaultsManager)
-                .environment(fetchedWindowManager)
+                .environment(windowCore)
                 .environment(comfyTileMenuBarVM)
                 .environment(updateController)
                 .environment(settingsVM)
@@ -66,16 +66,16 @@ struct NewComfyTileMenuBarContent: View {
 struct ComfyTileMenuBarContent: View {
     
     @Environment(DefaultsManager.self) var defaultsManager
-    @Environment(FetchedWindowManager.self) var fetchedWindowManager
+    @Environment(WindowCore.self) var windowCore
     
     
     var body: some View {
         @Bindable var defaultsManager = defaultsManager
-        @Bindable var fetchedWindowManager = fetchedWindowManager
+        @Bindable var windowCore = windowCore
         
         Button(action: {
             Task {
-                await fetchedWindowManager.loadWindows()
+                await windowCore.loadWindows()
             }
         }) {
             Label("Refresh", systemImage: "arrow.clockwise")

@@ -55,30 +55,8 @@ extension KeyboardShortcuts.Name {
 
 @MainActor
 final class HotKeyCoordinator {
-    
-    private(set) var rightHalf : KeyboardShortcuts.Name
-    private(set) var leftHalf  : KeyboardShortcuts.Name
-    private(set) var center    : KeyboardShortcuts.Name
-    private(set) var maximize  : KeyboardShortcuts.Name
-    
-    private(set) var nudgeBottomDown : KeyboardShortcuts.Name
-    private(set) var nudgeBottomUp   : KeyboardShortcuts.Name
-    private(set) var nudgeTopUp      : KeyboardShortcuts.Name
-    private(set) var nudgeTopDown    : KeyboardShortcuts.Name
-    
-    private(set) var autoTile        : KeyboardShortcuts.Name
-    
-    private(set) var windowViewer    : KeyboardShortcuts.Name
-    
     private let modifierDetector   = ModifierDoubleTapDetector()
     private let globalClickMonitor = GlobalClickMonitor()
-    
-    public func startModifier(with group: ModifierGroup) {
-//        modifierDetector.start(with: group)
-    }
-    public func stopModifier() {
-//        modifierDetector.stop()
-    }
     
     public func startGlobalClickMonitor(onClick: @escaping () -> Void) {
         globalClickMonitor.start {
@@ -89,7 +67,9 @@ final class HotKeyCoordinator {
         globalClickMonitor.stop()
     }
     
-    init(
+    init() {}
+    
+    func start(
         onPrimaryLeftStackedHorizontallyTile : @escaping() -> Void = {},
         onPrimaryRightStackedHorizontallyTile: @escaping() -> Void = {},
         onPrimaryTile                        : @escaping() -> Void = {},
@@ -122,22 +102,6 @@ final class HotKeyCoordinator {
         onNudgeTopDownDown: @escaping () -> Void = {},
         
     ) {
-        self.windowViewer = .windowViewer
-        self.autoTile   = .AutoTile
-        self.rightHalf  = .RightHalf
-        self.leftHalf   = .LeftHalf
-        self.center     = .Center
-        self.maximize   = .Maximize
-        
-        self.nudgeBottomDown = .NudgeBottomDown
-        self.nudgeBottomUp   = .NudgeBottomUp
-        self.nudgeTopUp      = .NudgeTopUp
-        self.nudgeTopDown    = .NudgeTopDown
-        
-        modifierDetector.onDoubleTapOption = onOptDoubleTapDown
-        modifierDetector.onDoubleTapOptionRelease = onOptDoubleTapUp
-        modifierDetector.onDoubleTapControl = onCtrlDoubleTapDown
-        modifierDetector.onDoubleTapControlRelease = onCtrlDoubleTapUp
         
         KeyboardShortcuts.onKeyDown(for: .primaryLeftStackedHorizontallyTile) {
             onPrimaryLeftStackedHorizontallyTile()
@@ -159,64 +123,61 @@ final class HotKeyCoordinator {
             onWindowViewerUp()
         }
         
-        KeyboardShortcuts.onKeyDown(for: self.autoTile) {
+        KeyboardShortcuts.onKeyDown(for: .AutoTile) {
 //            onAutoTile()
         }
         
         // MARK: - Right Half
-        KeyboardShortcuts.onKeyDown(for: self.rightHalf) {
+        KeyboardShortcuts.onKeyDown(for: .RightHalf) {
             onRightHalfDown()
         }
-        KeyboardShortcuts.onKeyUp(for: self.rightHalf) {
+        KeyboardShortcuts.onKeyUp(for: .RightHalf) {
             onRightHalfUp()
         }
         
         
 
         // MARK: - Left Half
-        KeyboardShortcuts.onKeyDown(for: self.leftHalf) {
+        KeyboardShortcuts.onKeyDown(for: .LeftHalf) {
             onLeftHalfDown()
         }
-        KeyboardShortcuts.onKeyUp(for: self.leftHalf) {
+        KeyboardShortcuts.onKeyUp(for: .LeftHalf) {
             onLeftHalfUp()
         }
         
         // MARK: - Center
-        KeyboardShortcuts.onKeyDown(for: self.center) {
+        KeyboardShortcuts.onKeyDown(for: .Center) {
             onCenterDown()
         }
-        KeyboardShortcuts.onKeyUp(for: self.center) {
+        KeyboardShortcuts.onKeyUp(for: .Center) {
             onCenterUp()
         }
         
         // MARK: - Maximize
-        KeyboardShortcuts.onKeyDown(for: self.maximize) {
+        KeyboardShortcuts.onKeyDown(for: .Maximize) {
             onMaximizeDown()
         }
-        KeyboardShortcuts.onKeyUp(for: self.maximize) {
+        KeyboardShortcuts.onKeyUp(for: .Maximize) {
             onMaximizeUp()
         }
         
-        
-        
-        
         // MARK: - Nudge Bottom Down
-        KeyboardShortcuts.onKeyDown(for: self.nudgeBottomDown) {
+        KeyboardShortcuts.onKeyDown(for: .NudgeBottomDown) {
             onNudgeBottomDownDown()
         }
         
         // MARK: - Nudge Bottom Up
-        KeyboardShortcuts.onKeyDown(for: self.nudgeBottomUp) {
+        KeyboardShortcuts.onKeyDown(for: .NudgeBottomUp) {
             onNudgeBottomUpDown()
         }
         
         // MARK: - Nudge Top Up
-        KeyboardShortcuts.onKeyDown(for: self.nudgeTopUp) {
+        KeyboardShortcuts.onKeyDown(for: .NudgeTopUp) {
             onNudgeTopUpDown()
         }
         
         // MARK: - Nudge Top Down
-        KeyboardShortcuts.onKeyDown(for: self.nudgeTopDown) {
+        KeyboardShortcuts.onKeyDown(for: .NudgeTopDown) {
             onNudgeTopDownDown()
         }
     }

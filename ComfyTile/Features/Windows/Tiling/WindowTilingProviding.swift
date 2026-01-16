@@ -1,5 +1,5 @@
 //
-//  WindowLayoutProviding.swift
+//  WindowTilingProviding.swift
 //  ComfyTileApp
 //
 //  Created by Aryan Rogye on 10/5/25.
@@ -7,7 +7,7 @@
 
 import AppKit
 
-protocol WindowLayoutProviding {
+protocol WindowTilingProviding {
     
     func nudgeTopUp(with step: Int)
     func nudgeTopDown(with step: Int)

@@ -12,10 +12,10 @@ import SwiftUI
 @MainActor
 final class ComfyTileMenuBarViewModel {
     
-    let windowTilingCoordinator: WindowTilingCoordinator
-    let fetchedWindowManager   : FetchedWindowManager
+    let windowSpatialEngine: WindowSpatialEngine
+    let windowCore   : WindowCore
     
-    var lastFocusedWindow : UserWindow? = nil {
+    var lastFocusedWindow : ComfyWindow? = nil {
         didSet {
             print("Did Set: \(lastFocusedWindow)")
         }
@@ -29,25 +29,25 @@ final class ComfyTileMenuBarViewModel {
     var panel: NSPanel?
     
     public func getLastFocusedWindow() {
-        self.lastFocusedWindow = WindowManagerHelpers.getFocusedWindow()
+        self.lastFocusedWindow = windowCore.getFocusedWindow()
     }
     
     init(
-        windowTilingCoordinator: WindowTilingCoordinator,
-        fetchedWindowManager: FetchedWindowManager
+        windowSpatialEngine: WindowSpatialEngine,
+        windowCore: WindowCore
     ) {
-        self.windowTilingCoordinator = windowTilingCoordinator
-        self.fetchedWindowManager = fetchedWindowManager
+        self.windowSpatialEngine = windowSpatialEngine
+        self.windowCore = windowCore
         observeTabs()
     }
     
     public func onTap(for tile: TilingMode) async {
-        var fetchedWindow: UserWindow?
+        var fetchedWindow: ComfyWindow?
         
         if let lastFocusedWindow {
             print("Found Window")
-            await fetchedWindowManager.loadWindows()
-            let fetchedWindows = fetchedWindowManager.fetchedWindows
+            await windowCore.loadWindows()
+            let fetchedWindows = windowCore.windows
             /// Check if Window in Here
             fetchedWindow = fetchedWindows.first(where: { $0.pid == lastFocusedWindow.pid })
             if let fetchedWindow {
@@ -55,10 +55,10 @@ final class ComfyTileMenuBarViewModel {
             }
         }
         
-        windowTilingCoordinator.action(for: tile)
+        windowSpatialEngine.action(for: tile)
     }
     public func onTap(for layout: LayoutMode) {
-        windowTilingCoordinator.action(for: layout)
+        windowSpatialEngine.action(for: layout)
     }
 }
 

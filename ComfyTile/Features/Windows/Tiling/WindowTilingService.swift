@@ -1,32 +1,37 @@
 //
-//  WindowLayoutService.swift
+//  WindowTilingService.swift
 //  ComfyTileApp
 //
 //  Created by Aryan Rogye on 10/5/25.
 //
 
 import Cocoa
+//import ComfyWindowingCore
 
-class WindowLayoutService: WindowLayoutProviding {
+class WindowTilingService: WindowTilingProviding {
     
+    let windowCore: WindowCore
     let animator = WindowAnimator()
+    
+    init(windowCore: WindowCore) {
+        self.windowCore = windowCore
+    }
     
     /// Keep Window Where it is, but its top point is moved up
     func nudgeTopUp(with step: Int) {
-        guard let f = WindowManagerHelpers.getFocusedWindow(),
+        guard let f = windowCore.getFocusedWindow(),
               var frame = f.element.windowFrame else { return }
 
         let delta: CGFloat = CGFloat(step)
         frame.origin.y -= delta
         frame.size.height += delta
         
-        
         f.element.setPosition(x: frame.origin.x, y: frame.origin.y)
         f.element.setSize(width: frame.width, height: frame.height)
     }
     
     func nudgeTopDown(with step: Int) {
-        guard let f = WindowManagerHelpers.getFocusedWindow(),
+        guard let f = windowCore.getFocusedWindow(),
               var frame = f.element.windowFrame else { return }
 
         let delta: CGFloat = CGFloat(step)
@@ -39,7 +44,7 @@ class WindowLayoutService: WindowLayoutProviding {
     
     
     func nudgeBottomDown(with step: Int) {
-        guard let f = WindowManagerHelpers.getFocusedWindow() else { return }
+        guard let f = windowCore.getFocusedWindow() else { return }
         
         // current frame
         guard var frame = f.element.windowFrame else { return }
@@ -52,7 +57,7 @@ class WindowLayoutService: WindowLayoutProviding {
     }
     
     func nudgeBottomUp(with step: Int) {
-        guard let f = WindowManagerHelpers.getFocusedWindow() else { return }
+        guard let f = windowCore.getFocusedWindow() else { return }
         
         // current frame
         guard var frame = f.element.windowFrame else { return }
@@ -65,7 +70,7 @@ class WindowLayoutService: WindowLayoutProviding {
     }
     
     func fullScreen() {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+        guard let focusedWindow = windowCore.getFocusedWindow(),
         let screen = focusedWindow.screen else { return }
         
         let frame = screen.visibleFrame
@@ -81,7 +86,7 @@ class WindowLayoutService: WindowLayoutProviding {
     }
     
     func center() {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+        guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = focusedWindow.screen else { return }
         
         /// This is padding around all sides of the window
@@ -113,7 +118,7 @@ class WindowLayoutService: WindowLayoutProviding {
     
     // MARK: - Move Left
     func moveLeft() {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+        guard let focusedWindow = windowCore.getFocusedWindow(),
         let screen = focusedWindow.screen else { return }
         
         let frame = screen.visibleFrame
@@ -139,7 +144,7 @@ class WindowLayoutService: WindowLayoutProviding {
     // MARK: - Move Right
     func moveRight() {
         
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+        guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = focusedWindow.screen else { return }
 
         let frame = screen.visibleFrame
@@ -183,7 +188,7 @@ class WindowLayoutService: WindowLayoutProviding {
     }
     
     func getFullScreenDimensions() -> CGRect? {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+        guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = focusedWindow.screen else { return nil }
 
         let frame = screen.visibleFrame
@@ -196,7 +201,7 @@ class WindowLayoutService: WindowLayoutProviding {
         )
     }
     func getLeftDimensions() -> CGRect? {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+        guard let focusedWindow = windowCore.getFocusedWindow(),
             let screen = focusedWindow.screen else { return nil }
         
         let frame = screen.visibleFrame
@@ -213,7 +218,7 @@ class WindowLayoutService: WindowLayoutProviding {
         
     }
     func getRightDimensions() -> CGRect? {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+        guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = focusedWindow.screen else { return nil }
 
         let frame = screen.visibleFrame
@@ -230,7 +235,7 @@ class WindowLayoutService: WindowLayoutProviding {
     }
     
     func getCenterDimensions() -> CGRect? {
-        guard let focusedWindow = WindowManagerHelpers.getFocusedWindow(),
+        guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = focusedWindow.screen else { return nil }
 
         /// This is padding around all sides of the window

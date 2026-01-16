@@ -8,7 +8,16 @@
 import AppKit
 
 class AppEnv {
-    var windowLayoutService: any WindowLayoutProviding = WindowLayoutService()
+    let windowCore = WindowCore()
+    
+    
+    lazy var windowTilingService: any WindowTilingProviding = WindowTilingService(
+        windowCore: windowCore
+    )
+    lazy var windowLayoutService: any WindowLayoutProviding = WindowLayoutService(
+        windowCore: windowCore
+    )
+    
     var permissionService: PermissionService = PermissionService()
 }
 
