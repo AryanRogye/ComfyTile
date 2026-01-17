@@ -69,7 +69,10 @@ class MenuBarCoordinator: NSObject {
             guard let self else { return }
             self.hidePanel()
         }
-
+        comfyTileMenuBarVM?.closePanel = { [weak self] in
+            guard let self else { return }
+            self.hidePanel()
+        }
     }
 
     // MARK: - Status Item Configuration

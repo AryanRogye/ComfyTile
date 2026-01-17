@@ -14,17 +14,58 @@ public struct ComfyTileMenuBarRootView: View {
     @Bindable var windowCore: WindowCore
     @Bindable var updateController: UpdateController
     
+    
     public var body: some View {
         VStack(spacing: 0) {
-            NewComfyTileMenuBarContent()
-                .environment(defaultsManager)
-                .environment(windowCore)
-                .environment(comfyTileMenuBarVM)
-                .environment(updateController)
-                .environment(settingsVM)
-            
+            if comfyTileMenuBarVM.permissionService.isAccessibilityEnabled {
+                NewComfyTileMenuBarContent()
+                    .environment(defaultsManager)
+                    .environment(windowCore)
+                    .environment(comfyTileMenuBarVM)
+                    .environment(updateController)
+                    .environment(settingsVM)
+            } else {
+                PermissionView(
+                    vm: comfyTileMenuBarVM
+                )
+            }
         }
         .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+struct PermissionView: View {
+    
+    @Bindable var vm : ComfyTileMenuBarViewModel
+    @State private var clickedPermissions: Bool = false
+
+    var body: some View {
+        VStack {
+            Text("👀 ComfyTile can’t see your windows yet.\nTurn on Accessibility so it can actually do its job.")
+
+            Spacer()
+            Button(action: {
+                clickedPermissions = true
+                vm.permissionService.requestPermission()
+                vm.closePanel()
+            }) {
+                if clickedPermissions {
+                    Text("😐 macOS still pretending we don’t exist?")
+                } else {
+                    Text("Request Accessibility")
+                }
+            }
+            if clickedPermissions {
+                Text("Sometimes macOS is just being stubborn. 😅")
+                Button(action: {
+                    try? vm.permissionService.resetAccessibility()
+                }) {
+                    Text("Reset Accessibility For ComfyTile")
+                }
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

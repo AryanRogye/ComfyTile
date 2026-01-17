@@ -12,7 +12,7 @@ import ScreenCaptureKit
 @MainActor
 public final class WindowCore {
     public var windows: [ComfyWindow] = []
-    private var elements: [CGWindowID: WindowElement] = [:]
+    private var elementCache: [CGWindowID: WindowElement] = [:]
     
     public init() {
         Task {
@@ -34,6 +34,18 @@ public final class WindowCore {
             /// Loop Through all screens for windows
             for window in allOnScreenWindows {
                 if let window = await ComfyWindow(window: window) {
+                    if let _ = window.element.element, let windowID = window.windowID {
+                        elementCache[windowID] = window.element
+                    }
+                    
+                    /// if element is nil but id is not nil we can check our cache
+                    if let windowID = window.windowID,
+                       window.element.element == nil {
+                        /// we have a WindowElement right here
+                        if let element = elementCache[windowID] {
+                            window.element = element
+                        }
+                    }
                     userWindows.append(window)
                 }
             }
@@ -99,6 +111,7 @@ public final class WindowCore {
         let windowElement = focusedWindow as! AXUIElement
         let element = WindowElement(element: windowElement)
         return ComfyWindow(
+            app: app,
             windowID: element.cgWindowID,
             windowTitle: element.title ?? "Unamed",
             element: element,

@@ -65,7 +65,8 @@ struct ComfyTileTabBar: View {
     @ViewBuilder
     private func TabButton(tab: ComfyTileTabs, shape: some Shape, isSelected: Bool) -> some View {
         Button {
-            withAnimation(.spring) {
+//            withAnimation(.spring) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 comfyTileMenuBarVM.selectedTab = tab
             }
         } label: {

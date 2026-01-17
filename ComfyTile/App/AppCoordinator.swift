@@ -43,14 +43,14 @@ class AppCoordinator {
     private let windowCore          : WindowCore
     private let defaultsManager     = DefaultsManager()
     private let windowSpatialEngine : WindowSpatialEngine
-    private var permissionManager : PermissionService
+    private var permissionService : PermissionService
 
     var numKeysHeld = 0
     var isHoldingModifier = false
     
     init(appEnv: AppEnv) {
         
-        self.permissionManager = PermissionService()
+        self.permissionService = PermissionService()
         self.windowCore = appEnv.windowCore
         self.windowTilingService = appEnv.windowTilingService
         self.windowLayoutService = appEnv.windowLayoutService
@@ -64,6 +64,7 @@ class AppCoordinator {
         )
         
         self.comfyTileMenuBarVM = ComfyTileMenuBarViewModel(
+            permissionService: permissionService,
             windowSpatialEngine: windowSpatialEngine,
             windowCore: appEnv.windowCore
         )

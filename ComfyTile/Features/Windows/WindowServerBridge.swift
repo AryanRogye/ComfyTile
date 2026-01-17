@@ -30,6 +30,7 @@ public class WindowServerBridge {
     public var getProcessForPID: GetProcessForPIDFn?
     public var axUIElementGetWindow: AXUIElementGetWindowFn?
     public var axUIElementCreateWithRemoteToken: AXUIElementCreateWithRemoteTokenFn?
+
     
     private let lock = NSLock()
     
@@ -61,7 +62,7 @@ public class WindowServerBridge {
         if let h = hiServicesHandle { dlclose(h) }
     }
     
-    public func focusApp(forUserWindowID windowID: UInt32, pid: pid_t, element: AXUIElement?) {
+    public func focusApp(forUserWindowID windowID: UInt32, pid: pid_t, element: AXUIElement?, app: NSRunningApplication) {
         guard let getProcessForPID else {
             ComfyLogger.WindowServerBridge.insert(
                 "GetProcessForPID fn nil",
@@ -99,16 +100,7 @@ public class WindowServerBridge {
         withUnsafePointer(to: psn) { psnPtr in
             setFrontProcessWithOptions(psnPtr, windowID, 0x200)
         }
-        ComfyLogger.WindowServerBridge.insert(
-            "Set Front Process With Options",
-            level: .info
-        )
-        
         makeKeyWindow(forWindowID: windowID, psn: &psn)
-        ComfyLogger.WindowServerBridge.insert(
-            "Made Key Window For WindowID",
-            level: .info
-        )
         
         if let element {
             ComfyLogger.WindowServerBridge.insert(
@@ -120,36 +112,60 @@ public class WindowServerBridge {
                 "Raising Done",
                 level: .info
             )
-        } else {
-            for attempt in 0..<3 {
-                if let found = findAXUIElement(forWindowID: windowID, pid: pid) {
-                    ComfyLogger.WindowServerBridge.insert(
-                        "AXElement Found, Raising",
-                        level: .info
-                    )
-                    AXUIElementPerformAction(found, kAXRaiseAction as CFString)
-                    // AXUIElement is CFType; ARC does not automatically release if created via remote token.
-                    // We created it; release it.
-                    break
-                } else {
-                    ComfyLogger.WindowServerBridge.insert(
-                        "AXElement Not Found On Try: \(attempt)",
-                        level: .warn
-                    )
-                }
-            }
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.pid_focus(pid: pid)
+//        else {
+//            if let fn = getWindowWorkspaceFn, let slsMainConnection {
+//                if let cid = slsMainConnection() {
+//                    var space: UInt32 = 0
+//                    let err = fn(cid, windowID, &space)
+//                    print("RESULT: \(space): \(err)")
+//                }
+//            }
+//        }
+//        else {
+            /// TODO: WARNING: FIX THIS HERE ATTEMPT TO USE A CACHE OR JUST FOCUS IT
+//            for attempt in 0..<3 {
+//                if let found = findAXUIElement(forWindowID: windowID, pid: pid) {
+//                    ComfyLogger.WindowServerBridge.insert(
+//                        "AXElement Found, Raising",
+//                        level: .info
+//                    )
+//                    AXUIElementPerformAction(found, kAXRaiseAction as CFString)
+//                    break
+//                } else {
+//                    ComfyLogger.WindowServerBridge.insert(
+//                        "AXElement Not Found On Try: \(attempt)",
+//                        level: .warn
+//                    )
+//                }
+//            }
+        //        }
+//        self.pid_focus(pid: pid)
+        
+        app.activate(options: [.activateIgnoringOtherApps])
+        
+        /// Then Check Element and bring above
+        if let axElement = element {
+            // Raise specific window using AX
+            AXUIElementPerformAction(axElement, kAXRaiseAction as CFString)
+            AXUIElementSetAttributeValue(
+                axElement,
+                kAXMainAttribute as CFString,
+                true as CFTypeRef
+            )
         }
     }
     
-    func pid_focus(pid :pid_t) {
-        let apps = NSWorkspace.shared.runningApplications
-        if let app = apps.first(where: { $0.processIdentifier == pid }) {
-            app.activate(options: [.activateIgnoringOtherApps])
-        }
-    }
+//    func pid_focus(pid :pid_t) {
+//        let apps = NSWorkspace.shared.runningApplications
+//        if let app = apps.first(where: { $0.processIdentifier == pid }) {
+//            for i in 0..<3 {
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15 * Double(i)) {
+//                    app.activate(options: [.activateIgnoringOtherApps])
+//                }
+//            }
+//        }
+//    }
     
     // Equivalent to your findMatchingAXWindowWithPid:targetWindowID:
     func findMatchingAXWindow(pid: pid_t, targetWindowID: CGWindowID) -> AXUIElement? {
@@ -213,7 +229,7 @@ public class WindowServerBridge {
         }
     }
     
-    private func findAXUIElement(forWindowID windowID: UInt32, pid: pid_t) -> AXUIElement? {
+    public func findAXUIElement(forWindowID windowID: UInt32, pid: pid_t) -> AXUIElement? {
         guard let axUIElementCreateWithRemoteToken,
               let axUIElementGetWindow else { return nil }
         
@@ -286,33 +302,42 @@ public class WindowServerBridge {
                         primary: String,
                         fallback: String) -> T {
         guard let handle else {
-            ComfyLogger.WindowServerBridge.insert(
-                "Handle nil for \(primary)",
-                level: .error
-            )
-            exit(1)
+            ComfyLogger.WindowServerBridge.insert("Handle nil for \(primary)", level: .error)
+            fatalError("Handle nil for \(primary)")
         }
         
-        if let p = dlsym(handle, primary) {
+        // Clear any prior dlerror state (important)
+        _ = dlerror()
+        
+        func resolve(_ name: String) -> UnsafeMutableRawPointer? {
+            _ = dlerror() // clear before each dlsym
+            let p = dlsym(handle, name)
+            // If dlerror() returns non-nil, this dlsym failed even if p is non-nil (rare but happens)
+            if dlerror() != nil { return nil }
+            return p
+        }
+        
+        guard let p = resolve(primary) ?? resolve(fallback) else {
+            let msg = dlerror().map { String(cString: $0) } ?? "unknown dlerror"
+            ComfyLogger.WindowServerBridge.insert(
+                "dlsym not found: \(primary) / \(fallback) — \(msg)",
+                level: .error
+            )
+            fatalError("dlsym not found: \(primary) / \(fallback) — \(msg)")
+        }
+        
+        // Cast symbol address -> requested function pointer type
+        return unsafeBitCast(p, to: T.self)
+    }
+    
+    private func symGlobal<T>(primary: String, fallback: String) -> T {
+        if let p = dlsym(UnsafeMutableRawPointer(bitPattern: -2), primary) { // RTLD_DEFAULT
             return unsafeBitCast(p, to: T.self)
         }
-        
-        if let p = dlsym(handle, fallback) {
+        if let p = dlsym(UnsafeMutableRawPointer(bitPattern: -2), fallback) {
             return unsafeBitCast(p, to: T.self)
         }
-        
-        if let err = dlerror() {
-            ComfyLogger.WindowServerBridge.insert(
-                "dlsym Cant be Found: \(String(cString: err))",
-                level: .error
-            )
-        } else {
-            ComfyLogger.WindowServerBridge.insert(
-                "dlsym Cant be Found: \(primary) / \(fallback)",
-                level: .error
-            )
-        }
-        exit(1)
+        fatalError("global dlsym failed: \(primary)/\(fallback)")
     }
     
     private func setAXUIElementCreateWithRemoteToken() {
@@ -383,7 +408,66 @@ public class WindowServerBridge {
         )
     }
 }
+/**
+ * SLSMainConnectionID:
+ * function _SLSMainConnectionID {
+ *      r31 = r31 + 0xffffffffffffffe0;
+ *      arg_10 = r29;
+ *      arg_18 = r30;
+ *      r19 = objc_autoreleasePoolPush();
+ *      r0 = _SLSMainConnection();
+ *      if (r0 != 0x0) {
+ *          r20 = r0[0x4];
+ *      }
+ *      else {
+ *          r20 = 0x0;
+ *      }
+ *      objc_autoreleasePoolPop(r19);
+ *      return;
+ * }
+ */
 
+/*
+ * This is deadass:
+ * void _SLSGetWindowWorkspaceIgnoringVisibility() {
+ *      abort();
+ *      return;
+ * }
+
+ */
+//public typealias SLSGetWindowWorkspaceIgnoringVisibilityFn =
+//@convention(c) (_ cid: CGSConnectionID,
+//                _ windowID: UInt32,
+//                _ spaceID: UnsafeMutablePointer<Int>
+//) -> Int
+
+//public typealias SLSMainConnectionFn = @convention(c) () -> UnsafeMutableRawPointer?
+//
+//public typealias SLSConnectionID = Int32
+//public typealias SLSMainConnectionIDFn = @convention(c) () -> SLSConnectionID
+
+/**
+ * void _SLSGetWindowWorkspace(int arg0, int arg1, int arg2) {
+ *      r31 = r31 - 0x30;
+ *      var_10 = r20;
+ *      decomp_var_8 = r19;
+ *      saved_fp = r29;
+ *      decomp_var_m8 = r30;
+ *      var_18 = **0x1e6b211e8;
+ *      CGSGetWindowTags();
+ *      *(int32_t *)arg2 = 0x10008 & (0x0 << 0x14) / 0x80000000;
+ *      if (**0x1e6b211e8 != var_18) {
+ *          __stack_chk_fail();
+ *      }
+ *      return;
+ * }
+ */
+//public typealias SLSGetWindowWorkspaceFn =
+//@convention(c) (
+//    _ cid: UnsafeMutableRawPointer,
+//    _ windowID: UInt32,
+//    _ outSpace: UnsafeMutablePointer<UInt32>
+//) -> Int32
 
 public typealias SLPSSetFrontProcessWithOptionsFn =
 @convention(c) (_ psn: UnsafePointer<ProcessSerialNumber>,

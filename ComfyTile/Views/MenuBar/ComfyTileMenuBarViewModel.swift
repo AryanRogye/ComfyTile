@@ -14,6 +14,7 @@ final class ComfyTileMenuBarViewModel {
     
     let windowSpatialEngine: WindowSpatialEngine
     let windowCore   : WindowCore
+    let permissionService : PermissionService
     
     var lastFocusedWindow : ComfyWindow? = nil
     
@@ -24,16 +25,20 @@ final class ComfyTileMenuBarViewModel {
     
     var panel: NSPanel?
     
+    var closePanel: () -> Void = { }
+    
     public func getLastFocusedWindow() {
         self.lastFocusedWindow = windowCore.getFocusedWindow()
     }
     
     init(
+        permissionService : PermissionService,
         windowSpatialEngine: WindowSpatialEngine,
         windowCore: WindowCore
     ) {
         self.windowSpatialEngine = windowSpatialEngine
         self.windowCore = windowCore
+        self.permissionService = permissionService
         observeTabs()
     }
     

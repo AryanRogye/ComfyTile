@@ -46,7 +46,8 @@ final class WindowLayoutService: WindowLayoutProviding {
             WindowServerBridge.shared.focusApp(
                 forUserWindowID: id,
                 pid: primary.pid,
-                element: primary.element.element
+                element: primary.element.element,
+                app: primary.app
             )
         }
     }
@@ -61,7 +62,8 @@ final class WindowLayoutService: WindowLayoutProviding {
             WindowServerBridge.shared.focusApp(
                 forUserWindowID: id,
                 pid: primary.pid,
-                element: primary.element.element
+                element: primary.element.element,
+                app: primary.app
             )
         }
     }

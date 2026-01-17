@@ -28,6 +28,8 @@ public final class ComfyWindow {
     public let windowID : CGWindowID?
     public let windowTitle : String
     
+    public let app: NSRunningApplication
+    
     /// More stronger element
     public var element: WindowElement
     public var screen: NSScreen?
@@ -41,7 +43,9 @@ public final class ComfyWindow {
             WindowServerBridge.shared.focusApp(
                 forUserWindowID: id,
                 pid: pid,
-                element: element.element)
+                element: element.element,
+                app: app
+            )
         }
     }
     
@@ -87,6 +91,11 @@ public final class ComfyWindow {
         
         let windowElement = WindowElement(element: axElement)
         
+        let nsapp = NSRunningApplication.runningApplications(withBundleIdentifier: app.bundleIdentifier)
+        guard nsapp.count > 0 else {
+            return nil
+        }
+        self.app = nsapp.first!
         self.windowID = window.windowID
         self.windowTitle = windowTitle
         self.element = windowElement
@@ -97,6 +106,7 @@ public final class ComfyWindow {
     }
     
     init(
+        app: NSRunningApplication,
         windowID: CGWindowID?,
         windowTitle     : String,
         element: WindowElement,
@@ -106,6 +116,7 @@ public final class ComfyWindow {
         screenshot: CGImage? = nil,
         isInSpace: Bool
     ) {
+        self.app = app
         self.windowID = windowID
         self.windowTitle = windowTitle
         self.element = element
@@ -117,7 +128,7 @@ public final class ComfyWindow {
     }
     
     private static func spacesForWindow(_ windowID: CGWindowID) -> [Int] {
-        let cid = CGSMainConnectionID()
+        let cid = CGSConnectionID()
         let ids: CFArray = [NSNumber(value: Int(windowID))] as CFArray
         
         guard let unmanaged = CGSCopySpacesForWindows(cid, kCGSAllSpacesMask, ids) else {
