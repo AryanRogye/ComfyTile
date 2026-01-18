@@ -54,11 +54,19 @@ public final class ComfyWindow {
     ) async {
         guard let app = window.owningApplication,
               window.windowLayer == 0,
-              window.frame.size.width > 100
+              window.frame.size.width > 100,
+              let getProcessForPID = WindowServerBridge.shared.getProcessForPID,
+              let setFrontProcessWithOptions = WindowServerBridge.shared.setFrontProcessWithOptions
         else {
             // Skip junk like "Cursor", "Menubar", etc.
             return nil
         }
+        
+        let nsapp = NSRunningApplication.runningApplications(withBundleIdentifier: app.bundleIdentifier)
+        guard nsapp.count > 0 else {
+            return nil
+        }
+
         
         /// Get Window Information
         guard let windowInfo = CGWindowListCopyWindowInfo([.optionIncludingWindow], window.windowID) as? [[String: Any]],
@@ -67,9 +75,41 @@ public final class ComfyWindow {
               let pid = firstWindow["kCGWindowOwnerPID"] as? pid_t
         else { return nil }
         
-        /// Get AXElement, Doesnt matter if nil
-        let axElement : AXUIElement? = WindowServerBridge.shared.findMatchingAXWindow(pid: pid, targetWindowID: window.windowID)
+//        var psn = ProcessSerialNumber()
+//        let status = getProcessForPID(pid, &psn)
+
+        /// Try Bringing Focus then getting AX
+        var psn = ProcessSerialNumber(highLongOfPSN: 0, lowLongOfPSN: 0)
+        let status = getProcessForPID(pid, &psn)
+//        if status == noErr {
+//            let _ = setFrontProcessWithOptions(&psn, window.windowID, 0x200)
+//            WindowServerBridge.shared.makeKeyWindow(forWindowID: window.windowID, psn: &psn)
+//        }
         
+        let appAX = AXUIElementCreateApplication(pid)
+        
+        if status == noErr {
+            _ = setFrontProcessWithOptions(&psn, window.windowID, 0x200)
+            WindowServerBridge.shared.makeKeyWindow(forWindowID: window.windowID, psn: &psn)
+            try? NSWorkspace.shared.launchApplication(at: nsapp.first!.bundleURL!,
+                                                 options: [.withoutActivation],
+                                                 configuration: [:])
+        }
+        
+        // poll for AX after focus/space switch
+        Task { @MainActor in
+            for _ in 0..<6 {
+                if let ax = WindowServerBridge.shared.findMatchingAXWindow(pid: pid, targetWindowID: window.windowID)
+                {
+                    AXUIElementPerformAction(ax, kAXRaiseAction as CFString)
+                    break
+                }
+                try? await Task.sleep(nanoseconds: 80_000_000) // 80ms
+            }
+        }
+        
+        /// Get AXElement, Doesnt matter if nil
+        var axElement : AXUIElement? = WindowServerBridge.shared.findMatchingAXWindow(pid: pid, targetWindowID: window.windowID)
         if let axElement {
             print("""
                         AX Present in WindowID: \(window.windowID),
@@ -77,6 +117,8 @@ public final class ComfyWindow {
                         Title: \(windowTitle),
                         AX: \(axElement)
                         """)
+        } else {
+            axElement = AXUIElementCreateApplication(pid)
         }
         
         var screenshot: CGImage? = nil
@@ -91,10 +133,6 @@ public final class ComfyWindow {
         
         let windowElement = WindowElement(element: axElement)
         
-        let nsapp = NSRunningApplication.runningApplications(withBundleIdentifier: app.bundleIdentifier)
-        guard nsapp.count > 0 else {
-            return nil
-        }
         self.app = nsapp.first!
         self.windowID = window.windowID
         self.windowTitle = windowTitle
@@ -128,7 +166,7 @@ public final class ComfyWindow {
     }
     
     private static func spacesForWindow(_ windowID: CGWindowID) -> [Int] {
-        let cid = CGSConnectionID()
+        let cid = CGSMainConnectionID()
         let ids: CFArray = [NSNumber(value: Int(windowID))] as CFArray
         
         guard let unmanaged = CGSCopySpacesForWindows(cid, kCGSAllSpacesMask, ids) else {

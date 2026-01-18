@@ -95,23 +95,93 @@ public class WindowServerBridge {
             // keep behavior: don't hard-fail
             return
         }
-        
-        // 0x200 = userGenerated
-        withUnsafePointer(to: psn) { psnPtr in
-            setFrontProcessWithOptions(psnPtr, windowID, 0x200)
+
+        var didActivateFallback = false
+        func activateAppFallback() {
+            guard !didActivateFallback else { return }
+            if app.isHidden {
+                app.unhide()
+            }
+            app.activate(options: [.activateIgnoringOtherApps])
+            didActivateFallback = true
         }
-        makeKeyWindow(forWindowID: windowID, psn: &psn)
-        
-        if let element {
-            ComfyLogger.WindowServerBridge.insert(
-                "AXElement Exists, Attempting To Raise",
-                level: .debug
-            )
-            AXUIElementPerformAction(element, kAXRaiseAction as CFString)
-            ComfyLogger.WindowServerBridge.insert(
-                "Raising Done",
-                level: .info
-            )
+
+        func resolvedAXElement() -> AXUIElement? {
+            if let element {
+                if let axUIElementGetWindow {
+                    var id: CGWindowID = 0
+                    if axUIElementGetWindow(element, &id) == .success, id == windowID {
+                        return element
+                    }
+                } else {
+                    return element
+                }
+            }
+            return findMatchingAXWindow(pid: pid, targetWindowID: windowID)
+        }
+
+        let maxRetries = 3
+        var targetElement = resolvedAXElement()
+        for attempt in 0..<maxRetries {
+            // 0x200 = userGenerated
+            let frontError = setFrontProcessWithOptions(&psn, windowID, 0x200)
+            if frontError != .success {
+                ComfyLogger.WindowServerBridge.insert(
+                    "SLPSSetFrontProcessWithOptions error: \(frontError.rawValue)",
+                    level: .warn
+                )
+                activateAppFallback()
+            }
+            makeKeyWindow(forWindowID: windowID, psn: &psn)
+
+            if targetElement == nil {
+                targetElement = resolvedAXElement()
+            }
+
+            if let targetElement {
+                ComfyLogger.WindowServerBridge.insert(
+                    "AXElement Exists, Attempting To Raise",
+                    level: .debug
+                )
+                let raiseErr = AXUIElementPerformAction(targetElement, kAXRaiseAction as CFString)
+                let mainErr = AXUIElementSetAttributeValue(
+                    targetElement,
+                    kAXMainAttribute as CFString,
+                    true as CFTypeRef
+                )
+                let focusErr = AXUIElementSetAttributeValue(
+                    targetElement,
+                    kAXFocusedAttribute as CFString,
+                    true as CFTypeRef
+                )
+                if raiseErr == .success && mainErr == .success {
+                    ComfyLogger.WindowServerBridge.insert(
+                        "Raising Done",
+                        level: .info
+                    )
+                    break
+                }
+
+                if raiseErr == .cannotComplete || mainErr == .cannotComplete || focusErr == .cannotComplete {
+                    ComfyLogger.WindowServerBridge.insert(
+                        "AX raise cannotComplete, retrying (\(attempt + 1)/\(maxRetries))",
+                        level: .warn
+                    )
+                } else if raiseErr != .success || mainErr != .success {
+                    ComfyLogger.WindowServerBridge.insert(
+                        "AX raise failed (\(raiseErr.rawValue), \(mainErr.rawValue))",
+                        level: .warn
+                    )
+                    activateAppFallback()
+                    break
+                }
+            } else {
+                activateAppFallback()
+            }
+
+            if attempt < maxRetries - 1 {
+                usleep(50_000)
+            }
         }
 //        else {
 //            if let fn = getWindowWorkspaceFn, let slsMainConnection {
@@ -142,17 +212,8 @@ public class WindowServerBridge {
         //        }
 //        self.pid_focus(pid: pid)
         
-        app.activate(options: [.activateIgnoringOtherApps])
-        
-        /// Then Check Element and bring above
-        if let axElement = element {
-            // Raise specific window using AX
-            AXUIElementPerformAction(axElement, kAXRaiseAction as CFString)
-            AXUIElementSetAttributeValue(
-                axElement,
-                kAXMainAttribute as CFString,
-                true as CFTypeRef
-            )
+        if targetElement == nil {
+            activateAppFallback()
         }
     }
     
@@ -169,6 +230,8 @@ public class WindowServerBridge {
     
     // Equivalent to your findMatchingAXWindowWithPid:targetWindowID:
     func findMatchingAXWindow(pid: pid_t, targetWindowID: CGWindowID) -> AXUIElement? {
+        
+        
         let appAX: AXUIElement = AXUIElementCreateApplication(pid)
         
         var windowsValue: CFTypeRef?
@@ -196,36 +259,29 @@ public class WindowServerBridge {
         }
         
         return nil
+        
     }
     
     // MARK: - Private APIs (packet + token probe)
     
-    private func makeKeyWindow(forWindowID windowID: UInt32, psn: inout ProcessSerialNumber) {
+    public func makeKeyWindow(forWindowID windowID: UInt32, psn: inout ProcessSerialNumber) {
         guard let postEventRecordTo else { return }
-        
+
         var bytes = [UInt8](repeating: 0, count: 0xF8)
-        
         bytes[0x04] = 0xF8
-        bytes[0x08] = 0x01
         bytes[0x3A] = 0x10
-        
-        bytes[0x3C] = UInt8(windowID & 0xFF)
-        bytes[0x3D] = UInt8((windowID >> 8) & 0xFF)
-        bytes[0x3E] = UInt8((windowID >> 16) & 0xFF)
-        bytes[0x3F] = UInt8((windowID >> 24) & 0xFF)
-        
-        let psnLow  = UInt64(UInt32(psn.lowLongOfPSN))
-        let psnHigh = UInt64(UInt32(psn.highLongOfPSN))
-        let psnValue = psnLow | (psnHigh << 32)
-        
-        for i in 0..<8 {
-            bytes[0x20 + i] = UInt8((psnValue >> (i * 8)) & 0xFF)
+
+        var wid = windowID
+        memcpy(&bytes[0x3C], &wid, MemoryLayout<UInt32>.size)
+        memset(&bytes[0x20], 0xFF, 0x10)
+
+        bytes[0x08] = 0x01
+        bytes.withUnsafeMutableBufferPointer { buf in
+            postEventRecordTo(&psn, buf.baseAddress!)
         }
-        
-        bytes.withUnsafeBufferPointer { buf in
-            withUnsafePointer(to: psn) { psnPtr in
-                postEventRecordTo(psnPtr, buf.baseAddress!)
-            }
+        bytes[0x08] = 0x02
+        bytes.withUnsafeMutableBufferPointer { buf in
+            postEventRecordTo(&psn, buf.baseAddress!)
         }
     }
     
@@ -272,6 +328,70 @@ public class WindowServerBridge {
         }
         
         return nil
+    }
+    
+    /// Heuristic mapping from AX window to CG window when _AXUIElementGetWindow fails
+    func mapAXToCG(axWindow: AXUIElement, candidates: [[String: AnyObject]], excluding: Set<CGWindowID>) -> CGWindowID? {
+        
+        let element = WindowElement(element: axWindow)
+        
+        let axTitle = (try? axWindow.title())?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let axPos = element.position
+        let axSize = element.size
+        
+        // 1) Exact title match among unused candidates
+        if !axTitle.isEmpty {
+            if let match = candidates.first(where: { desc in
+                let title = (desc[kCGWindowName as String] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                let wid = CGWindowID((desc[kCGWindowNumber as String] as? NSNumber)?.uint32Value ?? 0)
+                return title == axTitle && !excluding.contains(wid)
+            }) {
+                return CGWindowID((match[kCGWindowNumber as String] as? NSNumber)?.uint32Value ?? 0)
+            }
+        }
+        
+        // 2) Geometry match within tolerance
+        if let p = axPos, let s = axSize, s != .zero {
+            let tol: CGFloat = 2.0
+            if let match = candidates.first(where: { desc in
+                let wid = CGWindowID((desc[kCGWindowNumber as String] as? NSNumber)?.uint32Value ?? 0)
+                if excluding.contains(wid) { return false }
+                let bounds = desc[kCGWindowBounds as String] as? [String: AnyObject]
+                let rx = CGFloat((bounds?["X"] as? NSNumber)?.doubleValue ?? .infinity)
+                let ry = CGFloat((bounds?["Y"] as? NSNumber)?.doubleValue ?? .infinity)
+                let rw = CGFloat((bounds?["Width"] as? NSNumber)?.doubleValue ?? .infinity)
+                let rh = CGFloat((bounds?["Height"] as? NSNumber)?.doubleValue ?? .infinity)
+                let r = CGRect(x: rx, y: ry, width: rw, height: rh)
+                let posMatch = abs(r.origin.x - p.x) <= tol && abs(r.origin.y - p.y) <= tol
+                let sizeMatch = abs(r.size.width - s.width) <= tol && abs(r.size.height - s.height) <= tol
+                return posMatch && sizeMatch
+            }) {
+                return CGWindowID((match[kCGWindowNumber as String] as? NSNumber)?.uint32Value ?? 0)
+            }
+        }
+        
+        // 3) Fuzzy title contains
+        if !axTitle.isEmpty {
+            if let match = candidates.first(where: { desc in
+                let title = ((desc[kCGWindowName as String] as? String) ?? "").lowercased()
+                let wid = CGWindowID((desc[kCGWindowNumber as String] as? NSNumber)?.uint32Value ?? 0)
+                return !excluding.contains(wid) && title.contains(axTitle.lowercased())
+            }) {
+                return CGWindowID((match[kCGWindowNumber as String] as? NSNumber)?.uint32Value ?? 0)
+            }
+        }
+        
+        return nil
+    }
+
+    
+    func getCGWindowCandidates(for pid: pid_t) -> [[String: AnyObject]] {
+        let cgAll = (CGWindowListCopyWindowInfo([.excludeDesktopElements], kCGNullWindowID) as? [[String: AnyObject]]) ?? []
+        return cgAll.filter { desc in
+            let owner = (desc[kCGWindowOwnerPID as String] as? NSNumber)?.int32Value ?? 0
+            let layer = (desc[kCGWindowLayer as String] as? NSNumber)?.intValue ?? 0
+            return owner == pid && layer == 0
+        }
     }
     
     // MARK: - dlopen/dlsym plumbing
@@ -470,13 +590,13 @@ public class WindowServerBridge {
 //) -> Int32
 
 public typealias SLPSSetFrontProcessWithOptionsFn =
-@convention(c) (_ psn: UnsafePointer<ProcessSerialNumber>,
+@convention(c) (_ psn: UnsafeMutablePointer<ProcessSerialNumber>,
                 _ windowID: UInt32,
-                _ options: UInt32) -> Void
+                _ options: UInt32) -> CGError
 
 public typealias SLPSPostEventRecordToFn =
-@convention(c) (_ psn: UnsafePointer<ProcessSerialNumber>,
-                _ bytes: UnsafePointer<UInt8>) -> Void
+@convention(c) (_ psn: UnsafeMutablePointer<ProcessSerialNumber>,
+                _ bytes: UnsafeMutablePointer<UInt8>) -> CGError
 
 public typealias GetProcessForPIDFn =
 @convention(c) (_ pid: pid_t,

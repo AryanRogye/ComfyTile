@@ -17,6 +17,10 @@ public final class WindowCore {
     public init() {
         Task {
             await self.loadWindows()
+            
+            for (k, e) in elementCache {
+                print("\(k) -> \(e)")
+            }
         }
     }
     
@@ -74,6 +78,12 @@ public final class WindowCore {
             }
             
             self.windows = merged
+            
+            self.windows.forEach {
+                if $0.windowID == nil {
+                    print("A WINDOW ID IS NIL FOR: \($0.bundleIdentifier, default: "Untitled")")
+                }
+            }
         } catch {
             
         }
@@ -110,6 +120,7 @@ public final class WindowCore {
         
         let windowElement = focusedWindow as! AXUIElement
         let element = WindowElement(element: windowElement)
+        
         return ComfyWindow(
             app: app,
             windowID: element.cgWindowID,
