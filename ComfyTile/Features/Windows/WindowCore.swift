@@ -11,7 +11,10 @@ import ScreenCaptureKit
 @Observable
 @MainActor
 public final class WindowCore {
+    
     public var windows: [ComfyWindow] = []
+    public var windowSubscriptions: [pid_t: AXSubscription] = [:]
+    
     private var elementCache: [CGWindowID: WindowElement] = [:]
     
     public init() {
@@ -34,20 +37,51 @@ public final class WindowCore {
             /// Loop Through all screens for windows
             for window in allOnScreenWindows {
                 if let window = await ComfyWindow(window: window) {
+                    
+                    
+                    /// if we have a element in the `WindowElement` then that means that
+                    /// we can store it in the cache
                     if let _ = window.element.element, let windowID = window.windowID {
                         elementCache[windowID] = window.element
                     }
                     
-                    /// if element is nil but id is not nil we can check our cache
-                    if let windowID = window.windowID,
-                       window.element.element == nil {
-                        /// we have a WindowElement right here
-                        if let element = elementCache[windowID] {
-                            window.element = element
+                    /// if we have a window id
+                    if  let windowID = window.windowID,
+                        /// if our cache has a existing element
+                            let element = elementCache[windowID],
+                        /// if that element is not nil
+                            window.element.element == nil {
+                        
+                        /// we can set it here
+                        window.element = element
+                    }
+                    
+                    
+                    /// Check if this pid has a AXSubscription or not, if it doesnt, we can add it
+                    if windowSubscriptions[window.pid] == nil {
+                        /// if we dont have a subscription stored
+                        /// if we can make a valid subscription
+                        if let sub = AXSubscription(pid: window.pid) {
+                            /// add it in
+                            windowSubscriptions[window.pid] = sub
                         }
                     }
+                    
+                    /// check to see if we can add a window to get watched
+                    if  let sub = windowSubscriptions[window.pid],
+                        let element = window.element.element,
+                        let windowID = window.windowID
+                    {
+                        sub.watch(element, windowID: windowID)
+                    }
+                    
                     userWindows.append(window)
                 }
+            }
+            
+            for (k, v) in windowSubscriptions {
+                print("WindowCore: \(k) has a subscription: \(v)")
+                print("Windows Watching: \(v.watchingWindows)")
             }
             
             // fast lookup of the newest snapshot by windowID

@@ -17,7 +17,6 @@ extension KeyboardShortcuts.Name {
     static let NudgeBottomUp = Self("NudgeBottomUp")
     static let NudgeTopUp = Self("NudgeTopUp")
     static let NudgeTopDown = Self("NudgeTopDown")
-    static let AutoTile     = Self("AutoTile")
     static let windowViewer = Self("WindowViewer")
     static let windowViewerEscapeEarly = Self("WindowViewerEscapeEarly", default: Shortcut(
         .escape,
@@ -35,22 +34,6 @@ extension KeyboardShortcuts.Name {
         .space,
         modifiers: [.control, .shift]
     ))
-}
-
-extension KeyboardShortcuts.Name {
-    static var allForHUD: [KeyboardShortcuts.Name] {
-        [
-            .LeftHalf,
-            .RightHalf,
-            .Maximize,
-            .Center,
-            .NudgeBottomDown,
-            .NudgeBottomUp,
-            .NudgeTopUp,
-            .NudgeTopDown,
-            .AutoTile
-        ]
-    }
 }
 
 @MainActor
@@ -123,10 +106,6 @@ final class HotKeyCoordinator {
             onWindowViewerUp()
         }
         
-        KeyboardShortcuts.onKeyDown(for: .AutoTile) {
-//            onAutoTile()
-        }
-        
         // MARK: - Right Half
         KeyboardShortcuts.onKeyDown(for: .RightHalf) {
             onRightHalfDown()
@@ -135,8 +114,6 @@ final class HotKeyCoordinator {
             onRightHalfUp()
         }
         
-        
-
         // MARK: - Left Half
         KeyboardShortcuts.onKeyDown(for: .LeftHalf) {
             onLeftHalfDown()

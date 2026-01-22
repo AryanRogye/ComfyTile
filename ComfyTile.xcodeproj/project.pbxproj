@@ -10,6 +10,7 @@
 		9B436CEE2ED7824E00D79941 /* ComfyTile.icon in Resources */ = {isa = PBXBuildFile; fileRef = 9B436CED2ED7824E00D79941 /* ComfyTile.icon */; };
 		9B490C752F0B5FFF00963D05 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B490C742F0B5FFF00963D05 /* LocalShortcuts */; };
 		9B4E04B82E934B05001CF411 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9B4E04B72E934B05001CF411 /* Defaults */; };
+		9B68EE9C2F227716009567DF /* AXSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B68EE9B2F227711009567DF /* AXSubscription.swift */; };
 		9B8FBD922F0F033400CBF4B8 /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B8FBD912F0F033400CBF4B8 /* ComfyLogger */; };
 		9B8FBF1B2F1039BF00CBF4B8 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9B8FBF1A2F1039BF00CBF4B8 /* Sparkle */; };
 		9B8FC05D2F10B80D00CBF4B8 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC00F2F10B80D00CBF4B8 /* AppCoordinator.swift */; };
@@ -95,6 +96,7 @@
 
 /* Begin PBXFileReference section */
 		9B436CED2ED7824E00D79941 /* ComfyTile.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = ComfyTile.icon; sourceTree = "<group>"; };
+		9B68EE9B2F227711009567DF /* AXSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AXSubscription.swift; sourceTree = "<group>"; };
 		9B8FC00F2F10B80D00CBF4B8 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		9B8FC0102F10B80D00CBF4B8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9B8FC0122F10B80D00CBF4B8 /* HotKeyCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyCoordinator.swift; sourceTree = "<group>"; };
@@ -472,6 +474,7 @@
 		9B9BCFEE2F1973F90020F3AD /* AX */ = {
 			isa = PBXGroup;
 			children = (
+				9B68EE9B2F227711009567DF /* AXSubscription.swift */,
 				9B9BCFED2F1973F90020F3AD /* AXHelpers.swift */,
 			);
 			path = AX;
@@ -625,6 +628,7 @@
 				9B8FC0D52F130B7700CBF4B8 /* HotKeyOrClose.swift in Sources */,
 				9B8FC0662F10B80D00CBF4B8 /* Bundle.swift in Sources */,
 				9B8FC0D72F130E7500CBF4B8 /* ShortcutEditableRow.swift in Sources */,
+				9B68EE9C2F227716009567DF /* AXSubscription.swift in Sources */,
 				9B8FC0672F10B80D00CBF4B8 /* CGImage+placeholder.swift in Sources */,
 				9B8FC0682F10B80D00CBF4B8 /* Divider+groupBoxStyle.swift in Sources */,
 				9B9BCFEA2F1973CB0020F3AD /* WindowServerBridge.swift in Sources */,
