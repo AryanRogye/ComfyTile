@@ -1,5 +1,5 @@
 # ComfyTile
-Currently my daily driver for last 3 months, I've been fixing bugs on the way,
+Currently my daily driver for last 4 months, I've been fixing bugs on the way,
 
 ComfyTile is a macOS window manager inspired by Rectangle, Alt-Tab, DockDoor, and Aerospace, focused on center tiling, window nudging, and advanced multi-monitor layouts—with fast window switching and previews built in.
 

@@ -14,7 +14,7 @@ struct TilingCover : View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(.ultraThinMaterial.opacity(0.5))
+                .fill(.ultraThinMaterial.opacity(0.4))
                 .overlay(
                     RoundedRectangle(cornerRadius: 22, style: .continuous)
                         .stroke(Color.white.opacity(0.3), lineWidth: 1)

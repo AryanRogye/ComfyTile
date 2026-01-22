@@ -10,6 +10,6 @@ import Defaults
 extension Defaults.Keys {
     static let nudgeStep = Key<Int>("NudgeStep", default: 2)
     static let modiferKey = Key<String>("ModiferKey", default: "Control")
-    static let showTilingAnimations = Key<Bool>("ShowTilingAnimations", default: true)
+    static let showTilingAnimations = Key<Bool>("ShowTilingAnimations", default: false)
     static let comfyTileTabPlacement = Key<ComfyTileTabPlacement>("ComfyTileTabPlacement", default: .bottom)
 }

@@ -127,8 +127,9 @@ public final class ComfyWindow {
         self.isInSpace = isInSpace
     }
     
+    /// TODO: This works for now, but make this better soon
     private static func spacesForWindow(_ windowID: CGWindowID) -> [Int] {
-        let cid = CGSConnectionID()
+        let cid = CGSMainConnectionID()
         let ids: CFArray = [NSNumber(value: Int(windowID))] as CFArray
         
         guard let unmanaged = CGSCopySpacesForWindows(cid, kCGSAllSpacesMask, ids) else {

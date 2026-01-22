@@ -54,13 +54,15 @@ class AppCoordinator {
         self.windowCore = appEnv.windowCore
         self.windowTilingService = appEnv.windowTilingService
         self.windowLayoutService = appEnv.windowLayoutService
-        
-        
+        self.tilingCoverCoordinator = TilingCoverCoordinator(
+            tilingCoverVM: tilingCoverVM
+        )
         self.windowSpatialEngine = WindowSpatialEngine(
             windowCore: appEnv.windowCore,
             windowLayoutService: windowLayoutService,
             windowTilingService: windowTilingService,
-            defaultsManager: defaultsManager
+            defaultsManager: defaultsManager,
+            tilingCoverCoordinator: tilingCoverCoordinator
         )
         
         self.comfyTileMenuBarVM = ComfyTileMenuBarViewModel(
@@ -69,7 +71,7 @@ class AppCoordinator {
             windowCore: appEnv.windowCore
         )
         
-        menuBarCoordinator.start(
+        self.menuBarCoordinator.start(
             comfyTileMenuBarVM: comfyTileMenuBarVM,
             settingsVM: settingsVM,
             defaultsManager: defaultsManager,
@@ -77,16 +79,13 @@ class AppCoordinator {
             updateController: updateController
         )
         
-        tilingCoverCoordinator = TilingCoverCoordinator(
-            tilingCoverVM: tilingCoverVM
-        )
-        windowViewerCoordinator = WindowViewerCoordinator(
+        self.windowViewerCoordinator = WindowViewerCoordinator(
             windowViewerVM: windowViewerVM,
             windowCore: appEnv.windowCore
         )
         
-        hotKeyCoordinator = HotKeyCoordinator()
-        startHotKey()
+        self.hotKeyCoordinator = HotKeyCoordinator()
+        self.startHotKey()
     }
     
     private func showWith(rect: CGRect) {
@@ -164,62 +163,32 @@ class AppCoordinator {
             
             // MARK: - Right Half
             onRightHalfDown: {
-                if self.defaultsManager.showTilingAnimations {
-                    if let rect = self.windowTilingService.getRightDimensions() {
-                        self.showWith(rect: rect)
-                    }
-                    self.numKeysHeld += 1
-                }
+                self.windowSpatialEngine.tileRightPressed()
             },
             onRightHalfUp: {
-                self.shouldCloseWith {
-                    self.windowSpatialEngine.tileRight()
-                }
+                self.windowSpatialEngine.tileRight()
             },
             // MARK: - Left Half
             onLeftHalfDown: {
-                if self.defaultsManager.showTilingAnimations {
-                    if let rect = self.windowTilingService.getLeftDimensions() {
-                        self.showWith(rect: rect)
-                    }
-                    self.numKeysHeld += 1
-                }
+                self.windowSpatialEngine.tileLeftPressed()
             },
             onLeftHalfUp: {
-                self.shouldCloseWith {
-                    self.windowSpatialEngine.tileLeft()
-                }
+                self.windowSpatialEngine.tileLeft()
             },
-            
             // MARK: - Center
             onCenterDown: {
-                if self.defaultsManager.showTilingAnimations {
-                    if let rect = self.windowTilingService.getCenterDimensions() {
-                        self.showWith(rect: rect)
-                    }
-                    self.numKeysHeld += 1
-                }
+                self.windowSpatialEngine.tileCenterPressed()
             },
             onCenterUp: {
-                self.shouldCloseWith {
-                    self.windowSpatialEngine.tileCenter()
-                }
+                self.windowSpatialEngine.tileCenter()
             },
             
             // MARK: - Full Screen
             onMaximizeDown: {
-                if self.defaultsManager.showTilingAnimations {
-                    if let rect = self.windowTilingService.getFullScreenDimensions() {
-                        self.showWith(rect: rect)
-                    }
-                    self.numKeysHeld += 1
-                }
-                
+                self.windowSpatialEngine.tileFullScreenPressed()
             },
             onMaximizeUp: {
-                self.shouldCloseWith {
-                    self.windowSpatialEngine.tileFullScreen()
-                }
+                self.windowSpatialEngine.tileFullScreen()
             },
             
             // MARK: - Nudge From Bottom

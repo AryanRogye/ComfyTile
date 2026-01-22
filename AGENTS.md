@@ -22,7 +22,10 @@ Use Swift 5 defaults: 4-space indentation, trailing commas in multiline lists, a
 Adopt XCTest with a sibling `ComfyTileTests/` group. Name files `<Feature>Tests.swift` and methods `test_<Scenario>_<Expectation>()`. Stub macOS APIs via protocols in `Services/` to keep tests deterministic. Enforce coverage on new code by adding focused tests before opening a pull request and ensure `xcodebuild test` passes locally.
 
 ## Commit & Pull Request Guidelines
-Follow the existing history’s concise, lower-case summaries (≤50 chars) and present-tense verbs, e.g. `add hotkey coordinator`. Reference issues in the body. Pull requests should explain the change, note affected directories, list validation steps (build, tests), and include screenshots or screen recordings for UI tweaks. Request a review from another contributor before merging.
+Follow the existing history’s concise, lower-case summaries (≤50 chars) and present-tense verbs, e.g. `add hotkey coordinator`. Reference issues in the body. Pull requests should explain the change in a readable way, do not use complex terms, talk to the user as if they were a baby, note affected directories, list validation steps (build, tests), and include screenshots or screen recordings for UI tweaks. Request a review from another contributor before merging.
 
 ## Security & Configuration Notes
 `ComfyTile.entitlements` and `PermissionService` manage Accessibility privileges—verify System Settings permissions after new capability changes. Avoid checking personal signing certificates into the repo and store API keys or bundle identifiers in your local Xcode configuration only.
+
+## Adding Files
+ComfyTile uses Groups instead of Folders, make sure any files/folders added, are included as Groups

@@ -69,7 +69,7 @@ class WindowTilingService: WindowTilingProviding {
         f.element.setSize(width: frame.width, height: frame.height)
     }
     
-    func fullScreen() {
+    func fullScreen(withAnimation: Bool) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
         let screen = focusedWindow.screen else { return }
         
@@ -77,15 +77,25 @@ class WindowTilingService: WindowTilingProviding {
         
         let pos = frame.axPosition(on: screen)
         
-        animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+        let move = {
             focusedWindow.element.setSize(
                 width: frame.width,
                 height: frame.height
             )
         }
+        
+        if withAnimation {
+            animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+                move()
+            }
+        } else {
+            focusedWindow.element.setPosition(x: pos.x, y: pos.y)
+            move()
+        }
     }
     
-    func center() {
+    // MARK: - Center
+    func center(withAnimation: Bool) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = focusedWindow.screen else { return }
         
@@ -108,16 +118,25 @@ class WindowTilingService: WindowTilingProviding {
         let rect = NSRect(x: centeredOrigin.x, y: centeredOrigin.y, width: centeredSize.width, height: centeredSize.height)
         let pos = rect.axPosition(on: screen)
         
-        animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+        let move = {
             focusedWindow.element.setSize(
                 width: centeredSize.width,
                 height: centeredSize.height
             )
         }
+        
+        if withAnimation {
+            animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+                move()
+            }
+        } else {
+            focusedWindow.element.setPosition(x: pos.x, y: pos.y)
+            move()
+        }
     }
     
     // MARK: - Move Left
-    func moveLeft() {
+    func moveLeft(withAnimation: Bool) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
         let screen = focusedWindow.screen else { return }
         
@@ -133,16 +152,25 @@ class WindowTilingService: WindowTilingProviding {
         
         let pos = rect.axPosition(on: screen)
         
-        animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+        let move = {
             focusedWindow.element.setSize(
                 width: rect.width,
                 height: rect.height
             )
         }
+        
+        if withAnimation {
+            animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+                move()
+            }
+        } else {
+            focusedWindow.element.setPosition(x: pos.x, y: pos.y)
+            move()
+        }
     }
     
     // MARK: - Move Right
-    func moveRight() {
+    func moveRight(withAnimation: Bool) {
         
         guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = focusedWindow.screen else { return }
@@ -159,7 +187,7 @@ class WindowTilingService: WindowTilingProviding {
         
         let pos = rect.axPosition(on: screen)
         
-        animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+        let move = {
             focusedWindow.element.setSize(
                 width: rect.width,
                 height: rect.height
@@ -180,10 +208,19 @@ class WindowTilingService: WindowTilingProviding {
                 )
                 
                 let targetPos = targetRect.axPosition(on: screen)
-
+                
                 focusedWindow.element.setPosition(x: targetPos.x, y: targetPos.y)
                 focusedWindow.element.setSize(width: targetRect.width, height: targetRect.height)
             }
+        }
+        
+        if withAnimation {
+            animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
+                move()
+            }
+        } else {
+            focusedWindow.element.setPosition(x: pos.x, y: pos.y)
+            move()
         }
     }
     

@@ -19,8 +19,8 @@ protocol WindowTilingProviding {
     func getRightDimensions() -> CGRect?
     func getLeftDimensions() -> CGRect?
     
-    func fullScreen()
-    func center()
-    func moveRight()
-    func moveLeft()
+    func fullScreen(withAnimation: Bool)
+    func center(withAnimation: Bool)
+    func moveRight(withAnimation: Bool)
+    func moveLeft(withAnimation: Bool)
 }
