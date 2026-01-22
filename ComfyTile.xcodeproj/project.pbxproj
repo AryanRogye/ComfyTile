@@ -11,6 +11,7 @@
 		9B490C752F0B5FFF00963D05 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B490C742F0B5FFF00963D05 /* LocalShortcuts */; };
 		9B4E04B82E934B05001CF411 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9B4E04B72E934B05001CF411 /* Defaults */; };
 		9B68EE9C2F227716009567DF /* AXSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B68EE9B2F227711009567DF /* AXSubscription.swift */; };
+		9B68EEA32F228C6C009567DF /* AppearanceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B68EEA22F228C6A009567DF /* AppearanceSettings.swift */; };
 		9B8FBD922F0F033400CBF4B8 /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B8FBD912F0F033400CBF4B8 /* ComfyLogger */; };
 		9B8FBF1B2F1039BF00CBF4B8 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9B8FBF1A2F1039BF00CBF4B8 /* Sparkle */; };
 		9B8FC05D2F10B80D00CBF4B8 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC00F2F10B80D00CBF4B8 /* AppCoordinator.swift */; };
@@ -97,6 +98,7 @@
 /* Begin PBXFileReference section */
 		9B436CED2ED7824E00D79941 /* ComfyTile.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = ComfyTile.icon; sourceTree = "<group>"; };
 		9B68EE9B2F227711009567DF /* AXSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AXSubscription.swift; sourceTree = "<group>"; };
+		9B68EEA22F228C6A009567DF /* AppearanceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettings.swift; sourceTree = "<group>"; };
 		9B8FC00F2F10B80D00CBF4B8 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		9B8FC0102F10B80D00CBF4B8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9B8FC0122F10B80D00CBF4B8 /* HotKeyCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyCoordinator.swift; sourceTree = "<group>"; };
@@ -185,6 +187,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9B68EEA12F228C62009567DF /* Appearance */ = {
+			isa = PBXGroup;
+			children = (
+				9B68EEA22F228C6A009567DF /* AppearanceSettings.swift */,
+			);
+			path = Appearance;
+			sourceTree = "<group>";
+		};
 		9B8FC0112F10B80D00CBF4B8 /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -247,7 +257,8 @@
 		9B8FC04E2F10B80D00CBF4B8 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				9B8FC0B52F11FF6500CBF4B8 /* GeneralSettings */,
+				9B68EEA12F228C62009567DF /* Appearance */,
+				9B8FC0B52F11FF6500CBF4B8 /* General */,
 				9B8FC04D2F10B80D00CBF4B8 /* SettingsView.swift */,
 				9B8FC0B82F11FFBE00CBF4B8 /* SettingsTopBar.swift */,
 				9B8FC0BA2F12019500CBF4B8 /* SettingsContent.swift */,
@@ -312,12 +323,12 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		9B8FC0B52F11FF6500CBF4B8 /* GeneralSettings */ = {
+		9B8FC0B52F11FF6500CBF4B8 /* General */ = {
 			isa = PBXGroup;
 			children = (
 				9B8FC0B62F11FF6800CBF4B8 /* GeneralSettings.swift */,
 			);
-			path = GeneralSettings;
+			path = General;
 			sourceTree = "<group>";
 		};
 		9B8FC0BE2F12305900CBF4B8 /* LayoutMode */ = {
@@ -657,6 +668,7 @@
 				9B8FC0842F10B80D00CBF4B8 /* View+sectionBackground.swift in Sources */,
 				9B8FC0852F10B80D00CBF4B8 /* ComfyTileMenuBar.swift in Sources */,
 				9B9BCFD72F1972C30020F3AD /* Modifiers.swift in Sources */,
+				9B68EEA32F228C6C009567DF /* AppearanceSettings.swift in Sources */,
 				9B9BCFD32F1972350020F3AD /* DefaultsManager.swift in Sources */,
 				9B9BCFD42F1972350020F3AD /* DefaultsKeys.swift in Sources */,
 				9B8FC0862F10B80D00CBF4B8 /* SettingsView.swift in Sources */,

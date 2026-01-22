@@ -41,13 +41,11 @@ final class HotKeyCoordinator {
     private let modifierDetector   = ModifierDoubleTapDetector()
     private let globalClickMonitor = GlobalClickMonitor()
     
-    public func startGlobalClickMonitor(onClick: @escaping () -> Void) {
-        globalClickMonitor.start {
-            onClick()
-        }
+    public func startModifier(with group: ModifierGroup) {
+        modifierDetector.start(with: group)
     }
-    public func stopGlobalClickMonitor() {
-        globalClickMonitor.stop()
+    public func stopModifier() {
+        modifierDetector.stop()
     }
     
     init() {}
@@ -85,6 +83,11 @@ final class HotKeyCoordinator {
         onNudgeTopDownDown: @escaping () -> Void = {},
         
     ) {
+        
+        modifierDetector.onDoubleTapOption = onOptDoubleTapDown
+        modifierDetector.onDoubleTapOptionRelease = onOptDoubleTapUp
+        modifierDetector.onDoubleTapControl = onCtrlDoubleTapDown
+        modifierDetector.onDoubleTapControlRelease = onCtrlDoubleTapUp
         
         KeyboardShortcuts.onKeyDown(for: .primaryLeftStackedHorizontallyTile) {
             onPrimaryLeftStackedHorizontallyTile()
@@ -224,6 +227,7 @@ extension HotKeyCoordinator {
             runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
             CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
             CGEvent.tapEnable(tap: tap, enable: true)
+            print("Started Modifier Double Tap Detector")
         }
         
         func stop() {
@@ -260,6 +264,8 @@ extension HotKeyCoordinator {
             let isControlDown = flags.contains(.control)
             let otherModsDown: Bool = {
                 switch group {
+                case .none:
+                    return false
                 case .option: return flags.contains(.command) || flags.contains(.shift) || flags.contains(.function) || isControlDown
                 case .control: return flags.contains(.command) || flags.contains(.shift) || flags.contains(.function) || isOptionDown
                 }
@@ -273,6 +279,7 @@ extension HotKeyCoordinator {
             if previouslyDown && !nowDown {
                 if doubleTapActive[group] == true {
                     switch group {
+                    case .none: break
                     case .option: onDoubleTapOptionRelease?()
                     case .control: onDoubleTapControlRelease?()
                     }
@@ -289,6 +296,7 @@ extension HotKeyCoordinator {
             if let last = lastDownTime[group], (t - last) <= doubleTapWindow {
                 doubleTapActive[group] = true
                 switch group {
+                case .none: break
                 case .option: onDoubleTapOption?()
                 case .control: onDoubleTapControl?()
                 }

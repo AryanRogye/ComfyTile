@@ -40,6 +40,8 @@ private struct SidebarRow: View {
         Button(action: action) {
             HStack {
                 Text(title)
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
                 Spacer()
             }
             .padding(.horizontal)

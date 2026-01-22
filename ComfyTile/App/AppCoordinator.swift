@@ -6,6 +6,7 @@
 //
 
 import CoreGraphics
+import Foundation
 
 @MainActor
 class AppCoordinator {
@@ -144,22 +145,22 @@ class AppCoordinator {
             },
             
             // MARK: - Modifier Key
-            //                        onOptDoubleTapDown: {
-            //                            self.isHoldingModifier = true
-            //                            self.shortcutHUDCoordinator.show()
-            //                        },
-            //                        onOptDoubleTapUp: {
-            //                            self.isHoldingModifier = false
-            ////                            self.shortcutHUDCoordinator.hide()
-            //                        },
-            //                        onCtrlDoubleTapDown: {
-            //                            self.isHoldingModifier = true
-            //                            self.shortcutHUDCoordinator.show()
-            //                        },
-            //                        onCtrlDoubleTapUp: {
-            //                            self.isHoldingModifier = false
-            ////                            self.shortcutHUDCoordinator.hide()
-            //                        },
+            onOptDoubleTapDown: {
+                self.isHoldingModifier = true
+                print("HOLDING OPTION")
+            },
+            onOptDoubleTapUp: {
+                self.isHoldingModifier = false
+                print("RELEASED OPTION")
+            },
+            onCtrlDoubleTapDown: {
+                self.isHoldingModifier = true
+                print("HOLDING CONTROL")
+            },
+            onCtrlDoubleTapUp: {
+                self.isHoldingModifier = false
+                print("RELEASED CONTROL")
+            },
             
             // MARK: - Right Half
             onRightHalfDown: {
@@ -207,5 +208,20 @@ class AppCoordinator {
                 self.windowSpatialEngine.nudgeTopDown()
             }
         )
+        
+        self.hotKeyCoordinator.startModifier(with: defaultsManager.modiferKey)
+        observeModifierKey()
+    }
+    
+    internal func observeModifierKey() {
+        withObservationTracking {
+            _ = defaultsManager.modiferKey
+        } onChange: {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                hotKeyCoordinator.startModifier(with: defaultsManager.modiferKey)
+                self.observeModifierKey()
+            }
+        }
     }
 }
