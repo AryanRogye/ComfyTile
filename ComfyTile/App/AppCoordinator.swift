@@ -209,7 +209,9 @@ class AppCoordinator {
             }
         )
         
-        self.hotKeyCoordinator.startModifier(with: defaultsManager.modiferKey)
+        let key = defaultsManager.modiferKey
+        
+        self.shouldStartDoubleModifier()
         observeModifierKey()
     }
     
@@ -219,9 +221,20 @@ class AppCoordinator {
         } onChange: {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                hotKeyCoordinator.startModifier(with: defaultsManager.modiferKey)
+                self.shouldStartDoubleModifier()
                 self.observeModifierKey()
             }
+        }
+    }
+    
+    /// Function handles what happens with the modifier key
+    internal func shouldStartDoubleModifier() {
+        let key = defaultsManager.modiferKey
+        
+        if key == .none {
+            hotKeyCoordinator.stopModifier()
+        } else {
+            hotKeyCoordinator.startModifier(with: key)
         }
     }
 }
