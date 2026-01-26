@@ -8,8 +8,7 @@
 import Cocoa
 import ScreenCaptureKit
 
-@MainActor
-public final class ComfyWindow {
+public final class ComfyWindow: Sendable {
     
     public var id: String {
         if let wid = windowID {
@@ -49,8 +48,12 @@ public final class ComfyWindow {
         }
     }
     
+    public func setElement(_ element: WindowElement) {
+        self.element = element
+    }
+    
     init?(
-        window: SCWindow
+        window: ComfySCWindow
     ) async {
         guard let app = window.owningApplication,
               window.windowLayer == 0,
@@ -69,15 +72,6 @@ public final class ComfyWindow {
         
         /// Get AXElement, Doesnt matter if nil
         let axElement : AXUIElement? = WindowServerBridge.shared.findMatchingAXWindow(pid: pid, targetWindowID: window.windowID)
-        
-        if let axElement {
-            print("""
-                        AX Present in WindowID: \(window.windowID),
-                        PID: \(pid),
-                        Title: \(windowTitle),
-                        AX: \(axElement)
-                        """)
-        }
         
         var screenshot: CGImage? = nil
         do {

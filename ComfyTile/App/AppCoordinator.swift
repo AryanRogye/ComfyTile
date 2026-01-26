@@ -46,9 +46,6 @@ class AppCoordinator {
     private let windowSpatialEngine : WindowSpatialEngine
     private var permissionService : PermissionService
 
-    var numKeysHeld = 0
-    var isHoldingModifier = false
-    
     init(appEnv: AppEnv) {
         
         self.permissionService = PermissionService()
@@ -87,22 +84,6 @@ class AppCoordinator {
         
         self.hotKeyCoordinator = HotKeyCoordinator()
         self.startHotKey()
-    }
-    
-    private func showWith(rect: CGRect) {
-        self.tilingCoverCoordinator.show(with: rect)
-    }
-    
-    private func shouldCloseWith(completion: @escaping () -> Void) {
-        if !self.defaultsManager.showTilingAnimations {
-            completion()
-        } else {
-            self.numKeysHeld -= 1
-            if self.numKeysHeld == 0 {
-                self.tilingCoverCoordinator.hide()
-                completion()
-            }
-        }
     }
     
     private func startHotKey() {
@@ -146,20 +127,16 @@ class AppCoordinator {
             
             // MARK: - Modifier Key
             onOptDoubleTapDown: {
-                self.isHoldingModifier = true
-                print("HOLDING OPTION")
+                self.windowCore.isHoldingModifier = true
             },
             onOptDoubleTapUp: {
-                self.isHoldingModifier = false
-                print("RELEASED OPTION")
+                self.windowCore.isHoldingModifier = false
             },
             onCtrlDoubleTapDown: {
-                self.isHoldingModifier = true
-                print("HOLDING CONTROL")
+                self.windowCore.isHoldingModifier = true
             },
             onCtrlDoubleTapUp: {
-                self.isHoldingModifier = false
-                print("RELEASED CONTROL")
+                self.windowCore.isHoldingModifier = false
             },
             
             // MARK: - Right Half
@@ -208,8 +185,6 @@ class AppCoordinator {
                 self.windowSpatialEngine.nudgeTopDown()
             }
         )
-        
-        let key = defaultsManager.modiferKey
         
         self.shouldStartDoubleModifier()
         observeModifierKey()

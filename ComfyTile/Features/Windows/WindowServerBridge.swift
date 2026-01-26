@@ -12,6 +12,11 @@ extension ComfyLogger {
     static let WindowServerBridge = ComfyLogger.Name("WindowServerBridge")
 }
 
+final class DylibHandles: @unchecked Sendable {
+    private var skylightHandle: UnsafeMutableRawPointer?
+    private var hiServicesHandle: UnsafeMutableRawPointer?
+}
+
 @MainActor
 public class WindowServerBridge {
     public static let shared = WindowServerBridge(
@@ -43,6 +48,7 @@ public class WindowServerBridge {
         
         self.skylightHandle = nil
         self.hiServicesHandle = nil
+        
         self.setFrontProcessWithOptions = nil
         self.postEventRecordTo = nil
         self.getProcessForPID = nil
@@ -58,8 +64,14 @@ public class WindowServerBridge {
     }
     
     deinit {
-        if let h = skylightHandle { dlclose(h) }
-        if let h = hiServicesHandle { dlclose(h) }
+        closeHandles()
+    }
+    
+    nonisolated internal func closeHandles() {
+        DispatchQueue.main.async {
+            if let h = self.skylightHandle { dlclose(h) }
+            if let h = self.hiServicesHandle { dlclose(h) }
+        }
     }
     
     public func focusApp(forUserWindowID windowID: UInt32, pid: pid_t, element: AXUIElement?, app: NSRunningApplication) {

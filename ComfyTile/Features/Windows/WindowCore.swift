@@ -13,76 +13,190 @@ import ScreenCaptureKit
 public final class WindowCore {
     
     public var windows: [ComfyWindow] = []
-    public var windowSubscriptions: [pid_t: AXSubscription] = [:]
+    let clickMonitor = GlobalClickMonitor()
+    
+    public var isHoldingModifier: Bool = false
     
     private var elementCache: [CGWindowID: WindowElement] = [:]
     
-    public init() {
-        Task {
-            await self.loadWindows()
-        }
-    }
+    var bootTask : Task<Void, Never>?
+    var pollingWindowDragging : Task<Void, Never>?
+    var loadWindowTask: Task<[ComfyWindow], Never>?
     
-    @ObservationIgnored
-    static let ignore_list = [
+    @ObservationIgnored static let ignore_list = [
         "com.aryanrogye.ComfyTile"
     ]
     
-    public func loadWindows() async {
+
+    public init() {
+        bootTask = Task { [weak self] in
+            guard let self else { return }
+            await self.loadWindows()
+            self.observeModifierChange()
+        }
+    }
+    
+    // MARK: - Helpers
+    
+    /// Global Helper
+    public static func screenUnderMouse() -> NSScreen? {
+        let loc = NSEvent.mouseLocation
+        return NSScreen.screens.first {
+            NSMouseInRect(loc, $0.frame, false)
+        }
+    }
+}
+
+// MARK: - Drag Layouts
+extension WindowCore {
+    
+    /// ObserveModifer Change
+    /// This is used if `defaultsManager.modiferKey` is either
+    /// .control or .option - ``AppCoordinator``
+    private func observeModifierChange() {
+        withObservationTracking {
+            _ = isHoldingModifier
+        } onChange: {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                if isHoldingModifier {
+                    print("Started Pollng")
+                    /// We Want to check for a click
+//                    clickMonitor.start {
+                        self.pollAllWindowsOnScreen()
+//                    }
+                } else {
+                    print("Stopped Polling")
+                    pollingWindowDragging?.cancel()
+//                    clickMonitor.stop()
+                }
+                self.observeModifierChange()
+            }
+        }
+    }
+    
+    private func pollAllWindowsOnScreen() {
+        guard let screen = Self.screenUnderMouse() else { return }
+        
+        pollingWindowDragging?.cancel()
+        pollingWindowDragging = Task { @MainActor [weak self] in
+            guard let self else { return }
+            
+            let wins: [ComfyWindow] = await refreshAndGetWindows()
+            
+            /// This is all the windows in the current space
+            let inSpace = wins.filter(\.isInSpace)
+            
+            /// Storage for positions
+            var positions: [CGWindowID: CGRect] = [:]
+            var elements: [CGWindowID: WindowElement] = [:]
+            
+            /// Fill Positions with default positions
+            for window in inSpace {
+                if let windowID = window.windowID {
+                    /// this is default position
+                    positions[windowID] = window.element.frame
+                    
+                    /// this is the window element so we can poll the element for frame again
+                    elements[windowID] = window.element
+                }
+            }
+            if positions.isEmpty { return }
+            
+            let screenFrame : CGRect = screen.visibleFrame
+            print("Started Polling With: \(positions.count) Windows On Screen")
+            
+            var startedTask = false
+            while !Task.isCancelled {
+                if !startedTask {
+                    print("Started Task")
+                    startedTask = true
+                }
+                for (id, frame) in positions {
+                    guard let element = elements[id] else { continue }
+                    
+                    let newFrame: CGRect = element.frame
+                    
+                    if newFrame != frame {
+                        print("\(Date()): \(element.title ?? "Unkown") Frame Adjusted From: \(frame) to \(newFrame)")
+                        
+                        /// set old frame to be this new one, so it doesnt spam, that we kept changing
+                        positions[id] = newFrame
+                        
+                        /// We can check other frames on the screen if their positions intersect with our newFrame
+                        
+                    }
+                }
+                
+                try? await Task.sleep(nanoseconds: 500_000_000)
+            }
+        }
+    }
+    
+    @MainActor
+    internal func refreshAndGetWindows() async -> [ComfyWindow] {
+        await loadWindows()
+    }
+}
+
+
+// MARK: - Main Loading Of Windows
+extension WindowCore {
+    
+    /// Load Windows is used for Layouts + Window Switcher
+    
+    @discardableResult
+    public func loadWindows() async -> [ComfyWindow] {
+        var allWindows: [SCWindow]
+        
+        /// Use ScreenRecordingKit to get all windows the user owns
         do {
             let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
-            let allOnScreenWindows = content.windows
+            allWindows = content.windows
+        } catch {
+            print("There Was an Error Getting the Windows With SCShareableContent: \(error)")
+            return []
+        }
+        
+        /// return [] on no windows found
+        if allWindows.isEmpty {
+            print("No Windows Found")
+            return []
+        }
+        
+        let cscWindows: [ComfySCWindow] = ComfySCWindow.toComfySCWindows(allWindows)
+        
+        loadWindowTask = Task.detached(priority: .userInitiated) { [weak self, cscWindows] in
+            guard let self else { return [] }
             var userWindows: [ComfyWindow] = []
-            
-            /// Loop Through all screens for windows
-            for window in allOnScreenWindows {
-                if let window = await ComfyWindow(window: window) {
+            for w in cscWindows {
+                /// Create a ComfyWindow Object
+                if let cw = await ComfyWindow(window: w) {
                     
-                    
-                    /// if we have a element in the `WindowElement` then that means that
-                    /// we can store it in the cache
-                    if let _ = window.element.element, let windowID = window.windowID {
-                        elementCache[windowID] = window.element
-                    }
-                    
-                    /// if we have a window id
-                    if  let windowID = window.windowID,
-                        /// if our cache has a existing element
-                            let element = elementCache[windowID],
-                        /// if that element is not nil
-                            window.element.element == nil {
-                        
-                        /// we can set it here
-                        window.element = element
-                    }
-                    
-                    
-                    /// Check if this pid has a AXSubscription or not, if it doesnt, we can add it
-                    if windowSubscriptions[window.pid] == nil {
-                        /// if we dont have a subscription stored
-                        /// if we can make a valid subscription
-                        if let sub = AXSubscription(pid: window.pid) {
-                            /// add it in
-                            windowSubscriptions[window.pid] = sub
+                    await MainActor.run {
+                        if let windowID = cw.windowID {
+                            /// if the element in ComfyWindow is a valid AXUIElement?, we can update cache
+                            if cw.element.element != nil {
+                                self.elementCache[windowID] = cw.element
+                            }
+                            /// if AXUIElement is nil, we can check our cache and update
+                            else if let element = self.elementCache[windowID] {
+                                cw.setElement(element)
+                            }
                         }
                     }
+                    /// Add Window into userWindows
+                    userWindows.append(cw)
                     
-                    /// check to see if we can add a window to get watched
-                    if  let sub = windowSubscriptions[window.pid],
-                        let element = window.element.element,
-                        let windowID = window.windowID
-                    {
-                        sub.watch(element, windowID: windowID)
-                    }
-                    
-                    userWindows.append(window)
                 }
             }
             
-            for (k, v) in windowSubscriptions {
-                print("WindowCore: \(k) has a subscription: \(v)")
-                print("Windows Watching: \(v.watchingWindows)")
-            }
+            return userWindows
+        }
+        
+        if let loadWindowTask = loadWindowTask {
+            let userWindows = await loadWindowTask.value
+            if userWindows.isEmpty { return [] }
             
             // fast lookup of the newest snapshot by windowID
             let newByID = Dictionary(uniqueKeysWithValues: userWindows.map { ($0.windowID, $0) })
@@ -108,11 +222,20 @@ public final class WindowCore {
             }
             
             self.windows = merged
-        } catch {
-            
+            return merged
+        } else {
+            return []
         }
     }
+}
+
+// MARK: - Main Focus Window
+extension WindowCore {
     
+    /// This is used for Tiling + Layouts
+    ///
+    /// Layouts, use focusing on the WindowElement then call Focus
+
     public func getFocusedWindow() -> ComfyWindow? {
         // If we can't get the screen under the mouse, stop.
         guard let screen = Self.screenUnderMouse() else {
@@ -155,12 +278,5 @@ public final class WindowCore {
             /// Most Likely Focused will always be in space
             isInSpace: true
         )
-    }
-    
-    public static func screenUnderMouse() -> NSScreen? {
-        let loc = NSEvent.mouseLocation
-        return NSScreen.screens.first {
-            NSMouseInRect(loc, $0.frame, false)
-        }
     }
 }

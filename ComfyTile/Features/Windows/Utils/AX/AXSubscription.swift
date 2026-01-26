@@ -7,12 +7,13 @@
 
 import ApplicationServices
 
+/// Class listens for Changes done to the AXUIELement
 public final class AXSubscription {
     
     let pid: pid_t
     var observer: AXObserver? = nil
-    
     var watchingWindows: Set<CGWindowID> = []
+    var onChange: ((pid_t, AXUIElement, CFString) -> Void)?
     
     init?(pid: pid_t) {
         self.pid = pid
@@ -52,6 +53,19 @@ public final class AXSubscription {
             kAXResizedNotification as CFString,
             ctx
         )
+        
+        AXObserverAddNotification(
+            observer!,
+            element,
+            kAXWindowMovedNotification as CFString,
+            ctx
+        )
+        AXObserverAddNotification(
+            observer!,
+            element,
+            kAXWindowResizedNotification as CFString,
+            ctx
+        )
     }
     
     private static let callback: AXObserverCallback = { observer, element, notification, refcon in
@@ -69,6 +83,6 @@ public final class AXSubscription {
     }
     
     private func handle(element: AXUIElement, notification: CFString) {
-        print("PID:", pid, "Event:", notification)
+        onChange?(pid, element, notification)
     }
 }

@@ -24,6 +24,8 @@ final class WindowLayoutService: WindowLayoutProviding {
         case left
         case right
     }
+    
+    let timeBetween : UInt64 = 50_000_000
 
     init(windowCore: WindowCore) {
         self.windowCore = windowCore
@@ -93,12 +95,12 @@ extension WindowLayoutService {
         
         primary.focusWindow()
         
-        try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        try? await Task.sleep(nanoseconds: timeBetween) // 50ms
         guard let foc = windowCore.getFocusedWindow() else { return }
         
         foc.element.setPosition(x: pos.x, y: pos.y)
         
-        try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        try? await Task.sleep(nanoseconds: timeBetween) // 50ms
         
         foc.element.setSize(width: frame.width, height: frame.height)
     }
@@ -134,18 +136,28 @@ extension WindowLayoutService {
         /// Focus
         primary.focusWindow()
         
-        try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        try? await Task.sleep(nanoseconds: timeBetween)
         
         /// Get Better Details When Focused
         guard let foc = windowCore.getFocusedWindow() else { return (nil, nil) }
         
         foc.element.setPosition(x: pos.x, y: pos.y)
         
-        try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        try? await Task.sleep(nanoseconds: timeBetween)
+        
+        if foc.element.position != pos {
+            foc.element.setPosition(x: pos.x, y: pos.y)
+            try? await Task.sleep(nanoseconds: timeBetween)
+        }
         
         foc.element.setSize(width: rect.width, height: rect.height)
         
-        try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        try? await Task.sleep(nanoseconds: timeBetween) // 50ms
+        
+        if foc.element.frame != rect {
+            foc.element.setSize(width: rect.width, height: rect.height)
+            try? await Task.sleep(nanoseconds: timeBetween) // 50ms
+        }
         
         if direction == .left {
             return (foc, primary)
@@ -168,7 +180,7 @@ extension WindowLayoutService {
             foc.element.setPosition(x: targetPos.x, y: targetPos.y)
             foc.element.setSize(width: targetRect.width, height: targetRect.height)
             
-            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+            try? await Task.sleep(nanoseconds: timeBetween) // 50ms
             
             return (foc, primary)
             
@@ -207,7 +219,7 @@ extension WindowLayoutService {
         
         for w in windows {
             w.focusWindow()
-            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+            try? await Task.sleep(nanoseconds: timeBetween) // 50ms
             
             guard let foc = windowCore.getFocusedWindow() else { continue }
             
@@ -216,13 +228,23 @@ extension WindowLayoutService {
             
             foc.element.setPosition(x: pos.x, y: pos.y)
             
-            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+            try? await Task.sleep(nanoseconds: timeBetween) // 50ms
+            
+            if foc.element.position != pos {
+                foc.element.setPosition(x: pos.x, y: pos.y)
+                try? await Task.sleep(nanoseconds: timeBetween) // 50ms
+            }
             
             foc.element.setSize(width: width, height: height)
             
-            y += height
+            try? await Task.sleep(nanoseconds: timeBetween) // 50ms
             
-            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+            if foc.element.frame != rect {
+                foc.element.setSize(width: width, height: height)
+                try? await Task.sleep(nanoseconds: timeBetween) // 50ms
+            }
+            
+            y += height
             
             ComfyLogger.WindowSplitManager.insert(
                 "\(w.bundleIdentifier, default: "Nil") (Size) (Postion) Requested: (width: \(width), height: \(height))|(x: \(x), y: \(y))"
