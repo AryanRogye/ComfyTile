@@ -7,6 +7,7 @@
 import AppKit
 /// Which modifier gesture to detect
 enum ModifierGroup: String, CaseIterable {
+    case none   = "None"
     case option = "Option"
     case control = "Control"
 }

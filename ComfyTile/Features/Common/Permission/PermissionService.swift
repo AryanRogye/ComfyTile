@@ -9,14 +9,17 @@ import ApplicationServices
 import AppKit
 
 
+@MainActor
 @Observable
 class PermissionService {
     var isAccessibilityEnabled: Bool = false
     
     var permissionService: PermissionProviding = PermissionFetcherService()
 
-    private var pollTimer: Timer?
     private var didBecomeActiveObserver: NSObjectProtocol?
+    
+    private var pollTask: Task<Void, Never>?
+
     
     init() {
         self.isAccessibilityEnabled = permissionService.getAccessibilityPermissions()
@@ -26,8 +29,9 @@ class PermissionService {
         }
     }
 
+    @MainActor
     deinit {
-        pollTimer?.invalidate()
+        pollTask?.cancel()
         if let didBecomeActiveObserver {
             NotificationCenter.default.removeObserver(didBecomeActiveObserver)
         }
@@ -56,26 +60,20 @@ class PermissionService {
     public func openPermissionSettings() {
         permissionService.openPermissionSettings()
     }
-
+    
+    @MainActor
     private func startPollingAccessibility() {
-        pollTimer?.invalidate()
-
-        var tries = 0
-        pollTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
-            guard let self else {
-                timer.invalidate()
-                return
-            }
-
-            tries += 1
-            let status = self.permissionService.getAccessibilityPermissions()
-            if status != self.isAccessibilityEnabled {
-                self.isAccessibilityEnabled = status
-            }
-
-            if status || tries > 30 {
-                timer.invalidate()
-                self.pollTimer = nil
+        pollTask?.cancel()
+        pollTask = Task { [weak self] in
+            guard let self else { return }
+            
+            for _ in 1...30 {
+                let status = self.permissionService.getAccessibilityPermissions()
+                if status != self.isAccessibilityEnabled {
+                    self.isAccessibilityEnabled = status
+                }
+                if status { break }
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
             }
         }
     }
@@ -87,9 +85,12 @@ class PermissionService {
             queue: .main
         ) { [weak self] _ in
             guard let self else { return }
-            let status = self.permissionService.getAccessibilityPermissions()
-            if status != self.isAccessibilityEnabled {
-                self.isAccessibilityEnabled = status
+            
+            DispatchQueue.main.async {
+                let status = self.permissionService.getAccessibilityPermissions()
+                if status != self.isAccessibilityEnabled {
+                    self.isAccessibilityEnabled = status
+                }
             }
         }
     }
@@ -100,6 +101,7 @@ protocol PermissionProviding {
     func openPermissionSettings()
     func requestAccessibilityPermission() -> Bool
 }
+
 
 class PermissionFetcherService: PermissionProviding {
     
@@ -115,15 +117,10 @@ class PermissionFetcherService: PermissionProviding {
     
     /// Request Accessibility Permissions
     func requestAccessibilityPermission() -> Bool {
-        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true]
-        let status = AXIsProcessTrustedWithOptions(options)
+        let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
+        let trusted = AXIsProcessTrustedWithOptions(options)
         
-        if !status {
-            print("Accessibility permission denied.")
-        } else {
-            print("Accessibility permission granted.")
-        }
-
-        return status
+        print(trusted ? "Accessibility permission granted." : "Accessibility permission denied.")
+        return trusted
     }
 }
