@@ -54,25 +54,26 @@ extension WindowCore {
     /// This is used if `defaultsManager.modiferKey` is either
     /// .control or .option - ``AppCoordinator``
     private func observeModifierChange() {
-        withObservationTracking {
-            _ = isHoldingModifier
-        } onChange: {
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                if isHoldingModifier {
-                    print("Started Pollng")
-                    /// We Want to check for a click
-//                    clickMonitor.start {
-                        self.pollAllWindowsOnScreen()
-//                    }
-                } else {
-                    print("Stopped Polling")
-                    pollingWindowDragging?.cancel()
-//                    clickMonitor.stop()
-                }
-                self.observeModifierChange()
-            }
-        }
+        /// Dont do anything here for now, this is unfinished
+//        withObservationTracking {
+//            _ = isHoldingModifier
+//        } onChange: {
+//            DispatchQueue.main.async { [weak self] in
+//                guard let self else { return }
+//                if isHoldingModifier {
+//                    print("Started Pollng")
+//                    /// We Want to check for a click
+////                    clickMonitor.start {
+//                        self.pollAllWindowsOnScreen()
+////                    }
+//                } else {
+//                    print("Stopped Polling")
+//                    pollingWindowDragging?.cancel()
+////                    clickMonitor.stop()
+//                }
+//                self.observeModifierChange()
+//            }
+//        }
     }
     
     private func pollAllWindowsOnScreen() {
