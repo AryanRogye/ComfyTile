@@ -50,6 +50,14 @@ public final class WindowCore {
 // MARK: - Drag Layouts
 extension WindowCore {
     
+    public func startPollingForDragsInCurrentLayout() {
+        
+    }
+    
+    public func stopPollingForDragInCurrentLayout() {
+        
+    }
+    
     /// ObserveModifer Change
     /// This is used if `defaultsManager.modiferKey` is either
     /// .control or .option - ``AppCoordinator``
@@ -76,63 +84,63 @@ extension WindowCore {
 //        }
     }
     
-    private func pollAllWindowsOnScreen() {
-        guard let screen = Self.screenUnderMouse() else { return }
-        
-        pollingWindowDragging?.cancel()
-        pollingWindowDragging = Task { @MainActor [weak self] in
-            guard let self else { return }
-            
-            let wins: [ComfyWindow] = await refreshAndGetWindows()
-            
-            /// This is all the windows in the current space
-            let inSpace = wins.filter(\.isInSpace)
-            
-            /// Storage for positions
-            var positions: [CGWindowID: CGRect] = [:]
-            var elements: [CGWindowID: WindowElement] = [:]
-            
-            /// Fill Positions with default positions
-            for window in inSpace {
-                if let windowID = window.windowID {
-                    /// this is default position
-                    positions[windowID] = window.element.frame
-                    
-                    /// this is the window element so we can poll the element for frame again
-                    elements[windowID] = window.element
-                }
-            }
-            if positions.isEmpty { return }
-            
-            let screenFrame : CGRect = screen.visibleFrame
-            print("Started Polling With: \(positions.count) Windows On Screen")
-            
-            var startedTask = false
-            while !Task.isCancelled {
-                if !startedTask {
-                    print("Started Task")
-                    startedTask = true
-                }
-                for (id, frame) in positions {
-                    guard let element = elements[id] else { continue }
-                    
-                    let newFrame: CGRect = element.frame
-                    
-                    if newFrame != frame {
-                        print("\(Date()): \(element.title ?? "Unkown") Frame Adjusted From: \(frame) to \(newFrame)")
-                        
-                        /// set old frame to be this new one, so it doesnt spam, that we kept changing
-                        positions[id] = newFrame
-                        
-                        /// We can check other frames on the screen if their positions intersect with our newFrame
-                        
-                    }
-                }
-                
-                try? await Task.sleep(nanoseconds: 500_000_000)
-            }
-        }
-    }
+//    private func pollAllWindowsOnScreen() {
+//        guard let screen = Self.screenUnderMouse() else { return }
+//        
+//        pollingWindowDragging?.cancel()
+//        pollingWindowDragging = Task { @MainActor [weak self] in
+//            guard let self else { return }
+//            
+//            let wins: [ComfyWindow] = await refreshAndGetWindows()
+//            
+//            /// This is all the windows in the current space
+//            let inSpace = wins.filter(\.isInSpace)
+//            
+//            /// Storage for positions
+//            var positions: [CGWindowID: CGRect] = [:]
+//            var elements: [CGWindowID: WindowElement] = [:]
+//            
+//            /// Fill Positions with default positions
+//            for window in inSpace {
+//                if let windowID = window.windowID {
+//                    /// this is default position
+//                    positions[windowID] = window.element.frame
+//                    
+//                    /// this is the window element so we can poll the element for frame again
+//                    elements[windowID] = window.element
+//                }
+//            }
+//            if positions.isEmpty { return }
+//            
+//            let screenFrame : CGRect = screen.visibleFrame
+//            print("Started Polling With: \(positions.count) Windows On Screen")
+//            
+//            var startedTask = false
+//            while !Task.isCancelled {
+//                if !startedTask {
+//                    print("Started Task")
+//                    startedTask = true
+//                }
+//                for (id, frame) in positions {
+//                    guard let element = elements[id] else { continue }
+//                    
+//                    let newFrame: CGRect = element.frame
+//                    
+//                    if newFrame != frame {
+//                        print("\(Date()): \(element.title ?? "Unkown") Frame Adjusted From: \(frame) to \(newFrame)")
+//                        
+//                        /// set old frame to be this new one, so it doesnt spam, that we kept changing
+//                        positions[id] = newFrame
+//                        
+//                        /// We can check other frames on the screen if their positions intersect with our newFrame
+//                        
+//                    }
+//                }
+//                
+//                try? await Task.sleep(nanoseconds: 500_000_000)
+//            }
+//        }
+//    }
     
     @MainActor
     internal func refreshAndGetWindows() async -> [ComfyWindow] {

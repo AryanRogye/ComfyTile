@@ -31,6 +31,14 @@ final class ComfyTileMenuBarViewModel {
         self.lastFocusedWindow = windowCore.getFocusedWindow()
     }
     
+    public func startWatchingWindowLayouts() {
+        windowCore.startPollingForDragsInCurrentLayout()
+    }
+    
+    public func stopWatchingWindowLayouts() {
+        windowCore.stopPollingForDragInCurrentLayout()
+    }
+    
     init(
         permissionService : PermissionService,
         windowSpatialEngine: WindowSpatialEngine,
