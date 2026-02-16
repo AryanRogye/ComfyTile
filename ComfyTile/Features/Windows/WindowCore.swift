@@ -11,44 +11,103 @@ import ScreenCaptureKit
 @Observable
 @MainActor
 public final class WindowCore {
+    
     public var windows: [ComfyWindow] = []
+    
+    public var isHoldingModifier: Bool = false
+    
     private var elementCache: [CGWindowID: WindowElement] = [:]
     
+    var bootTask : Task<Void, Never>?
+    var pollingWindowDragging : Task<Void, Never>?
+    var loadWindowTask: Task<[ComfyWindow], Never>?
+    
+    @ObservationIgnored static let ignore_list = [
+        "com.aryanrogye.ComfyTile"
+    ]
+    
+
     public init() {
-        Task {
+        bootTask = Task { [weak self] in
+            guard let self else { return }
             await self.loadWindows()
         }
     }
     
-    @ObservationIgnored
-    static let ignore_list = [
-        "com.aryanrogye.ComfyTile"
-    ]
+    // MARK: - Helpers
     
-    public func loadWindows() async {
+    /// Global Helper
+    public static func screenUnderMouse() -> NSScreen? {
+        let loc = NSEvent.mouseLocation
+        return NSScreen.screens.first {
+            NSMouseInRect(loc, $0.frame, false)
+        }
+    }
+    
+    @MainActor
+    internal func refreshAndGetWindows() async -> [ComfyWindow] {
+        await loadWindows()
+    }
+}
+
+
+// MARK: - Main Loading Of Windows
+extension WindowCore {
+    
+    /// Load Windows is used for Layouts + Window Switcher
+    
+    @discardableResult
+    public func loadWindows() async -> [ComfyWindow] {
+        var allWindows: [SCWindow]
+        
+        /// Use ScreenRecordingKit to get all windows the user owns
         do {
             let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
-            let allOnScreenWindows = content.windows
+            allWindows = content.windows
+        } catch {
+            print("There Was an Error Getting the Windows With SCShareableContent: \(error)")
+            return []
+        }
+        
+        /// return [] on no windows found
+        if allWindows.isEmpty {
+            print("No Windows Found")
+            return []
+        }
+        
+        let cscWindows: [ComfySCWindow] = ComfySCWindow.toComfySCWindows(allWindows)
+        
+        loadWindowTask = Task.detached(priority: .userInitiated) { [weak self, cscWindows] in
+            guard let self else { return [] }
             var userWindows: [ComfyWindow] = []
-            
-            /// Loop Through all screens for windows
-            for window in allOnScreenWindows {
-                if let window = await ComfyWindow(window: window) {
-                    if let _ = window.element.element, let windowID = window.windowID {
-                        elementCache[windowID] = window.element
-                    }
+            for w in cscWindows {
+                /// Create a ComfyWindow Object
+                if let cw = await ComfyWindow(window: w) {
                     
-                    /// if element is nil but id is not nil we can check our cache
-                    if let windowID = window.windowID,
-                       window.element.element == nil {
-                        /// we have a WindowElement right here
-                        if let element = elementCache[windowID] {
-                            window.element = element
+                    await MainActor.run {
+                        if let windowID = cw.windowID {
+                            /// if the element in ComfyWindow is a valid AXUIElement?, we can update cache
+                            if cw.element.element != nil {
+                                self.elementCache[windowID] = cw.element
+                            }
+                            /// if AXUIElement is nil, we can check our cache and update
+                            else if let element = self.elementCache[windowID] {
+                                cw.setElement(element)
+                            }
                         }
                     }
-                    userWindows.append(window)
+                    /// Add Window into userWindows
+                    userWindows.append(cw)
+                    
                 }
             }
+            
+            return userWindows
+        }
+        
+        if let loadWindowTask = loadWindowTask {
+            let userWindows = await loadWindowTask.value
+            if userWindows.isEmpty { return [] }
             
             // fast lookup of the newest snapshot by windowID
             let newByID = Dictionary(uniqueKeysWithValues: userWindows.map { ($0.windowID, $0) })
@@ -74,11 +133,20 @@ public final class WindowCore {
             }
             
             self.windows = merged
-        } catch {
-            
+            return merged
+        } else {
+            return []
         }
     }
+}
+
+// MARK: - Main Focus Window
+extension WindowCore {
     
+    /// This is used for Tiling + Layouts
+    ///
+    /// Layouts, use focusing on the WindowElement then call Focus
+
     public func getFocusedWindow() -> ComfyWindow? {
         // If we can't get the screen under the mouse, stop.
         guard let screen = Self.screenUnderMouse() else {
@@ -121,12 +189,5 @@ public final class WindowCore {
             /// Most Likely Focused will always be in space
             isInSpace: true
         )
-    }
-    
-    public static func screenUnderMouse() -> NSScreen? {
-        let loc = NSEvent.mouseLocation
-        return NSScreen.screens.first {
-            NSMouseInRect(loc, $0.frame, false)
-        }
     }
 }

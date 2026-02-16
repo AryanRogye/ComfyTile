@@ -6,6 +6,7 @@
 //
 
 import CoreGraphics
+import Foundation
 
 @MainActor
 class AppCoordinator {
@@ -45,9 +46,6 @@ class AppCoordinator {
     private let windowSpatialEngine : WindowSpatialEngine
     private var permissionService : PermissionService
 
-    var numKeysHeld = 0
-    var isHoldingModifier = false
-    
     init(appEnv: AppEnv) {
         
         self.permissionService = PermissionService()
@@ -86,22 +84,6 @@ class AppCoordinator {
         
         self.hotKeyCoordinator = HotKeyCoordinator()
         self.startHotKey()
-    }
-    
-    private func showWith(rect: CGRect) {
-        self.tilingCoverCoordinator.show(with: rect)
-    }
-    
-    private func shouldCloseWith(completion: @escaping () -> Void) {
-        if !self.defaultsManager.showTilingAnimations {
-            completion()
-        } else {
-            self.numKeysHeld -= 1
-            if self.numKeysHeld == 0 {
-                self.tilingCoverCoordinator.hide()
-                completion()
-            }
-        }
     }
     
     private func startHotKey() {
@@ -144,22 +126,18 @@ class AppCoordinator {
             },
             
             // MARK: - Modifier Key
-            //                        onOptDoubleTapDown: {
-            //                            self.isHoldingModifier = true
-            //                            self.shortcutHUDCoordinator.show()
-            //                        },
-            //                        onOptDoubleTapUp: {
-            //                            self.isHoldingModifier = false
-            ////                            self.shortcutHUDCoordinator.hide()
-            //                        },
-            //                        onCtrlDoubleTapDown: {
-            //                            self.isHoldingModifier = true
-            //                            self.shortcutHUDCoordinator.show()
-            //                        },
-            //                        onCtrlDoubleTapUp: {
-            //                            self.isHoldingModifier = false
-            ////                            self.shortcutHUDCoordinator.hide()
-            //                        },
+//            onOptDoubleTapDown: {
+//                self.windowCore.isHoldingModifier = true
+//            },
+//            onOptDoubleTapUp: {
+//                self.windowCore.isHoldingModifier = false
+//            },
+//            onCtrlDoubleTapDown: {
+//                self.windowCore.isHoldingModifier = true
+//            },
+//            onCtrlDoubleTapUp: {
+//                self.windowCore.isHoldingModifier = false
+//            },
             
             // MARK: - Right Half
             onRightHalfDown: {
@@ -207,5 +185,31 @@ class AppCoordinator {
                 self.windowSpatialEngine.nudgeTopDown()
             }
         )
+        
+//        self.shouldStartDoubleModifier()
+//        observeModifierKey()
     }
+    
+//    internal func observeModifierKey() {
+//        withObservationTracking {
+//            _ = defaultsManager.modiferKey
+//        } onChange: {
+//            DispatchQueue.main.async { [weak self] in
+//                guard let self else { return }
+//                self.shouldStartDoubleModifier()
+//                self.observeModifierKey()
+//            }
+//        }
+//    }
+    
+//    /// Function handles what happens with the modifier key
+//    internal func shouldStartDoubleModifier() {
+//        let key = defaultsManager.modiferKey
+//        
+//        if key == .none {
+//            hotKeyCoordinator.stopModifier()
+//        } else {
+//            hotKeyCoordinator.startModifier(with: key)
+//        }
+//    }
 }
