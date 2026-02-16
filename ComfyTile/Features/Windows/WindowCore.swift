@@ -26,6 +26,7 @@ public final class WindowCore {
     var bootTask : Task<Void, Never>?
     var pollingWindowDragging : Task<Void, Never>?
     var loadWindowTask: Task<[ComfyWindow], Never>?
+    var focusedWindowTask: Task<ComfyWindow, Never>?
     var highlightFocusedWindow: Bool = false
     
     @ObservationIgnored static let ignore_list = [
@@ -87,13 +88,14 @@ extension WindowCore {
             guard let self else { return }
             
             guard let win = self.activeWindowElement(for: pid) else { return }
-            var comfyWindow: ComfyWindow?
+            var comfyWindow = getFocusedWindow()
             
-            /// We Can use windows api to get something stronger
-            /// Window state may already be cached/synchronized elsewhere.
-            if let winID = win.cgWindowID {
-                /// lol funny ass bug, if we have { $0.windowID == win.cgWindowID } and its both nil, itll fall through
-                if let win = windows.first(where: { $0.windowID == winID }) {
+            /// if the focusedWindow != what the notification was
+            if let id = win.cgWindowID, id != comfyWindow?.windowID {
+                    /// We Can use windows api to get something stronger
+                    /// Window state may already be cached/synchronized elsewhere.
+                    /// lol funny ass bug, if we have { $0.windowID == win.cgWindowID } and its both nil, itll fall through
+                if let win = windows.first(where: { $0.windowID == id }) {
                     comfyWindow = win
                 }
             }
@@ -102,29 +104,29 @@ extension WindowCore {
             
             onNewFrame?(comfyWindow)
             
-            print("\(comfyWindow.windowTitle) [\(comfyWindow.app.localizedName, default: "[NIL]")]")
-            if notif as String == kAXFocusedUIElementChangedNotification as String {
-                print("Element Changed | id:", win.cgWindowID ?? "Unkown ID")
-            }
-            if notif as String == kAXFocusedWindowChangedNotification as String {
-                print("Focused window Changed | id:", win.cgWindowID ?? "Unkown ID")
-            }
-            if notif as String == kAXApplicationActivatedNotification as String {
-                print("Application Activated | id:", win.cgWindowID ?? "Unkown ID")
-            }
-            if notif as String == kAXWindowMovedNotification as String {
-                print("Window Moved | id:", win.cgWindowID ?? "Unkown ID")
-            }
-            if notif as String == kAXWindowResizedNotification as String {
-                print("Window Resized | id:", win.cgWindowID ?? "Unkown ID")
-            }
-            if notif as String == kAXMovedNotification as String {
-                print("Window Moved | id:", win.cgWindowID ?? "Unkown ID")
-            }
-            if notif as String == kAXResizedNotification as String {
-                print("Window Resized | id:", win.cgWindowID ?? "Unkown ID")
-            }
-            print("====================END==================")
+//            print("\(comfyWindow.windowTitle) [\(comfyWindow.app.localizedName, default: "[NIL]")]")
+//            if notif as String == kAXFocusedUIElementChangedNotification as String {
+//                print("Element Changed | id:", win.cgWindowID ?? "Unkown ID")
+//            }
+//            if notif as String == kAXFocusedWindowChangedNotification as String {
+//                print("Focused window Changed | id:", win.cgWindowID ?? "Unkown ID")
+//            }
+//            if notif as String == kAXApplicationActivatedNotification as String {
+//                print("Application Activated | id:", win.cgWindowID ?? "Unkown ID")
+//            }
+//            if notif as String == kAXWindowMovedNotification as String {
+//                print("Window Moved | id:", win.cgWindowID ?? "Unkown ID")
+//            }
+//            if notif as String == kAXWindowResizedNotification as String {
+//                print("Window Resized | id:", win.cgWindowID ?? "Unkown ID")
+//            }
+//            if notif as String == kAXMovedNotification as String {
+//                print("Window Moved | id:", win.cgWindowID ?? "Unkown ID")
+//            }
+//            if notif as String == kAXResizedNotification as String {
+//                print("Window Resized | id:", win.cgWindowID ?? "Unkown ID")
+//            }
+//            print("====================END==================")
         }
     }
     

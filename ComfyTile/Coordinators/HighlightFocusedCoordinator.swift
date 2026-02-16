@@ -14,7 +14,7 @@ final class HighlightFocusedViewModel {
     var isShown = false
     var currentFocused: ComfyWindow?
     
-    var onShow: (() -> Void)?
+    var onShow: ((ComfyWindow?) -> Void)?
     var onHide: (() -> Void)?
     
     init() {
@@ -28,7 +28,7 @@ final class HighlightFocusedViewModel {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 if let _ = currentFocused {
-                    onShow?()
+                    onShow?(currentFocused)
                 } else {
                     onHide?()
                 }
@@ -56,8 +56,8 @@ final class HighlightFocusedCoordinator: NSObject {
         
         super.init()
         
-        highlightVM.onShow = {
-            self.show()
+        highlightVM.onShow = { window in
+            self.show(window: window)
         }
         highlightVM.onHide = {
             self.hide()
@@ -85,8 +85,10 @@ final class HighlightFocusedCoordinator: NSObject {
         }
     }
     
+    var panelScreen: NSScreen?
     func setupPanel() {
         guard let screen = WindowCore.screenUnderMouse() else { return }
+        panelScreen = screen
         panel = FocusablePanel(
             contentRect: .zero,
             styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
@@ -101,7 +103,7 @@ final class HighlightFocusedCoordinator: NSObject {
         let overlayRaw = CGWindowLevelForKey(.overlayWindow)
         panel.level = NSWindow.Level(rawValue: Int(overlayRaw))
         panel.collectionBehavior = [
-            .moveToActiveSpace,
+            .canJoinAllSpaces,
             .fullScreenAuxiliary,
             .fullScreenDisallowsTiling,
             .ignoresCycle,
@@ -128,11 +130,20 @@ final class HighlightFocusedCoordinator: NSObject {
         panel.orderFrontRegardless()
     }
     
-    func show() {
+    func show(window: ComfyWindow?) {
         if panel == nil { setupPanel() }
+        
+        if let screen = WindowCore.screenUnderMouse(), screen != panelScreen {
+            panelScreen = screen
+            panel.setFrame(screen.frame, display: true)
+        }
+        
         highlightVM.isShown = true
         panel.orderFrontRegardless()
-        print("Is Showing Highlight")
+        let appName = window?.app.localizedName ?? "[NIL]"
+        print("Showing Highlight: \(appName)")
+        print("Panel Position: \(panel.frame)")
+        print("Done \(appName)")
     }
     
     public func hide() {
