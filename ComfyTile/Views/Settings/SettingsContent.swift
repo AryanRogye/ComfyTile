@@ -15,6 +15,8 @@ struct SettingsContent: View {
     
     var body: some View {
         switch settingsVM.selectedTab {
+        case .appereance:
+            AppearanceSettings(defaultsManager: defaultsManager)
         case .log:
             LogSettings()
         case .general:

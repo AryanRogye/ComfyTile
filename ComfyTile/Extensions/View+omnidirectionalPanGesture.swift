@@ -41,6 +41,7 @@ private struct OmnidirectionalPanGestureRepresentable: NSViewRepresentable {
             super.init()
         }
         
+        @MainActor
         deinit {
             if let monitor = eventMonitor {
                 NSEvent.removeMonitor(monitor)

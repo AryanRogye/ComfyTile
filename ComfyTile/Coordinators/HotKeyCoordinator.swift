@@ -17,7 +17,6 @@ extension KeyboardShortcuts.Name {
     static let NudgeBottomUp = Self("NudgeBottomUp")
     static let NudgeTopUp = Self("NudgeTopUp")
     static let NudgeTopDown = Self("NudgeTopDown")
-    static let AutoTile     = Self("AutoTile")
     static let windowViewer = Self("WindowViewer")
     static let windowViewerEscapeEarly = Self("WindowViewerEscapeEarly", default: Shortcut(
         .escape,
@@ -37,34 +36,15 @@ extension KeyboardShortcuts.Name {
     ))
 }
 
-extension KeyboardShortcuts.Name {
-    static var allForHUD: [KeyboardShortcuts.Name] {
-        [
-            .LeftHalf,
-            .RightHalf,
-            .Maximize,
-            .Center,
-            .NudgeBottomDown,
-            .NudgeBottomUp,
-            .NudgeTopUp,
-            .NudgeTopDown,
-            .AutoTile
-        ]
-    }
-}
-
 @MainActor
 final class HotKeyCoordinator {
     private let modifierDetector   = ModifierDoubleTapDetector()
-    private let globalClickMonitor = GlobalClickMonitor()
     
-    public func startGlobalClickMonitor(onClick: @escaping () -> Void) {
-        globalClickMonitor.start {
-            onClick()
-        }
+    public func startModifier(with group: ModifierGroup) {
+        modifierDetector.start(with: group)
     }
-    public func stopGlobalClickMonitor() {
-        globalClickMonitor.stop()
+    public func stopModifier() {
+        modifierDetector.stop()
     }
     
     init() {}
@@ -103,6 +83,11 @@ final class HotKeyCoordinator {
         
     ) {
         
+        modifierDetector.onDoubleTapOption = onOptDoubleTapDown
+        modifierDetector.onDoubleTapOptionRelease = onOptDoubleTapUp
+        modifierDetector.onDoubleTapControl = onCtrlDoubleTapDown
+        modifierDetector.onDoubleTapControlRelease = onCtrlDoubleTapUp
+        
         KeyboardShortcuts.onKeyDown(for: .primaryLeftStackedHorizontallyTile) {
             onPrimaryLeftStackedHorizontallyTile()
         }
@@ -123,10 +108,6 @@ final class HotKeyCoordinator {
             onWindowViewerUp()
         }
         
-        KeyboardShortcuts.onKeyDown(for: .AutoTile) {
-//            onAutoTile()
-        }
-        
         // MARK: - Right Half
         KeyboardShortcuts.onKeyDown(for: .RightHalf) {
             onRightHalfDown()
@@ -135,8 +116,6 @@ final class HotKeyCoordinator {
             onRightHalfUp()
         }
         
-        
-
         // MARK: - Left Half
         KeyboardShortcuts.onKeyDown(for: .LeftHalf) {
             onLeftHalfDown()
@@ -283,6 +262,8 @@ extension HotKeyCoordinator {
             let isControlDown = flags.contains(.control)
             let otherModsDown: Bool = {
                 switch group {
+                case .none:
+                    return false
                 case .option: return flags.contains(.command) || flags.contains(.shift) || flags.contains(.function) || isControlDown
                 case .control: return flags.contains(.command) || flags.contains(.shift) || flags.contains(.function) || isOptionDown
                 }
@@ -296,6 +277,7 @@ extension HotKeyCoordinator {
             if previouslyDown && !nowDown {
                 if doubleTapActive[group] == true {
                     switch group {
+                    case .none: break
                     case .option: onDoubleTapOptionRelease?()
                     case .control: onDoubleTapControlRelease?()
                     }
@@ -312,113 +294,13 @@ extension HotKeyCoordinator {
             if let last = lastDownTime[group], (t - last) <= doubleTapWindow {
                 doubleTapActive[group] = true
                 switch group {
+                case .none: break
                 case .option: onDoubleTapOption?()
                 case .control: onDoubleTapControl?()
                 }
                 lastDownTime[group] = 0
             } else {
                 lastDownTime[group] = t
-            }
-        }
-    }
-}
-
-extension HotKeyCoordinator {
-    @MainActor
-    final class GlobalClickMonitor {
-        
-        private var tap: CFMachPort?
-        private var runLoopSource: CFRunLoopSource?
-        
-        /// Flag to know if the modifier key is pressed locally or not
-        private(set) var isLocallyPressingModifier: Bool = false
-        
-        /// Store the onClick closure as an instance variable
-        private var onClick: (() -> Void)?
-        
-        init() {}
-        
-        deinit {
-            DispatchQueue.main.async { [weak self] in
-                self?.stop()
-            }
-        }
-        
-        public func start(onClick: @escaping () -> Void) {
-            if tap != nil {
-                print("⚠️ Mouse monitor already running")
-                return
-            }
-            
-            // Store the closure
-            self.onClick = onClick
-            
-            print("🔄 Starting CGEventTap mouse monitor...")
-            
-            // Create mask for mouse events
-            let mask = (1 << CGEventType.leftMouseDown.rawValue) | (1 << CGEventType.leftMouseUp.rawValue)
-            
-            let callback: CGEventTapCallBack = { proxy, type, event, userInfo in
-                guard let userInfo = userInfo else { return Unmanaged.passUnretained(event) }
-                let monitor = Unmanaged<GlobalClickMonitor>.fromOpaque(userInfo).takeUnretainedValue()
-                monitor.handleMouseEvent(type: type, event: event)
-                return Unmanaged.passUnretained(event)
-            }
-            
-            let selfPtr = Unmanaged.passUnretained(self).toOpaque()
-            tap = CGEvent.tapCreate(
-                tap: .cgSessionEventTap,
-                place: .headInsertEventTap,
-                options: .listenOnly,
-                eventsOfInterest: CGEventMask(mask),
-                callback: callback,
-                userInfo: selfPtr
-            )
-            
-            guard let tap else {
-                print("❌ Failed to create mouse event tap - check Accessibility permissions")
-                return
-            }
-            
-            runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
-            CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
-            CGEvent.tapEnable(tap: tap, enable: true)
-            
-            print("✅ CGEventTap mouse monitor started successfully")
-        }
-        
-        public func stop() {
-            if let tap {
-                CGEvent.tapEnable(tap: tap, enable: false)
-                print("🛑 Mouse monitor stopped")
-            }
-            if let runLoopSource {
-                CFRunLoopRemoveSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
-            }
-            runLoopSource = nil
-            tap = nil
-            
-            // Clear the stored closure
-            onClick = nil
-        }
-        
-        private func handleMouseEvent(type: CGEventType, event: CGEvent) {
-            // Handle tap re-enable
-            if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
-                if let tap { CGEvent.tapEnable(tap: tap, enable: true) }
-                return
-            }
-            
-            switch type {
-            case .leftMouseDown:
-//                print("🖱️ CGEventTap: Left Mouse Down")
-                isLocallyPressingModifier = true
-                onClick?() // Call the stored closure
-            case .leftMouseUp:
-//                print("🖱️ CGEventTap: Left Mouse Up")
-                isLocallyPressingModifier = false
-            default:
-                break
             }
         }
     }
