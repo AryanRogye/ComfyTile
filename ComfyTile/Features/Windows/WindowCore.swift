@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreGraphics
 import ScreenCaptureKit
 
 @Observable
@@ -18,6 +19,11 @@ public final class WindowCore {
     public var isHoldingModifier: Bool = false
     
     private var elementCache: [CGWindowID: WindowElement] = [:]
+    private var onLayoutWindowsChanged: (([ComfyWindow]) -> Void)?
+    private var trackedWindowFramesByID: [CGWindowID: CGRect] = [:]
+    private var trackedWindowsByID: [CGWindowID: ComfyWindow] = [:]
+    private let frameChangeTolerance: CGFloat = 0.5
+    private let dragPollingIntervalNs: UInt64 = 60_000_000
     
     var bootTask : Task<Void, Never>?
     var pollingWindowDragging : Task<Void, Never>?
@@ -50,12 +56,42 @@ public final class WindowCore {
 // MARK: - Drag Layouts
 extension WindowCore {
     
-    public func startPollingForDragsInCurrentLayout() {
+    public func startPollingForDragsInCurrentLayout(onLayoutChanged: (([ComfyWindow]) -> Void)? = nil) {
+        onLayoutWindowsChanged = onLayoutChanged
+        pollingWindowDragging?.cancel()
+        pollingWindowDragging = nil
+        clickMonitor.stop()
         
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            
+            let windows = await self.refreshAndGetWindows()
+            let currentWindowsByID = self.currentSpaceWindowsByID(from: windows)
+            let currentFrames = self.currentSpaceFramesByID(from: currentWindowsByID)
+            
+            self.trackedWindowsByID = currentWindowsByID
+            self.trackedWindowFramesByID = currentFrames
+            self.emitTrackedLayoutWindows()
+            
+            self.clickMonitor.start { [weak self] in
+                Task { @MainActor [weak self] in
+                    self?.startDragPollingLoopIfNeeded()
+                }
+            }
+            
+            if self.isLeftMousePressed() {
+                self.startDragPollingLoopIfNeeded()
+            }
+        }
     }
     
     public func stopPollingForDragInCurrentLayout() {
-        
+        pollingWindowDragging?.cancel()
+        pollingWindowDragging = nil
+        clickMonitor.stop()
+        trackedWindowsByID.removeAll()
+        trackedWindowFramesByID.removeAll()
+        onLayoutWindowsChanged = nil
     }
     
     /// ObserveModifer Change
@@ -82,6 +118,136 @@ extension WindowCore {
 //                self.observeModifierChange()
 //            }
 //        }
+    }
+
+    private func startDragPollingLoopIfNeeded() {
+        if let pollingWindowDragging, !pollingWindowDragging.isCancelled {
+            return
+        }
+        
+        pollingWindowDragging = Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.reloadTrackedWindowsForCurrentSpace()
+            
+            while !Task.isCancelled {
+                let isDragging = self.clickMonitor.mouseDown || self.isLeftMousePressed()
+                if !isDragging {
+                    break
+                }
+                
+                let trackedState = self.readTrackedWindowState()
+                let latestWindowsByID = trackedState.windowsByID
+                let latestFrames = trackedState.framesByID
+                
+                if self.didFramesChange(
+                    from: self.trackedWindowFramesByID,
+                    to: latestFrames
+                ) {
+                    self.trackedWindowsByID = latestWindowsByID
+                    self.trackedWindowFramesByID = latestFrames
+                    self.emitTrackedLayoutWindows()
+                }
+                
+                try? await Task.sleep(nanoseconds: self.dragPollingIntervalNs)
+            }
+            
+            self.pollingWindowDragging = nil
+        }
+    }
+    
+    private func isLeftMousePressed() -> Bool {
+        CGEventSource.buttonState(.combinedSessionState, button: .left)
+    }
+    
+    private func reloadTrackedWindowsForCurrentSpace() async {
+        let windows = await self.refreshAndGetWindows()
+        let windowsByID = self.currentSpaceWindowsByID(from: windows)
+        guard !windowsByID.isEmpty else { return }
+        
+        trackedWindowsByID = windowsByID
+        trackedWindowFramesByID = currentSpaceFramesByID(from: windowsByID)
+        emitTrackedLayoutWindows()
+    }
+    
+    private func currentSpaceWindowsByID(from windows: [ComfyWindow]) -> [CGWindowID: ComfyWindow] {
+        var windowsByID: [CGWindowID: ComfyWindow] = [:]
+        
+        for window in windows {
+            guard let windowID = window.windowID else { continue }
+            windowsByID[windowID] = window
+        }
+        
+        return windowsByID
+    }
+    
+    private func currentSpaceFramesByID(from windowsByID: [CGWindowID: ComfyWindow]) -> [CGWindowID: CGRect] {
+        var framesByID: [CGWindowID: CGRect] = [:]
+        
+        for (windowID, window) in windowsByID {
+            guard let frame = window.element.windowFrame else { continue }
+            guard frame.width > 0, frame.height > 0 else { continue }
+            framesByID[windowID] = frame.standardized
+        }
+        
+        return framesByID
+    }
+    
+    private func readTrackedWindowState() -> (
+        windowsByID: [CGWindowID: ComfyWindow],
+        framesByID: [CGWindowID: CGRect]
+    ) {
+        var windowsByID: [CGWindowID: ComfyWindow] = [:]
+        var framesByID: [CGWindowID: CGRect] = [:]
+        
+        for (windowID, window) in trackedWindowsByID {
+            guard let frame = window.element.windowFrame else { continue }
+            guard frame.width > 0, frame.height > 0 else { continue }
+            
+            windowsByID[windowID] = window
+            framesByID[windowID] = frame.standardized
+        }
+        
+        return (windowsByID, framesByID)
+    }
+    
+    private func emitTrackedLayoutWindows() {
+        let windows = trackedWindowsByID
+            .values
+            .sorted {
+                guard let lhs = $0.windowID, let rhs = $1.windowID else {
+                    return $0.id < $1.id
+                }
+                return lhs < rhs
+            }
+        onLayoutWindowsChanged?(windows)
+    }
+    
+    private func didFramesChange(
+        from previous: [CGWindowID: CGRect],
+        to latest: [CGWindowID: CGRect]
+    ) -> Bool {
+        if previous.count != latest.count {
+            return true
+        }
+        
+        for (windowID, previousFrame) in previous {
+            guard let latestFrame = latest[windowID] else {
+                return true
+            }
+            
+            if !framesEqual(previousFrame, latestFrame) {
+                return true
+            }
+        }
+        
+        return false
+    }
+    
+    private func framesEqual(_ lhs: CGRect, _ rhs: CGRect) -> Bool {
+        abs(lhs.origin.x - rhs.origin.x) <= frameChangeTolerance &&
+            abs(lhs.origin.y - rhs.origin.y) <= frameChangeTolerance &&
+            abs(lhs.width - rhs.width) <= frameChangeTolerance &&
+            abs(lhs.height - rhs.height) <= frameChangeTolerance
     }
     
 //    private func pollAllWindowsOnScreen() {
