@@ -13,7 +13,6 @@ import ScreenCaptureKit
 public final class WindowCore {
     
     public var windows: [ComfyWindow] = []
-    let clickMonitor = GlobalClickMonitor()
     
     public var isHoldingModifier: Bool = false
     

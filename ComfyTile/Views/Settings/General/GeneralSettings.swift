@@ -14,17 +14,6 @@ struct GeneralSettings: View {
     
     var body: some View {
         Form {
-            Section("Layout") {
-                HStack {
-                    Text("Double Modifier On Drag Adjusts Window Layout")
-                    Spacer()
-                    Picker("", selection: $defaultsManager.modiferKey) {
-                        ForEach(ModifierGroup.allCases, id: \.self) { group in
-                            Text(group.rawValue)
-                        }
-                    }
-                }
-            }
             Section("About") {
                 if let updateNotFoundError = updateController.updaterVM.updateNotFoundError,
                    updateController.updaterVM.showUpdateNotFoundError {

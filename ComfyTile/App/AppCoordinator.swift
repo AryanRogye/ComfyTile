@@ -126,18 +126,18 @@ class AppCoordinator {
             },
             
             // MARK: - Modifier Key
-            onOptDoubleTapDown: {
-                self.windowCore.isHoldingModifier = true
-            },
-            onOptDoubleTapUp: {
-                self.windowCore.isHoldingModifier = false
-            },
-            onCtrlDoubleTapDown: {
-                self.windowCore.isHoldingModifier = true
-            },
-            onCtrlDoubleTapUp: {
-                self.windowCore.isHoldingModifier = false
-            },
+//            onOptDoubleTapDown: {
+//                self.windowCore.isHoldingModifier = true
+//            },
+//            onOptDoubleTapUp: {
+//                self.windowCore.isHoldingModifier = false
+//            },
+//            onCtrlDoubleTapDown: {
+//                self.windowCore.isHoldingModifier = true
+//            },
+//            onCtrlDoubleTapUp: {
+//                self.windowCore.isHoldingModifier = false
+//            },
             
             // MARK: - Right Half
             onRightHalfDown: {
@@ -186,30 +186,30 @@ class AppCoordinator {
             }
         )
         
-        self.shouldStartDoubleModifier()
-        observeModifierKey()
+//        self.shouldStartDoubleModifier()
+//        observeModifierKey()
     }
     
-    internal func observeModifierKey() {
-        withObservationTracking {
-            _ = defaultsManager.modiferKey
-        } onChange: {
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                self.shouldStartDoubleModifier()
-                self.observeModifierKey()
-            }
-        }
-    }
+//    internal func observeModifierKey() {
+//        withObservationTracking {
+//            _ = defaultsManager.modiferKey
+//        } onChange: {
+//            DispatchQueue.main.async { [weak self] in
+//                guard let self else { return }
+//                self.shouldStartDoubleModifier()
+//                self.observeModifierKey()
+//            }
+//        }
+//    }
     
-    /// Function handles what happens with the modifier key
-    internal func shouldStartDoubleModifier() {
-        let key = defaultsManager.modiferKey
-        
-        if key == .none {
-            hotKeyCoordinator.stopModifier()
-        } else {
-            hotKeyCoordinator.startModifier(with: key)
-        }
-    }
+//    /// Function handles what happens with the modifier key
+//    internal func shouldStartDoubleModifier() {
+//        let key = defaultsManager.modiferKey
+//        
+//        if key == .none {
+//            hotKeyCoordinator.stopModifier()
+//        } else {
+//            hotKeyCoordinator.startModifier(with: key)
+//        }
+//    }
 }
