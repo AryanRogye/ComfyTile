@@ -82,7 +82,6 @@
 		9BA06A032F26F0090032DA0B /* OverlapCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BA06A022F26EFFD0032DA0B /* OverlapCalculator.swift */; };
 		9BAF4AA12F1978CF006536D2 /* WindowLayoutProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAF4AA02F1978CB006536D2 /* WindowLayoutProviding.swift */; };
 		9BAF4AA32F1978DF006536D2 /* WindowLayoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAF4AA22F1978DA006536D2 /* WindowLayoutService.swift */; };
-		9BF40D362F41400B005FB27C /* SetsLayoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF40D352F41400A005FB27C /* SetsLayoutView.swift */; };
 		9BF95F0E2E9326AE00776771 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
@@ -173,7 +172,6 @@
 		9BA06A022F26EFFD0032DA0B /* OverlapCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlapCalculator.swift; sourceTree = "<group>"; };
 		9BAF4AA02F1978CB006536D2 /* WindowLayoutProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutProviding.swift; sourceTree = "<group>"; };
 		9BAF4AA22F1978DA006536D2 /* WindowLayoutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutService.swift; sourceTree = "<group>"; };
-		9BF40D352F41400A005FB27C /* SetsLayoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetsLayoutView.swift; sourceTree = "<group>"; };
 		9BF95ECE2E9321E000776771 /* ComfyTile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ComfyTile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -295,7 +293,6 @@
 		9B8FC0572F10B80D00CBF4B8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				9BF40D342F414006005FB27C /* SetsLayout */,
 				9B8FC0C42F12ECF000CBF4B8 /* Component */,
 				9B8FC0BF2F12306A00CBF4B8 /* TileMode */,
 				9B8FC0BE2F12305900CBF4B8 /* LayoutMode */,
@@ -521,14 +518,6 @@
 			path = Layout;
 			sourceTree = "<group>";
 		};
-		9BF40D342F414006005FB27C /* SetsLayout */ = {
-			isa = PBXGroup;
-			children = (
-				9BF40D352F41400A005FB27C /* SetsLayoutView.swift */,
-			);
-			path = SetsLayout;
-			sourceTree = "<group>";
-		};
 		9BF95EC52E9321E000776771 = {
 			isa = PBXGroup;
 			children = (
@@ -691,7 +680,6 @@
 				9B8FC0842F10B80D00CBF4B8 /* View+sectionBackground.swift in Sources */,
 				9B8FC0852F10B80D00CBF4B8 /* ComfyTileMenuBar.swift in Sources */,
 				9B9BCFD72F1972C30020F3AD /* Modifiers.swift in Sources */,
-				9BF40D362F41400B005FB27C /* SetsLayoutView.swift in Sources */,
 				9B68EEA32F228C6C009567DF /* AppearanceSettings.swift in Sources */,
 				9B9BCFD32F1972350020F3AD /* DefaultsManager.swift in Sources */,
 				9B9BCFD42F1972350020F3AD /* DefaultsKeys.swift in Sources */,

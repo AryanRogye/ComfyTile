@@ -87,7 +87,6 @@ struct NewComfyTileMenuBarContent: View {
                 switch vm.selectedTab {
                 case .layout: LayoutModeView()
                 case .settings: SettingsView()
-                case .setLayouts: SetsLayoutView()
                 case .tile: TileModeView()
                 }
             }
