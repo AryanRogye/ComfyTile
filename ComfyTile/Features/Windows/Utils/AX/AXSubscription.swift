@@ -29,43 +29,46 @@ public final class AXSubscription {
         CFRunLoopAddSource(
             CFRunLoopGetMain(),
             AXObserverGetRunLoopSource(observer),
-            .defaultMode
+            .commonModes
         )
     }
     
-    func watch(_ element: AXUIElement, windowID: CGWindowID) {
-        
-        if watchingWindows.contains(windowID) { return }
-        watchingWindows.insert(windowID)
-        
+    private var isWatchingApp = false
+    private var isWatchingWindow = false
+    
+    func setHandlerIfNeeded(_ handler: @escaping (pid_t, AXUIElement, CFString) -> Void) {
+        if onChange == nil { onChange = handler }
+    }
+    
+    func watchApp() {
+        guard !isWatchingApp else { return }
+        let appEl = AXUIElementCreateApplication(pid)
         let ctx = Unmanaged.passUnretained(self).toOpaque()
         
-        AXObserverAddNotification(
-            observer!,
-            element,
-            kAXMovedNotification as CFString,
-            ctx
-        )
+        add(appEl, kAXFocusedUIElementChangedNotification as CFString, ctx)
+        add(appEl, kAXFocusedWindowChangedNotification as CFString, ctx)
+        add(appEl, kAXApplicationActivatedNotification as CFString, ctx)
+        add(appEl, kAXWindowMovedNotification as CFString, ctx)
+        add(appEl, kAXWindowResizedNotification as CFString, ctx)
+        isWatchingApp = true
+    }
+    
+    func watchWindow(_ windowEl: AXUIElement, windowID: CGWindowID) {
+        guard !isWatchingWindow else { return }
+        // only dedupe the window-level stuff by windowID
+        guard watchingWindows.insert(windowID).inserted else { return }
         
-        AXObserverAddNotification(
-            observer!,
-            element,
-            kAXResizedNotification as CFString,
-            ctx
-        )
-        
-        AXObserverAddNotification(
-            observer!,
-            element,
-            kAXWindowMovedNotification as CFString,
-            ctx
-        )
-        AXObserverAddNotification(
-            observer!,
-            element,
-            kAXWindowResizedNotification as CFString,
-            ctx
-        )
+        let ctx = Unmanaged.passUnretained(self).toOpaque()
+        add(windowEl, kAXMovedNotification as CFString, ctx)
+        add(windowEl, kAXResizedNotification as CFString, ctx)
+        isWatchingWindow = true
+    }
+    
+    private func add(_ el: AXUIElement, _ notif: CFString, _ ctx: UnsafeMutableRawPointer) {
+        let err = AXObserverAddNotification(observer!, el, notif, ctx)
+        if err != .success {
+            print("❌ AXObserverAddNotification failed pid=\(pid) notif=\(notif) err=\(err)")
+        }
     }
     
     private static let callback: AXObserverCallback = { observer, element, notification, refcon in

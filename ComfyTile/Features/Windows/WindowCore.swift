@@ -14,8 +14,13 @@ public final class WindowCore {
     
     public var windows: [ComfyWindow] = []
     
-    public var isHoldingModifier: Bool = false
-    
+    /**
+     We cache WindowElements when the window is in the active Space
+     because they behave more reliably.
+     
+     AXUIElements can act differently depending on when/how they’re grabbed.
+     Reusing a previously cached one keeps window interactions stable.
+     */
     private var elementCache: [CGWindowID: WindowElement] = [:]
     
     var bootTask : Task<Void, Never>?
@@ -26,6 +31,9 @@ public final class WindowCore {
         "com.aryanrogye.ComfyTile"
     ]
     
+    @ObservationIgnored
+    public var windowSubscriptions: [pid_t: AXSubscription] = [:]
+
 
     public init() {
         bootTask = Task { [weak self] in
@@ -47,6 +55,83 @@ public final class WindowCore {
     @MainActor
     internal func refreshAndGetWindows() async -> [ComfyWindow] {
         await loadWindows()
+    }
+}
+
+// MARK: - AXSubscriptions
+extension WindowCore {
+    private func assignHandler(subscription: AXSubscription) {
+        subscription.setHandlerIfNeeded { [weak self] pid, _, notif in
+            guard let self else { return }
+            
+            guard let win = self.activeWindowElement(for: pid) else { return }
+            var comfyWindow: ComfyWindow?
+            
+            /// We Can use windows api to get something stronger
+            /// Window state may already be cached/synchronized elsewhere.
+            if let winID = win.cgWindowID {
+                /// lol funny ass bug, if we have { $0.windowID == win.cgWindowID } and its both nil, itll fall through
+                if let win = windows.first(where: { $0.windowID == winID }) {
+                    comfyWindow = win
+                }
+            }
+            
+            guard let comfyWindow else { print("Couldnt Find Valid ComfyWindow"); return }
+            
+            print("\(comfyWindow.windowTitle) [\(comfyWindow.app.localizedName, default: "[NIL]")]")
+            if notif as String == kAXFocusedUIElementChangedNotification as String {
+                print("Element Changed | id:", win.cgWindowID ?? "Unkown ID")
+            }
+            if notif as String == kAXFocusedWindowChangedNotification as String {
+                print("Focused window Changed | id:", win.cgWindowID ?? "Unkown ID")
+            }
+            if notif as String == kAXApplicationActivatedNotification as String {
+                print("Application Activated | id:", win.cgWindowID ?? "Unkown ID")
+            }
+            if notif as String == kAXWindowMovedNotification as String {
+                print("Window Moved | id:", win.cgWindowID ?? "Unkown ID")
+            }
+            if notif as String == kAXWindowResizedNotification as String {
+                print("Window Resized | id:", win.cgWindowID ?? "Unkown ID")
+            }
+            if notif as String == kAXMovedNotification as String {
+                print("Window Moved | id:", win.cgWindowID ?? "Unkown ID")
+            }
+            if notif as String == kAXResizedNotification as String {
+                print("Window Resized | id:", win.cgWindowID ?? "Unkown ID")
+            }
+            print("====================END==================")
+        }
+    }
+    private func attachAppWatcher(subscription: AXSubscription?, pid: pid_t) {
+        guard let sub = subscription else { return }
+        
+        // set onChange ONCE per subscription
+        sub.watchApp()
+    }
+    
+    private func attachWindowWatcher(subscription: AXSubscription?, windowEl: AXUIElement?, windowID: CGWindowID?) {
+        guard let sub = subscription, let windowEl, let windowID else { return }
+        sub.watchWindow(windowEl, windowID: windowID)
+    }
+    
+    /// Main API For
+    internal func attachSubscriptionIfNeeded(pid: pid_t, usedAppElement: Bool, windowEl: AXUIElement?, windowID: CGWindowID?) {
+        /// if we come in as a "false" on usedAppElement we can test to see if a true one exists
+        if self.windowSubscriptions[pid] == nil {
+            /// if we dont have a subscription stored
+            /// if we can make a valid subscription
+            if let sub = AXSubscription(pid: pid) {
+                /// add it in
+                self.windowSubscriptions[pid] = sub
+            }
+        }
+        
+        if let sub = self.windowSubscriptions[pid] {
+            self.attachAppWatcher(subscription: sub, pid: pid)
+            self.attachWindowWatcher(subscription: sub, windowEl: windowEl, windowID: windowID)
+            self.assignHandler(subscription: sub)
+        }
     }
 }
 
@@ -95,15 +180,23 @@ extension WindowCore {
                                 cw.setElement(element)
                             }
                         }
+                        
+                        self.attachSubscriptionIfNeeded(
+                            pid: cw.pid,
+                            usedAppElement: false,
+                            windowEl: cw.element.element,
+                            windowID: cw.windowID
+                        )
                     }
                     /// Add Window into userWindows
                     userWindows.append(cw)
                     
                 }
             }
-            
+            /// Return of the task
             return userWindows
         }
+        
         
         if let loadWindowTask = loadWindowTask {
             let userWindows = await loadWindowTask.value
@@ -143,6 +236,19 @@ extension WindowCore {
 // MARK: - Main Focus Window
 extension WindowCore {
     
+    internal func activeWindowElement(for pid: pid_t) -> WindowElement? {
+        let appEl = AXUIElementCreateApplication(pid)
+        var focused: CFTypeRef?
+        let r = AXUIElementCopyAttributeValue(appEl, kAXFocusedWindowAttribute as CFString, &focused)
+        guard r == .success, let focused else { return nil }
+        // Ensure the returned CFType is actually an AXUIElement before casting
+        guard CFGetTypeID(focused) == AXUIElementGetTypeID() else { return nil }
+        let element = focused as! AXUIElement
+        
+        return WindowElement(element: element)
+    }
+
+    
     /// This is used for Tiling + Layouts
     ///
     /// Layouts, use focusing on the WindowElement then call Focus
@@ -175,9 +281,16 @@ extension WindowCore {
             print("❌ Failed to get focused window: \(result)")
             return nil
         }
-        
         let windowElement = focusedWindow as! AXUIElement
-        let element = WindowElement(element: windowElement)
+        let element : WindowElement = WindowElement(element: windowElement)
+
+        self.attachSubscriptionIfNeeded(
+            pid: app.processIdentifier,
+            usedAppElement: true,
+            windowEl: element.element,
+            windowID: element.cgWindowID
+        )
+        
         return ComfyWindow(
             app: app,
             windowID: element.cgWindowID,

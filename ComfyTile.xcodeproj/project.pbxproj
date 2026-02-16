@@ -306,8 +306,8 @@
 			children = (
 				9B8FC0112F10B80D00CBF4B8 /* App */,
 				9B8FC0192F10B80D00CBF4B8 /* Coordinators */,
-				9B9BCFBD2F1971EB0020F3AD /* Features */,
 				9B8FC0222F10B80D00CBF4B8 /* Extensions */,
+				9B9BCFBD2F1971EB0020F3AD /* Features */,
 				9B8FC0572F10B80D00CBF4B8 /* Views */,
 				9B8FC0582F10B80D00CBF4B8 /* Assets.xcassets */,
 				9B8FC0592F10B80D00CBF4B8 /* ComfyTile.entitlements */,
