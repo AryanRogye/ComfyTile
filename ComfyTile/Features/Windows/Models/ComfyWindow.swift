@@ -80,8 +80,7 @@ public final class ComfyWindow: Sendable {
             print("Coudlnt get screenshot: \(error)")
         }
         
-        let spaces = Self.spacesForWindow(window.windowID)
-        let isInSpace = !spaces.isEmpty
+        let isInSpace = Self.isWindowInActiveSpace(window.windowID)
         
         let windowElement = WindowElement(element: axElement)
         
@@ -121,8 +120,8 @@ public final class ComfyWindow: Sendable {
         self.isInSpace = isInSpace
     }
     
-    /// TODO: This works for now, but make this better soon
-    private static func spacesForWindow(_ windowID: CGWindowID) -> [Int] {
+    /// Returns the space identifiers a window belongs to.
+    private static func spacesForWindow(_ windowID: CGWindowID) -> [CGSSpaceID] {
         let cid = CGSMainConnectionID()
         let ids: CFArray = [NSNumber(value: Int(windowID))] as CFArray
         
@@ -135,6 +134,14 @@ public final class ComfyWindow: Sendable {
         
         // Bridge to Swift
         let nums = cfArray as NSArray as? [NSNumber] ?? []
-        return nums.map { $0.intValue }
+        return nums.map { CGSSpaceID($0.uint64Value) }
+    }
+    
+    /// True when a window belongs to the currently active macOS Space.
+    public static func isWindowInActiveSpace(_ windowID: CGWindowID) -> Bool {
+        let cid = CGSMainConnectionID()
+        let activeSpace = CGSGetActiveSpace(cid)
+        let windowSpaces = spacesForWindow(windowID)
+        return windowSpaces.contains(activeSpace)
     }
 }

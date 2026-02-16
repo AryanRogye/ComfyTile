@@ -37,7 +37,10 @@ final class GlobalClickMonitor {
         self.onClick = onClick
         
         // Create mask for mouse events
-        let mask = (1 << CGEventType.leftMouseDown.rawValue) | (1 << CGEventType.leftMouseUp.rawValue)
+        let mask =
+            (1 << CGEventType.leftMouseDown.rawValue) |
+            (1 << CGEventType.leftMouseUp.rawValue) |
+            (1 << CGEventType.leftMouseDragged.rawValue)
         
         let callback: CGEventTapCallBack = { proxy, type, event, userInfo in
             guard let userInfo = userInfo else { return Unmanaged.passUnretained(event) }
@@ -92,6 +95,11 @@ final class GlobalClickMonitor {
         case .leftMouseDown:
             mouseDown = true
             onClick?() // Call the stored closure
+        case .leftMouseDragged:
+            if !mouseDown {
+                mouseDown = true
+            }
+            onClick?()
         case .leftMouseUp:
             mouseDown = false
         default:
