@@ -26,6 +26,7 @@ public final class WindowCore {
     var bootTask : Task<Void, Never>?
     var pollingWindowDragging : Task<Void, Never>?
     var loadWindowTask: Task<[ComfyWindow], Never>?
+    var highlightFocusedWindow: Bool = false
     
     @ObservationIgnored static let ignore_list = [
         "com.aryanrogye.ComfyTile"
@@ -34,11 +35,32 @@ public final class WindowCore {
     @ObservationIgnored
     public var windowSubscriptions: [pid_t: AXSubscription] = [:]
 
+    var onNewFrame: ((ComfyWindow?) -> Void)?
 
     public init() {
         bootTask = Task { [weak self] in
             guard let self else { return }
             await self.loadWindows()
+            observeHighlightFocusedWindow()
+        }
+    }
+    
+    internal func observeHighlightFocusedWindow() {
+        withObservationTracking {
+            _ = highlightFocusedWindow
+        } onChange: {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                
+                /// Clear out All Subscriptions
+                if !highlightFocusedWindow {
+                    clearSubscriptions()
+                } else {
+                    attachSubscriptionsOnAllWindows()
+                }
+                
+                self.observeHighlightFocusedWindow()
+            }
         }
     }
     
@@ -78,6 +100,8 @@ extension WindowCore {
             
             guard let comfyWindow else { print("Couldnt Find Valid ComfyWindow"); return }
             
+            onNewFrame?(comfyWindow)
+            
             print("\(comfyWindow.windowTitle) [\(comfyWindow.app.localizedName, default: "[NIL]")]")
             if notif as String == kAXFocusedUIElementChangedNotification as String {
                 print("Element Changed | id:", win.cgWindowID ?? "Unkown ID")
@@ -103,6 +127,7 @@ extension WindowCore {
             print("====================END==================")
         }
     }
+    
     private func attachAppWatcher(subscription: AXSubscription?, pid: pid_t) {
         guard let sub = subscription else { return }
         
@@ -116,7 +141,9 @@ extension WindowCore {
     }
     
     /// Main API For
-    internal func attachSubscriptionIfNeeded(pid: pid_t, usedAppElement: Bool, windowEl: AXUIElement?, windowID: CGWindowID?) {
+    internal func attachSubscriptionIfNeeded(pid: pid_t, windowEl: AXUIElement?, windowID: CGWindowID?) {
+        guard highlightFocusedWindow else { return }
+        print("Assigning Subscription For PID: \(pid)")
         /// if we come in as a "false" on usedAppElement we can test to see if a true one exists
         if self.windowSubscriptions[pid] == nil {
             /// if we dont have a subscription stored
@@ -131,6 +158,21 @@ extension WindowCore {
             self.attachAppWatcher(subscription: sub, pid: pid)
             self.attachWindowWatcher(subscription: sub, windowEl: windowEl, windowID: windowID)
             self.assignHandler(subscription: sub)
+        }
+    }
+    
+    internal func clearSubscriptions() {
+        self.windowSubscriptions.removeAll()
+    }
+    internal func attachSubscriptionsOnAllWindows() {
+        for cw in windows {
+            if self.windowSubscriptions[cw.pid] == nil {
+                self.attachSubscriptionIfNeeded(
+                    pid: cw.pid,
+                    windowEl: cw.element.element,
+                    windowID: cw.windowID
+                )
+            }
         }
     }
 }
@@ -183,7 +225,6 @@ extension WindowCore {
                         
                         self.attachSubscriptionIfNeeded(
                             pid: cw.pid,
-                            usedAppElement: false,
                             windowEl: cw.element.element,
                             windowID: cw.windowID
                         )
@@ -286,7 +327,6 @@ extension WindowCore {
 
         self.attachSubscriptionIfNeeded(
             pid: app.processIdentifier,
-            usedAppElement: true,
             windowEl: element.element,
             windowID: element.cgWindowID
         )

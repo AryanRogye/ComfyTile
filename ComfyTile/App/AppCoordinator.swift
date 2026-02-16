@@ -22,10 +22,11 @@ class AppCoordinator {
     /// ==============================================================================
     /// Coordinators
     /// ==============================================================================
-    let menuBarCoordinator      = MenuBarCoordinator()
-    let hotKeyCoordinator       : HotKeyCoordinator
-    let tilingCoverCoordinator  : TilingCoverCoordinator
-    let windowViewerCoordinator : WindowViewerCoordinator
+    let menuBarCoordinator          = MenuBarCoordinator()
+    let hotKeyCoordinator           : HotKeyCoordinator
+    let tilingCoverCoordinator      : TilingCoverCoordinator
+    let windowViewerCoordinator     : WindowViewerCoordinator
+    let highLightFocusedCoordinator : HighlightFocusedCoordinator
     
     /// ==============================================================================
     /// View Models
@@ -34,6 +35,7 @@ class AppCoordinator {
     let settingsVM         = SettingsViewModel()
     let tilingCoverVM      = TilingCoverViewModel()
     let windowViewerVM     = WindowViewerViewModel()
+    let highlightVM        = HighlightFocusedViewModel()
     
     /// ==============================================================================
     /// Controllers
@@ -54,6 +56,10 @@ class AppCoordinator {
         self.windowLayoutService = appEnv.windowLayoutService
         self.tilingCoverCoordinator = TilingCoverCoordinator(
             tilingCoverVM: tilingCoverVM
+        )
+        self.highLightFocusedCoordinator = HighlightFocusedCoordinator(
+            windowCore: windowCore,
+            highlightVM: highlightVM
         )
         self.windowSpatialEngine = WindowSpatialEngine(
             windowCore: appEnv.windowCore,
@@ -186,30 +192,23 @@ class AppCoordinator {
             }
         )
         
-//        self.shouldStartDoubleModifier()
-//        observeModifierKey()
+        self.windowCore.highlightFocusedWindow = defaultsManager.highlightFocusedWindow
+        self.observeHighlightFocusedWindow()
     }
     
-//    internal func observeModifierKey() {
-//        withObservationTracking {
-//            _ = defaultsManager.modiferKey
-//        } onChange: {
-//            DispatchQueue.main.async { [weak self] in
-//                guard let self else { return }
-//                self.shouldStartDoubleModifier()
-//                self.observeModifierKey()
-//            }
-//        }
-//    }
-    
-//    /// Function handles what happens with the modifier key
-//    internal func shouldStartDoubleModifier() {
-//        let key = defaultsManager.modiferKey
-//        
-//        if key == .none {
-//            hotKeyCoordinator.stopModifier()
-//        } else {
-//            hotKeyCoordinator.startModifier(with: key)
-//        }
-//    }
+    internal func observeHighlightFocusedWindow() {
+        withObservationTracking {
+            _ = defaultsManager.highlightFocusedWindow
+        } onChange: {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                let new = defaultsManager.highlightFocusedWindow
+
+                if self.windowCore.highlightFocusedWindow != new {
+                    self.windowCore.highlightFocusedWindow = new
+                }
+                self.observeHighlightFocusedWindow()
+            }
+        }
+    }
 }

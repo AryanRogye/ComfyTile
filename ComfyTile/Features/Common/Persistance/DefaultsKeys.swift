@@ -12,4 +12,5 @@ extension Defaults.Keys {
     static let modiferKey = Key<String>("ModiferKey", default: "Control")
     static let showTilingAnimations = Key<Bool>("ShowTilingAnimations", default: false)
     static let comfyTileTabPlacement = Key<ComfyTileTabPlacement>("ComfyTileTabPlacement", default: .bottom)
+    static let highlightFocusedWindow = Key<Bool>("HighlightFocusedWindow", default: false)
 }

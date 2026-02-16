@@ -22,6 +22,7 @@ struct AppearanceSettings: View {
                         Text(tab.rawValue)
                     }
                 }
+                Toggle("Highlight focused window", isOn: $defaultsManager.highlightFocusedWindow)
             }
             Section("Animations") {
                 Toggle("Tiling Animations", isOn: $defaultsManager.showTilingAnimations).toggleStyle(.switch)

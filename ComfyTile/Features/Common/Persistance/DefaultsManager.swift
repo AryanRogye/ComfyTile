@@ -14,6 +14,11 @@ class DefaultsManager {
     var modiferKey: ModifierGroup = ModifierGroup(rawValue: Defaults[.modiferKey]) ?? .control
     
     
+    var highlightFocusedWindow: Bool = Defaults[.highlightFocusedWindow] {
+        didSet {
+            Defaults[.highlightFocusedWindow] = highlightFocusedWindow
+        }
+    }
     var showTilingAnimations: Bool = Defaults[.showTilingAnimations] {
         didSet {
             Defaults[.showTilingAnimations] = showTilingAnimations
