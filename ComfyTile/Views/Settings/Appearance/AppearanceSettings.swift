@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import KeyboardShortcuts
 
 struct AppearanceSettings: View {
     
@@ -24,6 +25,8 @@ struct AppearanceSettings: View {
             Section("Focused Window") {
                 Toggle("Highlight focused window", isOn: $defaultsManager.highlightFocusedWindow)
                 Toggle("Super Focus Window", isOn: $defaultsManager.superFocusWindow)
+                ShortcutRecorder(label: "Toggle Super Focus", type: .toggleSuperFocus)
+                    .padding(.horizontal, -16)
             }
             
             Section("Animations") {

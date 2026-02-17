@@ -25,6 +25,7 @@ public final class WindowCore {
     
     var bootTask : Task<Void, Never>?
     var pollingWindowDragging : Task<Void, Never>?
+    private var unAsyncLoadWindowTask: Task<Void, Never>?
     var loadWindowTask: Task<[ComfyWindow], Never>?
     var focusedWindowTask: Task<ComfyWindow, Never>?
     
@@ -66,10 +67,33 @@ public final class WindowCore {
                 else {
                     attachSubscriptionsOnAllWindows()
                 }
+
+                emitCurrentFocusedState()
                 
                 self.observeFocusedWindow()
             }
         }
+    }
+
+    private func currentHighlightConfig() -> [HighlightConfiguration] {
+        var config: [HighlightConfiguration] = []
+        if highlightFocusedWindow {
+            config.append(.border)
+        }
+        if superFocusWindow {
+            config.append(.superFocus)
+        }
+        return config
+    }
+
+    private func emitCurrentFocusedState() {
+        let config = currentHighlightConfig()
+        guard !config.isEmpty else {
+            onNewFrame?(nil, [])
+            return
+        }
+
+        onNewFrame?(getFocusedWindow(), config)
     }
     
     // MARK: - Helpers
@@ -107,15 +131,11 @@ extension WindowCore {
                 }
             }
             
-            guard let comfyWindow else { print("Couldnt Find Valid ComfyWindow"); return }
+            guard let comfyWindow else {
+                print("Couldnt Find Valid ComfyWindow"); return
+            }
             
-            var config : [HighlightConfiguration] = []
-            if highlightFocusedWindow {
-                config.append(.border)
-            }
-            if superFocusWindow {
-                config.append(.superFocus)
-            }
+            let config = currentHighlightConfig()
             onNewFrame?(comfyWindow, config)
             
 //            print("\(comfyWindow.windowTitle) [\(comfyWindow.app.localizedName, default: "[NIL]")]")
@@ -158,7 +178,7 @@ extension WindowCore {
     
     /// Main API For
     internal func attachSubscriptionIfNeeded(pid: pid_t, windowEl: AXUIElement?, windowID: CGWindowID?) {
-        guard highlightFocusedWindow else { return }
+        guard highlightFocusedWindow || superFocusWindow else { return }
         /// if we come in as a "false" on usedAppElement we can test to see if a true one exists
         if self.windowSubscriptions[pid] == nil {
             /// if we dont have a subscription stored
@@ -196,7 +216,12 @@ extension WindowCore {
 // MARK: - Main Loading Of Windows
 extension WindowCore {
     
-    /// Load Windows is used for Layouts + Window Switcher
+    public func unAsyncLoadWindows() {
+        unAsyncLoadWindowTask?.cancel()
+        unAsyncLoadWindowTask = Task {
+            await loadWindows()
+        }
+    }
     
     @discardableResult
     public func loadWindows() async -> [ComfyWindow] {

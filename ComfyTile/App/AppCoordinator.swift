@@ -49,7 +49,6 @@ class AppCoordinator {
     private var permissionService : PermissionService
 
     init(appEnv: AppEnv) {
-        
         self.permissionService = PermissionService()
         self.windowCore = appEnv.windowCore
         self.windowTilingService = appEnv.windowTilingService
@@ -94,6 +93,9 @@ class AppCoordinator {
     
     private func startHotKey() {
         hotKeyCoordinator.start(
+            onToggleSuperFocus: {
+                self.defaultsManager.superFocusWindow.toggle()
+            },
             // MARK: - Layout Hotkey
             onPrimaryLeftStackedHorizontallyTile: {
                 self.windowSpatialEngine.primaryLeftStackedHorizontallyTile()

@@ -19,41 +19,46 @@ enum HighlightConfiguration {
 final class HighlightFocusedViewModel {
     var isShown = false
     
-    var panel: NSPanel? {
-        didSet {
-            print("Did Set Panel: \(panel == nil ? "IS NIL" : "NOT NIL")")
-        }
-    }
     var currentFocused: ComfyWindow?
-    var highlightConfig: [HighlightConfiguration] = [] {
-        didSet {
-            print("Did Set Highlight Config: \(highlightConfig)")
-        }
-    }
+    var highlightConfig: [HighlightConfiguration] = []
     
     var onShow: ((ComfyWindow?) -> Void)?
     var onHide: (() -> Void)?
     
-    init() {
-        observeFocused()
+    var cornerRadius: CGFloat {
+        
+        /// Standard regular windows without a toolbar
+        let titlebarRadius : CGFloat = 16
+        
+        /// Windows with a compact toolbar
+        let comapctToolbarRadius : CGFloat = 20
+        
+        /// Unified Window Radius
+        let toolbarWindowRadius : CGFloat = 26
+        
+        guard let currentFocused else { return titlebarRadius }
+        guard let appName = currentFocused.app.localizedName?.lowercased() else { return titlebarRadius }
+        guard let bundleIdentifier = currentFocused.bundleIdentifier?.lowercased() else { return titlebarRadius }
+        
+        if bundleIdentifier.contains("com.apple") {
+            return toolbarWindowRadius
+        }
+        if bundleIdentifier.contains("com.jetbrains") {
+            return titlebarRadius
+        }
+        /// Zed Github says they use 16pt radius
+        if bundleIdentifier.contains("dev.zed") {
+            return titlebarRadius
+        }
+        if appName.contains("ghostty") {
+            return toolbarWindowRadius
+        }
+        
+        return comapctToolbarRadius
     }
     
-    /// Make sure we call THIS AFTER INIT AND ASSIGNING PANEL
-    public func observeConfig() {
-        withObservationTracking {
-            _ = highlightConfig
-        } onChange: {
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                
-                guard let panel else {
-                    print("Panel Not Set")
-                    return
-                }
-                
-                observeConfig()
-            }
-        }
+    init() {
+        observeFocused()
     }
     
     func observeFocused()  {
@@ -139,6 +144,7 @@ final class HighlightFocusedCoordinator: NSObject {
     
     @objc private func activeSpaceChanged() {
         guard let panel else { return }
+        self.windowCore.unAsyncLoadWindows()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
             guard let self else { return }
             let screen = WindowCore.screenUnderMouse() ?? NSScreen.main
@@ -205,9 +211,6 @@ final class HighlightFocusedCoordinator: NSObject {
         
         panel.contentView = view
         panel.orderFrontRegardless()
-        
-        highlightVM.panel = panel
-        highlightVM.observeConfig()
     }
     
     func show(window: ComfyWindow?) {
@@ -233,12 +236,17 @@ struct HighlightView: View {
     
     var body: some View {
         if highlightVM.highlightConfig.contains(.superFocus) {
-            VisualEffectView(material: .menu)
+//            VisualEffectView(material: .menu)
+            Rectangle()
+                .fill(.black)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .compositingGroup()
+                .drawingGroup()
+            
                 .mask {
                     Rectangle()
                         .overlay {
-                            RoundedRectangle(cornerRadius: 12)
+                            RoundedRectangle(cornerRadius: highlightVM.cornerRadius)
                                 .frame(width: highlightVM.displayFrame.width,
                                        height: highlightVM.displayFrame.height)
                                 .position(x: highlightVM.displayPos.x, y: highlightVM.displayPos.y)
@@ -267,7 +275,7 @@ struct HighlightRing: View {
         /// Just 1 padding so it can pop out a little bit
         .padding(1)
         .background {
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: highlightVM.cornerRadius)
                 .fill(.clear)
                 .stroke(color, lineWidth: 1.5)
         }

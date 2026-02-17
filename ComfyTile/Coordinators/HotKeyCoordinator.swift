@@ -18,6 +18,7 @@ extension KeyboardShortcuts.Name {
     static let NudgeTopUp = Self("NudgeTopUp")
     static let NudgeTopDown = Self("NudgeTopDown")
     static let windowViewer = Self("WindowViewer")
+    static let toggleSuperFocus = Self("Toggle Super Focus")
     static let windowViewerEscapeEarly = Self("WindowViewerEscapeEarly", default: Shortcut(
         .escape,
         modifiers: .option
@@ -50,6 +51,7 @@ final class HotKeyCoordinator {
     init() {}
     
     func start(
+        onToggleSuperFocus : @escaping() -> Void = {},
         onPrimaryLeftStackedHorizontallyTile : @escaping() -> Void = {},
         onPrimaryRightStackedHorizontallyTile: @escaping() -> Void = {},
         onPrimaryTile                        : @escaping() -> Void = {},
@@ -158,6 +160,10 @@ final class HotKeyCoordinator {
         // MARK: - Nudge Top Down
         KeyboardShortcuts.onKeyDown(for: .NudgeTopDown) {
             onNudgeTopDownDown()
+        }
+        
+        KeyboardShortcuts.onKeyDown(for: .toggleSuperFocus) {
+            onToggleSuperFocus()
         }
     }
 }
