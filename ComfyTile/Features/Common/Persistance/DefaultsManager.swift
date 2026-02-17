@@ -7,6 +7,7 @@
 
 import Defaults
 import Foundation
+import SwiftUI
 
 @Observable @MainActor
 class DefaultsManager {
@@ -20,9 +21,26 @@ class DefaultsManager {
         }
     }
     
+    var highlightFocusedWindowColor: Color = Defaults[.highlightFocusedWindowColor] {
+        didSet {
+            Defaults[.highlightFocusedWindowColor] = highlightFocusedWindowColor
+        }
+    }
+    
+    var highlightedFocusedWindowWidth : Double = Defaults[.highlightedFocusedWindowWidth] {
+        didSet {
+           Defaults[.highlightedFocusedWindowWidth]  = highlightedFocusedWindowWidth
+        }
+    }
+    
     var superFocusWindow: Bool = Defaults[.superFocusWindow] {
         didSet {
             Defaults[.superFocusWindow] = superFocusWindow
+        }
+    }
+    var superFocusColor: Color = Defaults[.superFocusColor] {
+        didSet {
+            Defaults[.superFocusColor] = superFocusColor
         }
     }
     

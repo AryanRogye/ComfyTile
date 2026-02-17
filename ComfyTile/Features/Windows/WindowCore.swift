@@ -92,7 +92,6 @@ public final class WindowCore {
             onNewFrame?(nil, [])
             return
         }
-
         onNewFrame?(getFocusedWindow(), config)
     }
     
@@ -134,9 +133,7 @@ extension WindowCore {
             guard let comfyWindow else {
                 print("Couldnt Find Valid ComfyWindow"); return
             }
-            
-            let config = currentHighlightConfig()
-            onNewFrame?(comfyWindow, config)
+            onNewFrame?(comfyWindow, currentHighlightConfig())
             
 //            print("\(comfyWindow.windowTitle) [\(comfyWindow.app.localizedName, default: "[NIL]")]")
 //            if notif as String == kAXFocusedUIElementChangedNotification as String {

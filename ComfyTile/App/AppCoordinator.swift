@@ -58,7 +58,8 @@ class AppCoordinator {
         )
         self.highLightFocusedCoordinator = HighlightFocusedCoordinator(
             windowCore: windowCore,
-            highlightVM: highlightVM
+            highlightVM: highlightVM,
+            defaultsManager: defaultsManager
         )
         self.windowSpatialEngine = WindowSpatialEngine(
             windowCore: appEnv.windowCore,

@@ -51,7 +51,7 @@ final class HighlightFocusedViewModel {
             return titlebarRadius
         }
         if appName.contains("ghostty") {
-            return toolbarWindowRadius
+            return comapctToolbarRadius
         }
         
         return comapctToolbarRadius
@@ -114,10 +114,12 @@ final class HighlightFocusedCoordinator: NSObject {
     var panel      : NSPanel!
     var windowCore : WindowCore
     var highlightVM : HighlightFocusedViewModel
+    var defaultsManager: DefaultsManager
     
-    init(windowCore: WindowCore, highlightVM: HighlightFocusedViewModel) {
+    init(windowCore: WindowCore, highlightVM: HighlightFocusedViewModel, defaultsManager: DefaultsManager) {
         self.windowCore = windowCore
         self.highlightVM = highlightVM
+        self.defaultsManager = defaultsManager
         
         super.init()
         
@@ -203,7 +205,8 @@ final class HighlightFocusedCoordinator: NSObject {
         
         let view: NSView = NSHostingView(
             rootView: HighlightView(
-                highlightVM: highlightVM
+                highlightVM: highlightVM,
+                defaultsManager: defaultsManager
             )
         )
         view.wantsLayer = true
@@ -232,13 +235,15 @@ final class HighlightFocusedCoordinator: NSObject {
 }
 
 struct HighlightView: View {
+    
     @Bindable var highlightVM: HighlightFocusedViewModel
+    @Bindable var defaultsManager: DefaultsManager
     
     var body: some View {
         if highlightVM.highlightConfig.contains(.superFocus) {
 //            VisualEffectView(material: .menu)
             Rectangle()
-                .fill(.black)
+                .fill(defaultsManager.superFocusColor)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .compositingGroup()
                 .drawingGroup()
@@ -258,7 +263,11 @@ struct HighlightView: View {
                     HighlightRing(highlightVM: highlightVM, color: .white)
                 }
         } else {
-            HighlightRing(highlightVM: highlightVM)
+            HighlightRing(
+                highlightVM: highlightVM,
+                color: defaultsManager.highlightFocusedWindowColor,
+                lineWidth: defaultsManager.highlightedFocusedWindowWidth
+            )
         }
     }
 }
@@ -267,6 +276,7 @@ struct HighlightRing: View {
     
     @Bindable var highlightVM: HighlightFocusedViewModel
     var color: Color = .yellow
+    var lineWidth: CGFloat = 1.5
     
     var body: some View {
         VStack {
@@ -277,7 +287,7 @@ struct HighlightRing: View {
         .background {
             RoundedRectangle(cornerRadius: highlightVM.cornerRadius)
                 .fill(.clear)
-                .stroke(color, lineWidth: 1.5)
+                .stroke(color, lineWidth: lineWidth)
         }
         .position(x: highlightVM.displayPos.x, y: highlightVM.displayPos.y)
     }
