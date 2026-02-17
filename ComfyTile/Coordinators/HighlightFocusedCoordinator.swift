@@ -161,6 +161,21 @@ struct HighlightView: View {
         highlightVM.currentFocused?.element.frame ?? .zero
     }
     
+    var position: CGPoint {
+        
+        guard let screen = WindowCore.screenUnderMouse() else {
+            return .zero
+        }
+        
+        let axPos = frame.axPosition(on: screen)
+        
+        // Shift from the top-left corner to the center of the frame
+        return CGPoint(
+            x: axPos.x + (frame.width / 2),
+            y: axPos.y + (frame.height / 2)
+        )
+    }
+    
     var body: some View {
         VStack {
             Text("This is Focused")
@@ -168,6 +183,7 @@ struct HighlightView: View {
         .frame(width: frame.width, height: frame.height)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .opacity(0.5)
+        .position(x: position.x, y: position.y)
+        .ignoresSafeArea()
     }
 }
-
