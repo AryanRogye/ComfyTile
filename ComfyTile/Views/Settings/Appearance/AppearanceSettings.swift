@@ -13,19 +13,22 @@ struct AppearanceSettings: View {
     
     var body: some View {
         Form {
-            Section("Appearance") {
-                Picker("Tab Bar Position", selection: $defaultsManager.comfyTileTabPlacement) {
-                    ForEach(
-                        ComfyTileTabPlacement.allCases,
-                        id: \.self
-                    ) { tab in
+            Section("Tab Bar") {
+                Picker("Position", selection: $defaultsManager.comfyTileTabPlacement) {
+                    ForEach(ComfyTileTabPlacement.allCases, id: \.self) { tab in
                         Text(tab.rawValue)
                     }
                 }
-                Toggle("Highlight focused window", isOn: $defaultsManager.highlightFocusedWindow)
             }
+            
+            Section("Focused Window") {
+                Toggle("Highlight focused window", isOn: $defaultsManager.highlightFocusedWindow)
+                Toggle("Super Focus Window", isOn: $defaultsManager.superFocusWindow)
+            }
+            
             Section("Animations") {
-                Toggle("Tiling Animations", isOn: $defaultsManager.showTilingAnimations).toggleStyle(.switch)
+                Toggle("Tiling animations", isOn: $defaultsManager.showTilingAnimations)
+                    .toggleStyle(.switch)
             }
         }
         .formStyle(.grouped)

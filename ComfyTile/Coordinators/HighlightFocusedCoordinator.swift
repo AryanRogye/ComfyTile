@@ -8,17 +8,52 @@
 import SwiftUI
 import AppKit
 
+
+enum HighlightConfiguration {
+    case superFocus
+    case border
+}
+
 @Observable
 @MainActor
 final class HighlightFocusedViewModel {
     var isShown = false
+    
+    var panel: NSPanel? {
+        didSet {
+            print("Did Set Panel: \(panel == nil ? "IS NIL" : "NOT NIL")")
+        }
+    }
     var currentFocused: ComfyWindow?
+    var highlightConfig: [HighlightConfiguration] = [] {
+        didSet {
+            print("Did Set Highlight Config: \(highlightConfig)")
+        }
+    }
     
     var onShow: ((ComfyWindow?) -> Void)?
     var onHide: (() -> Void)?
     
     init() {
         observeFocused()
+    }
+    
+    /// Make sure we call THIS AFTER INIT AND ASSIGNING PANEL
+    public func observeConfig() {
+        withObservationTracking {
+            _ = highlightConfig
+        } onChange: {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                
+                guard let panel else {
+                    print("Panel Not Set")
+                    return
+                }
+                
+                observeConfig()
+            }
+        }
     }
     
     func observeFocused()  {
@@ -34,7 +69,37 @@ final class HighlightFocusedViewModel {
                 }
                 
                 self.observeFocused()
+                syncHighlight()
             }
+        }
+    }
+    
+    var displayFrame: CGRect = .zero
+    var displayPos: CGPoint = .zero
+    
+    func computePos(from frame: CGRect) -> CGPoint {
+        guard let screen = WindowCore.screenUnderMouse(),
+              let desktopTopY = NSScreen.screens.map(\.frame.maxY).max() else {
+            return .zero
+        }
+        
+        let panelLocalX = frame.origin.x - screen.frame.minX
+        let screenTopAX = desktopTopY - screen.frame.maxY
+        let panelLocalY = frame.origin.y - screenTopAX
+        
+        return CGPoint(
+            x: panelLocalX + (frame.width / 2),
+            y: panelLocalY + (frame.height / 2)
+        )
+    }
+    
+    func syncHighlight() {
+        let newFrame = currentFocused?.element.frame ?? .zero
+        let newPos = computePos(from: newFrame) // your math, returns center-point
+        
+        withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
+            displayFrame = newFrame
+            displayPos = newPos
         }
     }
 }
@@ -49,13 +114,14 @@ final class HighlightFocusedCoordinator: NSObject {
         self.windowCore = windowCore
         self.highlightVM = highlightVM
         
-        
-        windowCore.onNewFrame = { win in
-            highlightVM.currentFocused = win
-        }
-        
         super.init()
         
+        windowCore.onNewFrame = { [weak self] win, highlightConfig in
+            guard let self else { return }
+            self.highlightVM.currentFocused = win
+            self.highlightVM.highlightConfig = highlightConfig
+        }
+
         highlightVM.onShow = { window in
             self.show(window: window)
         }
@@ -79,8 +145,12 @@ final class HighlightFocusedCoordinator: NSObject {
             if let screen {
                 panel.setFrame(screen.frame, display: true)
             }
+            /// This works really well
             if self.highlightVM.isShown {
-                panel.orderFrontRegardless()
+                hide()
+                if let comfyWindow = highlightVM.currentFocused {
+                    self.show(window: comfyWindow)
+                }
             }
         }
     }
@@ -100,8 +170,15 @@ final class HighlightFocusedCoordinator: NSObject {
         panel.contentView?.wantsLayer = true
         panel.acceptsMouseMovedEvents = true
         
-        let overlayRaw = CGWindowLevelForKey(.overlayWindow)
-        panel.level = NSWindow.Level(rawValue: Int(overlayRaw))
+        let normalRaw = CGWindowLevelForKey(.normalWindow)
+//        if windowCore.superFocusWindow {
+//            print("Config Contains Super Focus - Settings Panel to one level below normal")
+            panel.level = NSWindow.Level(rawValue: Int(normalRaw))
+//        } else {
+//            print("Config Does not Contain Super Focus - Settings Panel to one level below normal")
+//            panel.level = NSWindow.Level(rawValue: Int(normalRaw) - 1)
+//        }
+        
         panel.collectionBehavior = [
             .canJoinAllSpaces,
             .fullScreenAuxiliary,
@@ -128,6 +205,9 @@ final class HighlightFocusedCoordinator: NSObject {
         
         panel.contentView = view
         panel.orderFrontRegardless()
+        
+        highlightVM.panel = panel
+        highlightVM.observeConfig()
     }
     
     func show(window: ComfyWindow?) {
@@ -140,50 +220,75 @@ final class HighlightFocusedCoordinator: NSObject {
         
         highlightVM.isShown = true
         panel.orderFrontRegardless()
-        let appName = window?.app.localizedName ?? "[NIL]"
-        print("Showing Highlight: \(appName)")
-        print("Panel Position: \(panel.frame)")
-        print("Done \(appName)")
     }
     
     public func hide() {
         panel?.orderOut(nil)
         highlightVM.isShown = false
-        print("is Hiding Highlight")
     }
 }
 
 struct HighlightView: View {
-    
     @Bindable var highlightVM: HighlightFocusedViewModel
     
-    var frame: CGRect {
-        highlightVM.currentFocused?.element.frame ?? .zero
-    }
-    
-    var position: CGPoint {
-        
-        guard let screen = WindowCore.screenUnderMouse() else {
-            return .zero
+    var body: some View {
+        if highlightVM.highlightConfig.contains(.superFocus) {
+            VisualEffectView(material: .menu)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .mask {
+                    Rectangle()
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12)
+                                .frame(width: highlightVM.displayFrame.width,
+                                       height: highlightVM.displayFrame.height)
+                                .position(x: highlightVM.displayPos.x, y: highlightVM.displayPos.y)
+                                .blendMode(.destinationOut)
+                        }
+                        .compositingGroup()
+                }
+                .overlay {
+                    HighlightRing(highlightVM: highlightVM, color: .white)
+                }
+        } else {
+            HighlightRing(highlightVM: highlightVM)
         }
-        
-        let axPos = frame.axPosition(on: screen)
-        
-        // Shift from the top-left corner to the center of the frame
-        return CGPoint(
-            x: axPos.x + (frame.width / 2),
-            y: axPos.y + (frame.height / 2)
-        )
     }
+}
+
+struct HighlightRing: View {
+    
+    @Bindable var highlightVM: HighlightFocusedViewModel
+    var color: Color = .yellow
     
     var body: some View {
         VStack {
-            Text("This is Focused")
         }
-        .frame(width: frame.width, height: frame.height)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-        .opacity(0.5)
-        .position(x: position.x, y: position.y)
-        .ignoresSafeArea()
+        .frame(width: highlightVM.displayFrame.width, height: highlightVM.displayFrame.height)
+        /// Just 1 padding so it can pop out a little bit
+        .padding(1)
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.clear)
+                .stroke(color, lineWidth: 1.5)
+        }
+        .position(x: highlightVM.displayPos.x, y: highlightVM.displayPos.y)
     }
+}
+
+
+struct VisualEffectView: NSViewRepresentable {
+    var material: NSVisualEffectView.Material = .sidebar
+    var blendingMode: NSVisualEffectView.BlendingMode = .behindWindow
+    
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.material = material
+        view.blendingMode = blendingMode
+        view.state = .active
+        view.wantsLayer = true
+        view.layer?.masksToBounds = true
+        return view
+    }
+    
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
 }

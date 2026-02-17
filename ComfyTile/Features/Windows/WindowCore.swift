@@ -27,7 +27,9 @@ public final class WindowCore {
     var pollingWindowDragging : Task<Void, Never>?
     var loadWindowTask: Task<[ComfyWindow], Never>?
     var focusedWindowTask: Task<ComfyWindow, Never>?
+    
     var highlightFocusedWindow: Bool = false
+    var superFocusWindow: Bool = false
     
     @ObservationIgnored static let ignore_list = [
         "com.aryanrogye.ComfyTile"
@@ -36,31 +38,36 @@ public final class WindowCore {
     @ObservationIgnored
     public var windowSubscriptions: [pid_t: AXSubscription] = [:]
 
-    var onNewFrame: ((ComfyWindow?) -> Void)?
+    var onNewFrame: ((ComfyWindow?, [HighlightConfiguration]) -> Void)?
 
     public init() {
         bootTask = Task { [weak self] in
             guard let self else { return }
             await self.loadWindows()
-            observeHighlightFocusedWindow()
+            observeFocusedWindow()
         }
     }
     
-    internal func observeHighlightFocusedWindow() {
+    internal func observeFocusedWindow() {
         withObservationTracking {
-            _ = highlightFocusedWindow
+            _ = highlightFocusedWindow;
+            _ = superFocusWindow
         } onChange: {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 
-                /// Clear out All Subscriptions
-                if !highlightFocusedWindow {
+                let isHighlightFocusWindow = self.highlightFocusedWindow
+                let isSuperFocusWindow = self.superFocusWindow
+                
+                if !isHighlightFocusWindow && !isSuperFocusWindow {
                     clearSubscriptions()
-                } else {
+                }
+                /// Else falls through if at least 1 is true
+                else {
                     attachSubscriptionsOnAllWindows()
                 }
                 
-                self.observeHighlightFocusedWindow()
+                self.observeFocusedWindow()
             }
         }
     }
@@ -102,7 +109,14 @@ extension WindowCore {
             
             guard let comfyWindow else { print("Couldnt Find Valid ComfyWindow"); return }
             
-            onNewFrame?(comfyWindow)
+            var config : [HighlightConfiguration] = []
+            if highlightFocusedWindow {
+                config.append(.border)
+            }
+            if superFocusWindow {
+                config.append(.superFocus)
+            }
+            onNewFrame?(comfyWindow, config)
             
 //            print("\(comfyWindow.windowTitle) [\(comfyWindow.app.localizedName, default: "[NIL]")]")
 //            if notif as String == kAXFocusedUIElementChangedNotification as String {
@@ -145,7 +159,6 @@ extension WindowCore {
     /// Main API For
     internal func attachSubscriptionIfNeeded(pid: pid_t, windowEl: AXUIElement?, windowID: CGWindowID?) {
         guard highlightFocusedWindow else { return }
-        print("Assigning Subscription For PID: \(pid)")
         /// if we come in as a "false" on usedAppElement we can test to see if a true one exists
         if self.windowSubscriptions[pid] == nil {
             /// if we dont have a subscription stored

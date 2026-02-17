@@ -193,21 +193,29 @@ class AppCoordinator {
         )
         
         self.windowCore.highlightFocusedWindow = defaultsManager.highlightFocusedWindow
-        self.observeHighlightFocusedWindow()
+        self.windowCore.superFocusWindow = defaultsManager.superFocusWindow
+        self.observeFocusedWindow()
     }
     
-    internal func observeHighlightFocusedWindow() {
+    internal func observeFocusedWindow() {
         withObservationTracking {
-            _ = defaultsManager.highlightFocusedWindow
+            _ = defaultsManager.highlightFocusedWindow;
+            _ = defaultsManager.superFocusWindow
         } onChange: {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                let new = defaultsManager.highlightFocusedWindow
-
-                if self.windowCore.highlightFocusedWindow != new {
-                    self.windowCore.highlightFocusedWindow = new
+                let newHighlight = defaultsManager.highlightFocusedWindow
+                let newSuperFocus = defaultsManager.superFocusWindow
+                
+                if self.windowCore.highlightFocusedWindow != newHighlight {
+                    self.windowCore.highlightFocusedWindow = newHighlight
                 }
-                self.observeHighlightFocusedWindow()
+                
+                if self.windowCore.superFocusWindow != newSuperFocus {
+                    self.windowCore.superFocusWindow = newSuperFocus
+                }
+                
+                self.observeFocusedWindow()
             }
         }
     }

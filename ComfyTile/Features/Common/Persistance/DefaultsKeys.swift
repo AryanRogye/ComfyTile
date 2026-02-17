@@ -13,4 +13,5 @@ extension Defaults.Keys {
     static let showTilingAnimations = Key<Bool>("ShowTilingAnimations", default: false)
     static let comfyTileTabPlacement = Key<ComfyTileTabPlacement>("ComfyTileTabPlacement", default: .bottom)
     static let highlightFocusedWindow = Key<Bool>("HighlightFocusedWindow", default: false)
+    static let superFocusWindow = Key<Bool>("SuperFocusWindow", default: false)
 }

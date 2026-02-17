@@ -19,6 +19,13 @@ class DefaultsManager {
             Defaults[.highlightFocusedWindow] = highlightFocusedWindow
         }
     }
+    
+    var superFocusWindow: Bool = Defaults[.superFocusWindow] {
+        didSet {
+            Defaults[.superFocusWindow] = superFocusWindow
+        }
+    }
+    
     var showTilingAnimations: Bool = Defaults[.showTilingAnimations] {
         didSet {
             Defaults[.showTilingAnimations] = showTilingAnimations
