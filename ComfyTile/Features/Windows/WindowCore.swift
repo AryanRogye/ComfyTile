@@ -228,11 +228,11 @@ extension WindowCore {
 
 // MARK: - Main Loading Of Windows
 extension WindowCore {
-    
-    public func unAsyncLoadWindows() {
+    public func unAsyncLoadWindows(completion: @escaping () -> Void) {
         unAsyncLoadWindowTask?.cancel()
         unAsyncLoadWindowTask = Task {
             await loadWindows()
+            completion()
         }
     }
     

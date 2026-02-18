@@ -26,6 +26,9 @@ final class HighlightFocusedViewModel {
     var onShow: ((ComfyWindow?) -> Void)?
     var onHide: (() -> Void)?
     
+    @ObservationIgnored @MainActor
+    var highLightTask: Task<Void, Never>?
+    
     var cornerRadius: CGFloat {
         
         /// Standard regular windows without a toolbar
@@ -126,17 +129,29 @@ final class HighlightFocusedViewModel {
     }
     
     func syncHighlight() {
-        let newFrame = currentFocused?.element.frame ?? .zero
-        let newPos = computePos(from: newFrame) // your math, returns center-point
-        
-        if newFrame == .zero {
-            displayFrame = newFrame
-            displayPos = newPos
-        } else {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
+        /// Throttling highlight requests to make sure no weird glitchy things happen
+        highLightTask?.cancel()
+        highLightTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            try? await Task.sleep(nanoseconds: UInt64(0.1 * 1_000_000_000))
+            
+            guard !Task.isCancelled else { return }
+            
+            let newFrame = currentFocused?.element.frame ?? .zero
+            let newPos = computePos(from: newFrame)
+            
+            guard !Task.isCancelled else { return }
+
+            if newFrame == .zero {
                 displayFrame = newFrame
                 displayPos = newPos
+            } else {
+                withAnimation(.smooth) {
+                    self.displayFrame = newFrame
+                    self.displayPos = newPos
+                }
             }
+            highLightTask = nil
         }
     }
 }
@@ -176,13 +191,35 @@ final class HighlightFocusedCoordinator: NSObject {
             name: NSWorkspace.activeSpaceDidChangeNotification,
             object: nil
         )
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(loadWindowsThenShowIfNeeded),
+            name: NSWorkspace.didLaunchApplicationNotification,
+            object: nil
+        )
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(loadWindowsThenShowIfNeeded),
+            name: NSWorkspace.willLaunchApplicationNotification,
+            object: nil
+        )
+    }
+    
+    @objc func loadWindowsThenShowIfNeeded() {
+        windowCore.unAsyncLoadWindows { [weak self] in
+                guard let self else { return }
+                if highlightVM.isShown {
+                    if let foc = windowCore.getFocusedWindow() {
+                        foc.focusWindow()
+                    }
+                }
+        }
     }
     
     @objc
     private func activeSpaceChanged() {
         guard let panel else { return }
-        self.windowCore.unAsyncLoadWindows()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+        self.windowCore.unAsyncLoadWindows { [weak self] in
             guard let self else { return }
             
             let screen =
@@ -219,7 +256,7 @@ final class HighlightFocusedCoordinator: NSObject {
         panel.acceptsMouseMovedEvents = true
         
         let normalRaw = CGWindowLevelForKey(.normalWindow)
-        panel.level = NSWindow.Level(rawValue: Int(normalRaw))
+        panel.level = NSWindow.Level(rawValue: Int(normalRaw) + 1)
         
         panel.collectionBehavior = [
             .canJoinAllSpaces,
@@ -270,7 +307,7 @@ final class HighlightFocusedCoordinator: NSObject {
         hideTask?.cancel()
         hideTask = Task { @MainActor [weak self] in
             guard let self else { return }
-            try? await Task.sleep(nanoseconds: UInt64(1.0 * 1_000_000_000))
+            try? await Task.sleep(nanoseconds: UInt64(1.5 * 1_000_000_000))
             guard !Task.isCancelled else {
                 return
             }
@@ -283,32 +320,20 @@ final class HighlightFocusedCoordinator: NSObject {
 }
 
 struct HighlightView: View {
-    
     @Bindable var highlightVM: HighlightFocusedViewModel
     @Bindable var defaultsManager: DefaultsManager
     
     var body: some View {
         if highlightVM.highlightConfig.contains(.superFocus) {
-            Rectangle()
-                .fill(defaultsManager.superFocusColor)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .compositingGroup()
-                .drawingGroup()
-            
-                .mask {
-                    Rectangle()
-                        .overlay {
-                            RoundedRectangle(cornerRadius: highlightVM.cornerRadius)
-                                .frame(width: highlightVM.displayFrame.width,
-                                       height: highlightVM.displayFrame.height)
-                                .position(x: highlightVM.displayPos.x, y: highlightVM.displayPos.y)
-                                .blendMode(.destinationOut)
-                        }
-                        .compositingGroup()
-                }
-                .overlay {
-                    HighlightRing(highlightVM: highlightVM, color: .white)
-                }
+            FocusCutoutShape(
+                size: highlightVM.displayFrame.size,
+                center: highlightVM.displayPos,
+                cornerRadius: highlightVM.cornerRadius
+            )
+            .fill(defaultsManager.superFocusColor, style: FillStyle(eoFill: true))
+            .overlay {
+                HighlightRing(highlightVM: highlightVM, color: .white)
+            }
         } else {
             HighlightRing(
                 highlightVM: highlightVM,
@@ -326,16 +351,42 @@ struct HighlightRing: View {
     var lineWidth: CGFloat = 1.5
     
     var body: some View {
-        VStack {
+        RoundedRectangle(cornerRadius: highlightVM.cornerRadius)
+            .stroke(color, lineWidth: lineWidth)
+            .frame(width: highlightVM.displayFrame.width, height: highlightVM.displayFrame.height)
+            .position(x: highlightVM.displayPos.x, y: highlightVM.displayPos.y)
+    }
+}
+
+
+struct FocusCutoutShape: Shape {
+    var size: CGSize
+    var center: CGPoint
+    var cornerRadius: CGFloat
+    
+    // This tells SwiftUI exactly how to interpolate the shape during a .spring animation
+    var animatableData: AnimatablePair<CGSize.AnimatableData, CGPoint.AnimatableData> {
+        get { AnimatablePair(size.animatableData, center.animatableData) }
+        set {
+            size.animatableData = newValue.first
+            center.animatableData = newValue.second
         }
-        .frame(width: highlightVM.displayFrame.width, height: highlightVM.displayFrame.height)
-        /// Just 1 padding so it can pop out a little bit
-        .padding(1)
-        .background {
-            RoundedRectangle(cornerRadius: highlightVM.cornerRadius)
-                .fill(.clear)
-                .stroke(color, lineWidth: lineWidth)
-        }
-        .position(x: highlightVM.displayPos.x, y: highlightVM.displayPos.y)
+    }
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path(rect) // The full screen outer bounds
+        
+        // Calculate the hole
+        let cutoutRect = CGRect(
+            x: center.x - size.width / 2,
+            y: center.y - size.height / 2,
+            width: size.width,
+            height: size.height
+        )
+        
+        // Adding a shape inside another shape creates a hole when using eoFill
+        path.addRoundedRect(in: cutoutRect, cornerSize: CGSize(width: cornerRadius, height: cornerRadius), style: .continuous)
+        
+        return path
     }
 }
