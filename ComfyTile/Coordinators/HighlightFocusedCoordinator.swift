@@ -98,7 +98,7 @@ final class HighlightFocusedViewModel {
                 
                 if let _ = currentFocused, !isFullScreen {
                     onShow?(currentFocused)
-                    syncHighlight()
+                    syncHighlightThrottling()
                 } else {
                     onHide?()
                 }
@@ -129,6 +129,22 @@ final class HighlightFocusedViewModel {
     }
     
     func syncHighlight() {
+        let newFrame = currentFocused?.element.frame ?? .zero
+        let newPos = computePos(from: newFrame)
+        
+        guard !Task.isCancelled else { return }
+        
+        if newFrame == .zero {
+            displayFrame = newFrame
+            displayPos = newPos
+        } else {
+            withAnimation(.smooth) {
+                self.displayFrame = newFrame
+                self.displayPos = newPos
+            }
+        }
+    }
+    func syncHighlightThrottling() {
         /// Throttling highlight requests to make sure no weird glitchy things happen
         highLightTask?.cancel()
         highLightTask = Task { @MainActor [weak self] in

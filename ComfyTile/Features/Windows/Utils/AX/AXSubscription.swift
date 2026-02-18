@@ -54,8 +54,10 @@ public final class AXSubscription {
     }
     
     func watchWindow(_ windowEl: AXUIElement, windowID: CGWindowID) {
+        // App-level kAXWindowMoved/kAXWindowResized notifications from watchApp()
+        // are the primary source for per-window geometry updates across this PID.
+        // Keep a single window-level hook here to avoid duplicate moved/resized events.
         guard !isWatchingWindow else { return }
-        // only dedupe the window-level stuff by windowID
         guard watchingWindows.insert(windowID).inserted else { return }
         
         let ctx = Unmanaged.passUnretained(self).toOpaque()
