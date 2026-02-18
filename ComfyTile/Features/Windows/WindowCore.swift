@@ -39,7 +39,8 @@ public final class WindowCore {
     @ObservationIgnored
     public var windowSubscriptions: [pid_t: AXSubscription] = [:]
 
-    var onNewFrame: ((ComfyWindow?, [HighlightConfiguration]) -> Void)?
+    var onNewFrame: ((ComfyWindow?, [HighlightConfiguration], Bool) -> Void)?
+    var fullScreenDetection: ((Bool) -> Void)?
 
     public init() {
         bootTask = Task { [weak self] in
@@ -85,14 +86,28 @@ public final class WindowCore {
         }
         return config
     }
+    
+    private func isFullScreen(on window: ComfyWindow?) -> Bool {
+        if let element = window?.element.element {
+            var value: CFTypeRef?
+            AXUIElementCopyAttributeValue(element,
+                                          kAXFullscreenAttribute as CFString,
+                                          &value)
+            if let bool = value as? Bool {
+                return bool
+            }
+        }
+        return false
+    }
 
     private func emitCurrentFocusedState() {
         let config = currentHighlightConfig()
         guard !config.isEmpty else {
-            onNewFrame?(nil, [])
+            onNewFrame?(nil, [], false)
             return
         }
-        onNewFrame?(getFocusedWindow(), config)
+        let win = getFocusedWindow()
+        onNewFrame?(win, config, isFullScreen(on: win))
     }
     
     // MARK: - Helpers
@@ -133,7 +148,8 @@ extension WindowCore {
             guard let comfyWindow else {
                 print("Couldnt Find Valid ComfyWindow"); return
             }
-            onNewFrame?(comfyWindow, currentHighlightConfig())
+            
+            onNewFrame?(comfyWindow, currentHighlightConfig(), isFullScreen(on: comfyWindow))
             
 //            print("\(comfyWindow.windowTitle) [\(comfyWindow.app.localizedName, default: "[NIL]")]")
 //            if notif as String == kAXFocusedUIElementChangedNotification as String {

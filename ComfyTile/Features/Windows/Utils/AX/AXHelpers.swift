@@ -115,3 +115,5 @@ enum AxError: Error {
 }
 
 typealias AXUIElementID = UInt64
+
+let kAXFullscreenAttribute = "AXFullScreen"

@@ -21,6 +21,7 @@ final class HighlightFocusedViewModel {
     
     var currentFocused: ComfyWindow?
     var highlightConfig: [HighlightConfiguration] = []
+    var isFullScreen: Bool = false
     
     var onShow: ((ComfyWindow?) -> Void)?
     var onHide: (() -> Void)?
@@ -59,22 +60,47 @@ final class HighlightFocusedViewModel {
     
     init() {
         observeFocused()
+        observeFullScreen()
+    }
+    
+    func observeFullScreen() {
+        withObservationTracking {
+            _ = isFullScreen
+        } onChange: {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                print("IS FULLSCREEN: \(isFullScreen)")
+
+                if isFullScreen {
+                    onHide?()
+                } else {
+                    if let _ = currentFocused {
+                        onShow?(currentFocused)
+                    } else {
+                        onHide?()
+                    }
+                }
+                
+                observeFullScreen()
+            }
+        }
     }
     
     func observeFocused()  {
         withObservationTracking {
-            _ = currentFocused
+            _ = currentFocused;
         } onChange: {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                if let _ = currentFocused {
+                
+                if let _ = currentFocused, !isFullScreen {
                     onShow?(currentFocused)
+                    syncHighlight()
                 } else {
                     onHide?()
                 }
                 
                 self.observeFocused()
-                syncHighlight()
             }
         }
     }
@@ -83,7 +109,8 @@ final class HighlightFocusedViewModel {
     var displayPos: CGPoint = .zero
     
     func computePos(from frame: CGRect) -> CGPoint {
-        guard let screen = WindowCore.screenUnderMouse(),
+        
+        guard let screen = currentFocused?.screen ?? WindowCore.screenUnderMouse(),
               let desktopTopY = NSScreen.screens.map(\.frame.maxY).max() else {
             return .zero
         }
@@ -102,9 +129,14 @@ final class HighlightFocusedViewModel {
         let newFrame = currentFocused?.element.frame ?? .zero
         let newPos = computePos(from: newFrame) // your math, returns center-point
         
-        withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
+        if newFrame == .zero {
             displayFrame = newFrame
             displayPos = newPos
+        } else {
+            withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
+                displayFrame = newFrame
+                displayPos = newPos
+            }
         }
     }
 }
@@ -116,6 +148,8 @@ final class HighlightFocusedCoordinator: NSObject {
     var highlightVM : HighlightFocusedViewModel
     var defaultsManager: DefaultsManager
     
+    @MainActor var hideTask: Task<Void, Never>?
+
     init(windowCore: WindowCore, highlightVM: HighlightFocusedViewModel, defaultsManager: DefaultsManager) {
         self.windowCore = windowCore
         self.highlightVM = highlightVM
@@ -123,10 +157,11 @@ final class HighlightFocusedCoordinator: NSObject {
         
         super.init()
         
-        windowCore.onNewFrame = { [weak self] win, highlightConfig in
+        windowCore.onNewFrame = { [weak self] win, highlightConfig, isFullScreen in
             guard let self else { return }
             self.highlightVM.currentFocused = win
             self.highlightVM.highlightConfig = highlightConfig
+            self.highlightVM.isFullScreen = isFullScreen
         }
 
         highlightVM.onShow = { window in
@@ -135,7 +170,6 @@ final class HighlightFocusedCoordinator: NSObject {
         highlightVM.onHide = {
             self.hide()
         }
-        
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
             selector: #selector(activeSpaceChanged),
@@ -144,12 +178,18 @@ final class HighlightFocusedCoordinator: NSObject {
         )
     }
     
-    @objc private func activeSpaceChanged() {
+    @objc
+    private func activeSpaceChanged() {
         guard let panel else { return }
         self.windowCore.unAsyncLoadWindows()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
             guard let self else { return }
-            let screen = WindowCore.screenUnderMouse() ?? NSScreen.main
+            
+            let screen =
+            highlightVM.currentFocused?.screen
+            ?? WindowCore.screenUnderMouse()
+            ?? NSScreen.main
+            
             if let screen {
                 panel.setFrame(screen.frame, display: true)
             }
@@ -179,13 +219,7 @@ final class HighlightFocusedCoordinator: NSObject {
         panel.acceptsMouseMovedEvents = true
         
         let normalRaw = CGWindowLevelForKey(.normalWindow)
-//        if windowCore.superFocusWindow {
-//            print("Config Contains Super Focus - Settings Panel to one level below normal")
-            panel.level = NSWindow.Level(rawValue: Int(normalRaw))
-//        } else {
-//            print("Config Does not Contain Super Focus - Settings Panel to one level below normal")
-//            panel.level = NSWindow.Level(rawValue: Int(normalRaw) - 1)
-//        }
+        panel.level = NSWindow.Level(rawValue: Int(normalRaw))
         
         panel.collectionBehavior = [
             .canJoinAllSpaces,
@@ -219,18 +253,32 @@ final class HighlightFocusedCoordinator: NSObject {
     func show(window: ComfyWindow?) {
         if panel == nil { setupPanel() }
         
-        if let screen = WindowCore.screenUnderMouse(), screen != panelScreen {
-            panelScreen = screen
-            panel.setFrame(screen.frame, display: true)
+        if let window {
+            if let screen = window.screen, screen != panelScreen {
+                panelScreen = screen
+                panel.setFrame(screen.frame, display: true)
+            }
+            
+            highlightVM.isShown = true
+            hideTask?.cancel()
+            hideTask = nil
+            panel.orderFrontRegardless()
         }
-        
-        highlightVM.isShown = true
-        panel.orderFrontRegardless()
     }
     
     public func hide() {
-        panel?.orderOut(nil)
-        highlightVM.isShown = false
+        hideTask?.cancel()
+        hideTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            try? await Task.sleep(nanoseconds: UInt64(1.0 * 1_000_000_000))
+            guard !Task.isCancelled else {
+                return
+            }
+
+            self.panel?.orderOut(nil)
+            self.highlightVM.isShown = false
+            self.hideTask = nil
+        }
     }
 }
 
@@ -241,7 +289,6 @@ struct HighlightView: View {
     
     var body: some View {
         if highlightVM.highlightConfig.contains(.superFocus) {
-//            VisualEffectView(material: .menu)
             Rectangle()
                 .fill(defaultsManager.superFocusColor)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -291,22 +338,4 @@ struct HighlightRing: View {
         }
         .position(x: highlightVM.displayPos.x, y: highlightVM.displayPos.y)
     }
-}
-
-
-struct VisualEffectView: NSViewRepresentable {
-    var material: NSVisualEffectView.Material = .sidebar
-    var blendingMode: NSVisualEffectView.BlendingMode = .behindWindow
-    
-    func makeNSView(context: Context) -> NSVisualEffectView {
-        let view = NSVisualEffectView()
-        view.material = material
-        view.blendingMode = blendingMode
-        view.state = .active
-        view.wantsLayer = true
-        view.layer?.masksToBounds = true
-        return view
-    }
-    
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
 }

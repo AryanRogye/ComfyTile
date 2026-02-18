@@ -12,9 +12,8 @@ struct AppearanceSettings: View {
     
     @Bindable var defaultsManager : DefaultsManager
     
-    @State var superFocusColorPicker = ColorPickerCoordinator()
-    @State var highlightFocusedWindowColorPicker = ColorPickerCoordinator()
-    
+    @State var colorPicker = ColorPickerCoordinator()
+
     var body: some View {
         Form {
             Section("Tab Bar") {
@@ -31,14 +30,13 @@ struct AppearanceSettings: View {
                 HStack {
                     Text("Highlight Color")
                     Button {
+                        colorPicker.activeTarget = .highlight
                         NSColorPanel.shared.orderFront(nil)
                     } label: {
                         Rectangle()
                             .fill(Color(defaultsManager.highlightFocusedWindowColor))
                     }
-                    .onChange(of: highlightFocusedWindowColorPicker.selectedColor) { _, newValue in
-                        defaultsManager.highlightFocusedWindowColor = Color(nsColor: newValue)
-                    }
+                    .buttonStyle(.plain)
                 }
                 
                 HStack {
@@ -53,14 +51,13 @@ struct AppearanceSettings: View {
                     Text("Super Focus Color")
                     
                     Button {
+                        colorPicker.activeTarget = .superFocus
                         NSColorPanel.shared.orderFront(nil)
                     } label: {
                         Rectangle()
                             .fill(Color(defaultsManager.superFocusColor))
                     }
-                    .onChange(of: superFocusColorPicker.selectedColor) { _, newValue in
-                        defaultsManager.superFocusColor = Color(nsColor: newValue)
-                    }
+                    .buttonStyle(.plain)
                 }
             }
             
@@ -71,13 +68,24 @@ struct AppearanceSettings: View {
         }
         .formStyle(.grouped)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onChange(of: colorPicker.selectedColor) { _, newValue in
+            switch colorPicker.activeTarget {
+            case .highlight: defaultsManager.highlightFocusedWindowColor = Color(nsColor: newValue)
+            case .superFocus: defaultsManager.superFocusColor = Color(nsColor: newValue)
+            }
+        }
     }
 }
+
+
+
+enum ColorTarget { case highlight, superFocus }
 
 @Observable
 @MainActor
 class ColorPickerCoordinator: NSObject {
     var selectedColor: NSColor = .white
+    var activeTarget: ColorTarget = .highlight
     
     override init() {
         super.init()
