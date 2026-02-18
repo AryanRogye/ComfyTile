@@ -44,9 +44,13 @@ struct AppearanceSettings: View {
                     Slider(value: $defaultsManager.highlightedFocusedWindowWidth, in: 1...2, step: 0.1)
                 }
                 
+                Text("⚠️ Note: Highlighting focused window only works if we're not super focusing")
+                
                 Toggle("Super Focus Window", isOn: $defaultsManager.superFocusWindow)
+                
                 ShortcutRecorder(label: "Toggle Super Focus", type: .toggleSuperFocus)
                     .padding(.horizontal, -16)
+                
                 HStack {
                     Text("Super Focus Color")
                     

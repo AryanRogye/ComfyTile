@@ -216,17 +216,30 @@ final class HighlightFocusedCoordinator: NSObject {
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
             selector: #selector(loadWindowsThenShowIfNeeded),
+            name: NSWorkspace.didActivateApplicationNotification,
+            object: nil
+        )
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(loadWindowsThenShowIfNeeded),
             name: NSWorkspace.willLaunchApplicationNotification,
             object: nil
         )
     }
     
+    /**
+     * Scammy But Works lol, idk if we focus sometimes it wont let the subscription on this new window happen
+     * so we use a little nudge on width + height on 1
+     */
     @objc func loadWindowsThenShowIfNeeded() {
         windowCore.unAsyncLoadWindows { [weak self] in
                 guard let self else { return }
                 if highlightVM.isShown {
                     if let foc = windowCore.getFocusedWindow() {
-                        foc.focusWindow()
+                        guard let initialSize : CGSize = foc.element.size else { return }
+                        let adjustedSize = CGSize(width: initialSize.width + 1, height: initialSize.height + 1)
+                        foc.element.setSize(width: adjustedSize.width, height: adjustedSize.height)
+                        foc.element.setSize(width: initialSize.width, height: initialSize.height)
                     }
                 }
         }
