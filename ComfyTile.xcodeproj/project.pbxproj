@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B3BC0982F43A8E300A86E11 /* HighlightFocusedCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */; };
 		9B436CEE2ED7824E00D79941 /* ComfyTile.icon in Resources */ = {isa = PBXBuildFile; fileRef = 9B436CED2ED7824E00D79941 /* ComfyTile.icon */; };
 		9B490C752F0B5FFF00963D05 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B490C742F0B5FFF00963D05 /* LocalShortcuts */; };
 		9B4E04B82E934B05001CF411 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9B4E04B72E934B05001CF411 /* Defaults */; };
@@ -98,6 +99,7 @@
 
 /* Begin PBXFileReference section */
 		9B3BC0962F437F1500A86E11 /* Untitled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Untitled.swift; sourceTree = "<group>"; };
+		9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightFocusedCoordinator.swift; sourceTree = "<group>"; };
 		9B436CED2ED7824E00D79941 /* ComfyTile.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = ComfyTile.icon; sourceTree = "<group>"; };
 		9B68EE9B2F227711009567DF /* AXSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AXSubscription.swift; sourceTree = "<group>"; };
 		9B68EEA22F228C6A009567DF /* AppearanceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettings.swift; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 		9B8FC0192F10B80D00CBF4B8 /* Coordinators */ = {
 			isa = PBXGroup;
 			children = (
+				9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */,
 				9B8FC0A82F11AB9A00CBF4B8 /* MenuBarCoordinator.swift */,
 				9B8FC0122F10B80D00CBF4B8 /* HotKeyCoordinator.swift */,
 				9B8FC0152F10B80D00CBF4B8 /* TilingCoverCoordinator.swift */,
@@ -306,8 +309,8 @@
 			children = (
 				9B8FC0112F10B80D00CBF4B8 /* App */,
 				9B8FC0192F10B80D00CBF4B8 /* Coordinators */,
-				9B9BCFBD2F1971EB0020F3AD /* Features */,
 				9B8FC0222F10B80D00CBF4B8 /* Extensions */,
+				9B9BCFBD2F1971EB0020F3AD /* Features */,
 				9B8FC0572F10B80D00CBF4B8 /* Views */,
 				9B8FC0582F10B80D00CBF4B8 /* Assets.xcassets */,
 				9B8FC0592F10B80D00CBF4B8 /* ComfyTile.entitlements */,
@@ -676,6 +679,7 @@
 				9B9BCFD72F1972C30020F3AD /* Modifiers.swift in Sources */,
 				9B68EEA32F228C6C009567DF /* AppearanceSettings.swift in Sources */,
 				9B9BCFD32F1972350020F3AD /* DefaultsManager.swift in Sources */,
+				9B3BC0982F43A8E300A86E11 /* HighlightFocusedCoordinator.swift in Sources */,
 				9B9BCFD42F1972350020F3AD /* DefaultsKeys.swift in Sources */,
 				9B8FC0862F10B80D00CBF4B8 /* SettingsView.swift in Sources */,
 				9B9BCFF22F1973F90020F3AD /* AXHelpers.swift in Sources */,

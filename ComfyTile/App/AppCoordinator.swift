@@ -22,10 +22,11 @@ class AppCoordinator {
     /// ==============================================================================
     /// Coordinators
     /// ==============================================================================
-    let menuBarCoordinator      = MenuBarCoordinator()
-    let hotKeyCoordinator       : HotKeyCoordinator
-    let tilingCoverCoordinator  : TilingCoverCoordinator
-    let windowViewerCoordinator : WindowViewerCoordinator
+    let menuBarCoordinator          = MenuBarCoordinator()
+    let hotKeyCoordinator           : HotKeyCoordinator
+    let tilingCoverCoordinator      : TilingCoverCoordinator
+    let windowViewerCoordinator     : WindowViewerCoordinator
+    let highLightFocusedCoordinator : HighlightFocusedCoordinator
     
     /// ==============================================================================
     /// View Models
@@ -34,6 +35,7 @@ class AppCoordinator {
     let settingsVM         = SettingsViewModel()
     let tilingCoverVM      = TilingCoverViewModel()
     let windowViewerVM     = WindowViewerViewModel()
+    let highlightVM        = HighlightFocusedViewModel()
     
     /// ==============================================================================
     /// Controllers
@@ -47,13 +49,17 @@ class AppCoordinator {
     private var permissionService : PermissionService
 
     init(appEnv: AppEnv) {
-        
         self.permissionService = PermissionService()
         self.windowCore = appEnv.windowCore
         self.windowTilingService = appEnv.windowTilingService
         self.windowLayoutService = appEnv.windowLayoutService
         self.tilingCoverCoordinator = TilingCoverCoordinator(
             tilingCoverVM: tilingCoverVM
+        )
+        self.highLightFocusedCoordinator = HighlightFocusedCoordinator(
+            windowCore: windowCore,
+            highlightVM: highlightVM,
+            defaultsManager: defaultsManager
         )
         self.windowSpatialEngine = WindowSpatialEngine(
             windowCore: appEnv.windowCore,
@@ -88,6 +94,9 @@ class AppCoordinator {
     
     private func startHotKey() {
         hotKeyCoordinator.start(
+            onToggleSuperFocus: {
+                self.defaultsManager.superFocusWindow.toggle()
+            },
             // MARK: - Layout Hotkey
             onPrimaryLeftStackedHorizontallyTile: {
                 self.windowSpatialEngine.primaryLeftStackedHorizontallyTile()
@@ -186,30 +195,31 @@ class AppCoordinator {
             }
         )
         
-//        self.shouldStartDoubleModifier()
-//        observeModifierKey()
+        self.windowCore.highlightFocusedWindow = defaultsManager.highlightFocusedWindow
+        self.windowCore.superFocusWindow = defaultsManager.superFocusWindow
+        self.observeFocusedWindow()
     }
     
-//    internal func observeModifierKey() {
-//        withObservationTracking {
-//            _ = defaultsManager.modiferKey
-//        } onChange: {
-//            DispatchQueue.main.async { [weak self] in
-//                guard let self else { return }
-//                self.shouldStartDoubleModifier()
-//                self.observeModifierKey()
-//            }
-//        }
-//    }
-    
-//    /// Function handles what happens with the modifier key
-//    internal func shouldStartDoubleModifier() {
-//        let key = defaultsManager.modiferKey
-//        
-//        if key == .none {
-//            hotKeyCoordinator.stopModifier()
-//        } else {
-//            hotKeyCoordinator.startModifier(with: key)
-//        }
-//    }
+    internal func observeFocusedWindow() {
+        withObservationTracking {
+            _ = defaultsManager.highlightFocusedWindow;
+            _ = defaultsManager.superFocusWindow
+        } onChange: {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                let newHighlight = defaultsManager.highlightFocusedWindow
+                let newSuperFocus = defaultsManager.superFocusWindow
+                
+                if self.windowCore.highlightFocusedWindow != newHighlight {
+                    self.windowCore.highlightFocusedWindow = newHighlight
+                }
+                
+                if self.windowCore.superFocusWindow != newSuperFocus {
+                    self.windowCore.superFocusWindow = newSuperFocus
+                }
+                
+                self.observeFocusedWindow()
+            }
+        }
+    }
 }
