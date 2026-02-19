@@ -138,7 +138,12 @@ final class HighlightFocusedViewModel {
             displayFrame = newFrame
             displayPos = newPos
         } else {
-            withAnimation(.smooth) {
+            if highlightConfig.contains(.superFocus) {
+                withAnimation(.smooth) {
+                    self.displayFrame = newFrame
+                    self.displayPos = newPos
+                }
+            } else {
                 self.displayFrame = newFrame
                 self.displayPos = newPos
             }
@@ -157,12 +162,17 @@ final class HighlightFocusedViewModel {
             let newPos = computePos(from: newFrame)
             
             guard !Task.isCancelled else { return }
-
+            
             if newFrame == .zero {
                 displayFrame = newFrame
                 displayPos = newPos
             } else {
-                withAnimation(.smooth) {
+                if highlightConfig.contains(.superFocus) {
+                    withAnimation(.smooth) {
+                        self.displayFrame = newFrame
+                        self.displayPos = newPos
+                    }
+                } else {
                     self.displayFrame = newFrame
                     self.displayPos = newPos
                 }
@@ -175,10 +185,13 @@ final class HighlightFocusedViewModel {
 final class HighlightFocusedCoordinator: NSObject {
     
     var panel      : NSPanel!
-    var windowCore : WindowCore
-    var highlightVM : HighlightFocusedViewModel
-    var defaultsManager: DefaultsManager
+    var panelScreen: NSScreen?
     
+    /// Dependencies
+    var windowCore      : WindowCore
+    var highlightVM     : HighlightFocusedViewModel
+    var defaultsManager : DefaultsManager
+
     @MainActor var hideTask: Task<Void, Never>?
 
     init(windowCore: WindowCore, highlightVM: HighlightFocusedViewModel, defaultsManager: DefaultsManager) {
@@ -193,37 +206,56 @@ final class HighlightFocusedCoordinator: NSObject {
             self.highlightVM.currentFocused = win
             self.highlightVM.highlightConfig = highlightConfig
             self.highlightVM.isFullScreen = isFullScreen
+            
+            if let panel {
+                let hasSuperFocus = highlightConfig.contains(.superFocus)
+                let alreadySticky = panel.collectionBehavior.contains(.canJoinAllSpaces)
+                
+                if hasSuperFocus && !alreadySticky {
+                    panel.collectionBehavior.insert(.canJoinAllSpaces)
+                } else if !hasSuperFocus && alreadySticky {
+                    panel.collectionBehavior.remove(.canJoinAllSpaces)
+                }
+            }
         }
 
-        highlightVM.onShow = { window in
+        highlightVM.onShow = { [weak self] window in
+            guard let self else { return }
             self.show(window: window)
         }
-        highlightVM.onHide = {
+        highlightVM.onHide = { [weak self] in
+            guard let self else { return }
             self.hide()
         }
-        NSWorkspace.shared.notificationCenter.addObserver(
+        let notifications: [NSNotification.Name] = [
+            NSWorkspace.activeSpaceDidChangeNotification,
+            NSWorkspace.didLaunchApplicationNotification,
+            NSWorkspace.didActivateApplicationNotification,
+            NSWorkspace.willLaunchApplicationNotification
+        ]
+        
+        notifications.forEach { name in
+            addObserver(
+                self,
+                selector: #selector(loadWindowsThenShowIfNeeded),
+                name: name,
+                object: nil
+            )
+        }
+        addObserver(
             self,
             selector: #selector(activeSpaceChanged),
             name: NSWorkspace.activeSpaceDidChangeNotification,
             object: nil
         )
+    }
+    
+    func addObserver(_ observer: Any, selector: Selector, name: NSNotification.Name?, object: Any?) {
         NSWorkspace.shared.notificationCenter.addObserver(
-            self,
-            selector: #selector(loadWindowsThenShowIfNeeded),
-            name: NSWorkspace.didLaunchApplicationNotification,
-            object: nil
-        )
-        NSWorkspace.shared.notificationCenter.addObserver(
-            self,
-            selector: #selector(loadWindowsThenShowIfNeeded),
-            name: NSWorkspace.didActivateApplicationNotification,
-            object: nil
-        )
-        NSWorkspace.shared.notificationCenter.addObserver(
-            self,
-            selector: #selector(loadWindowsThenShowIfNeeded),
-            name: NSWorkspace.willLaunchApplicationNotification,
-            object: nil
+            observer,
+            selector: selector,
+            name: name,
+            object: object
         )
     }
     
@@ -261,7 +293,12 @@ final class HighlightFocusedCoordinator: NSObject {
             }
             /// This works really well
             if self.highlightVM.isShown {
-                hide()
+                if self.highlightVM.highlightConfig.contains(.superFocus) {
+                    /// Super Focus needs a hide on delay so no weird stuttering happens
+                    hide()
+                } else {
+                    forceHide()
+                }
                 if let comfyWindow = highlightVM.currentFocused {
                     self.show(window: comfyWindow)
                 }
@@ -269,7 +306,6 @@ final class HighlightFocusedCoordinator: NSObject {
         }
     }
     
-    var panelScreen: NSScreen?
     func setupPanel() {
         guard let screen = WindowCore.screenUnderMouse() else { return }
         panelScreen = screen
@@ -288,7 +324,7 @@ final class HighlightFocusedCoordinator: NSObject {
         panel.level = NSWindow.Level(rawValue: Int(normalRaw) + 1)
         
         panel.collectionBehavior = [
-            .canJoinAllSpaces,
+//            .canJoinAllSpaces,
             .fullScreenAuxiliary,
             .fullScreenDisallowsTiling,
             .ignoresCycle,
@@ -332,6 +368,13 @@ final class HighlightFocusedCoordinator: NSObject {
         }
     }
     
+    public func forceHide() {
+        self.hideTask?.cancel()
+        self.hideTask = nil
+        self.panel?.orderOut(nil)
+        self.highlightVM.isShown = false
+    }
+    
     public func hide() {
         hideTask?.cancel()
         hideTask = Task { @MainActor [weak self] in
@@ -341,9 +384,7 @@ final class HighlightFocusedCoordinator: NSObject {
                 return
             }
 
-            self.panel?.orderOut(nil)
-            self.highlightVM.isShown = false
-            self.hideTask = nil
+            forceHide()
         }
     }
 }
@@ -369,6 +410,9 @@ struct HighlightView: View {
                 color: defaultsManager.highlightFocusedWindowColor,
                 lineWidth: defaultsManager.highlightedFocusedWindowWidth
             )
+            .id(highlightVM.currentFocused.map { ObjectIdentifier($0) })
+            // Optional: Make the blink faster
+            .transition(.opacity.animation(.easeInOut(duration: 0.1)))
         }
     }
 }
