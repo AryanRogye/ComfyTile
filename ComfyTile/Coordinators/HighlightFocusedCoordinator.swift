@@ -262,16 +262,31 @@ final class HighlightFocusedCoordinator: NSObject {
     /**
      * Scammy But Works lol, idk if we focus sometimes it wont let the subscription on this new window happen
      * so we use a little nudge on width + height on 1
+     * sometimes that doesnt work so trying out position too
      */
     @objc func loadWindowsThenShowIfNeeded() {
         windowCore.unAsyncLoadWindows { [weak self] in
                 guard let self else { return }
                 if highlightVM.isShown {
                     if let foc = windowCore.getFocusedWindow() {
-                        guard let initialSize : CGSize = foc.element.size else { return }
-                        let adjustedSize = CGSize(width: initialSize.width + 1, height: initialSize.height + 1)
-                        foc.element.setSize(width: adjustedSize.width, height: adjustedSize.height)
-                        foc.element.setSize(width: initialSize.width, height: initialSize.height)
+                        foc.focusWindow()
+                        if let initialSize : CGSize = foc.element.size {
+                            let adjustedSize = CGSize(width: initialSize.width + 1, height: initialSize.height + 1)
+                            foc.element.setSize(width: adjustedSize.width, height: adjustedSize.height)
+                            foc.element.setSize(width: initialSize.width, height: initialSize.height)
+                        }
+                        if let initialPos : CGPoint = foc.element.position {
+                            let adjustedPostion = CGPoint(x: initialPos.x, y: initialPos.y)
+                            foc.element.setPosition(x: adjustedPostion.x, y: adjustedPostion.y)
+                            foc.element.setPosition(x: initialPos.x, y: initialPos.y)
+                        }
+                        
+                        if let windowID = foc.windowID {
+                            if windowID != self.highlightVM.currentFocused?.windowID {
+                                /// call focus again
+                                foc.focusWindow()
+                            }
+                        }
                     }
                 }
         }
