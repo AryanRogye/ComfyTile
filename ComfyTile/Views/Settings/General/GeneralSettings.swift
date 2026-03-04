@@ -14,26 +14,7 @@ struct GeneralSettings: View {
     var body: some View {
         Form {
             Section("Tiling") {
-                HStack(alignment: .center) {
-                    Text("Center Tiling Padding \(Int(defaultsManager.centerTilingPadding))")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    VStack {
-                        Slider(value: $defaultsManager.centerTilingPadding, in: 10...100, step: 1)
-                            .frame(maxWidth: .infinity)
-                        HStack {
-                            Text("10")
-                                .foregroundStyle(.secondary)
-                                .font(Font.caption.bold())
-                            Spacer()
-                            Text("100")
-                                .foregroundStyle(.secondary)
-                                .font(Font.caption.bold())
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(alignment: .trailing)
-                    .border(.red, width: 1)
-                }
+                CenterTilingGeneralView(defaultsManager: defaultsManager)
             }
             /// About Section
             Section("About") {
@@ -45,6 +26,36 @@ struct GeneralSettings: View {
         }
         .formStyle(.grouped)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: - Center Tiling Settings
+struct CenterTilingGeneralView: View {
+    @Bindable var defaultsManager : DefaultsManager
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Center Tiling Padding")
+                Spacer()
+                Text("\(Int(defaultsManager.centerTilingPadding)) px")
+                    .font(.subheadline.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+
+            Slider(value: $defaultsManager.centerTilingPadding, in: 10...100, step: 1) {
+                EmptyView()
+            } minimumValueLabel: {
+                Text("10")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } maximumValueLabel: {
+                Text("100")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .labelsHidden()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -87,4 +98,3 @@ struct UpdatesGeneralView: View {
         .animation(.easeInOut, value: updateController.updaterVM.showUserInitiatedUpdate)
     }
 }
-

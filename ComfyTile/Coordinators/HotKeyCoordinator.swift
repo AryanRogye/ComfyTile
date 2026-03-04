@@ -17,8 +17,15 @@ extension KeyboardShortcuts.Name {
     static let NudgeBottomUp = Self("NudgeBottomUp")
     static let NudgeTopUp = Self("NudgeTopUp")
     static let NudgeTopDown = Self("NudgeTopDown")
-    static let windowViewer = Self("WindowViewer")
     static let toggleSuperFocus = Self("Toggle Super Focus")
+    static let windowViewerBack = Self("WindowViewerBack", default: Shortcut(
+        .backtick,
+        modifiers: .option
+    ))
+    static let windowViewer = Self("WindowViewer", default: Shortcut(
+        .tab,
+        modifiers: .option
+    ))
     static let windowViewerEscapeEarly = Self("WindowViewerEscapeEarly", default: Shortcut(
         .escape,
         modifiers: .option
@@ -55,6 +62,7 @@ final class HotKeyCoordinator {
         onPrimaryLeftStackedHorizontallyTile : @escaping() -> Void = {},
         onPrimaryRightStackedHorizontallyTile: @escaping() -> Void = {},
         onPrimaryTile                        : @escaping() -> Void = {},
+        onWindowViewerBack  : @escaping () -> Void = {},
         onWindowViewer      : @escaping () -> Void = {},
         onWindowViewerUp    : @escaping () -> Void = {},
         onWindowViewerEscapeEarly : @escaping () -> Void = {},
@@ -100,6 +108,10 @@ final class HotKeyCoordinator {
             onPrimaryTile()
         }
 
+        // MARK: - WindowViewer
+        KeyboardShortcuts.onKeyDown(for: .windowViewerBack) {
+            onWindowViewerBack()
+        }
         KeyboardShortcuts.onKeyDown(for: .windowViewer) {
             onWindowViewer()
         }

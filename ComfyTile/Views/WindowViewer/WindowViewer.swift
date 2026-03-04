@@ -40,6 +40,7 @@ struct WindowViewer: View {
                             if window.id == windowCore.windows[windowViewerVM.selected].id {
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(Color.accentColor)
+                                    .padding(2)
                             }
                         }
                     }
@@ -49,7 +50,7 @@ struct WindowViewer: View {
             .padding(.horizontal)
         }
         .padding()
-        .glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 12))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, 300)
     }

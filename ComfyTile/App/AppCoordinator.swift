@@ -108,6 +108,14 @@ class AppCoordinator {
                 self.windowSpatialEngine.primaryTile()
             },
             
+            onWindowViewerBack: {
+                /// cycle back only if is shown
+                if self.windowViewerVM.isShown {
+                    let count = self.windowCore.windows.count
+                    self.windowViewerVM.selected = (self.windowViewerVM.selected - 1 + count) % count
+                }
+            },
+            
             // MARK: - Window Switcher
             onWindowViewer: {
                 if self.windowViewerVM.isShown {
