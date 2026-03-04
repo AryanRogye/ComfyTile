@@ -14,6 +14,11 @@ class DefaultsManager {
     var nudgeStep: Int = Defaults[.nudgeStep]
     var modiferKey: ModifierGroup = ModifierGroup(rawValue: Defaults[.modiferKey]) ?? .control
     
+    var centerTilingPadding: Double = Defaults[.centerTilingPadding] {
+        didSet {
+            Defaults[.centerTilingPadding] = centerTilingPadding
+        }
+    }
     
     var highlightFocusedWindow: Bool = Defaults[.highlightFocusedWindow] {
         didSet {

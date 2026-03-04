@@ -121,7 +121,8 @@ final class WindowSpatialEngine {
                                     withAnimation: self.defaultsManager.showTilingAnimations
                                 )
         case .center:          self.windowTilingService.center(
-                                    withAnimation: self.defaultsManager.showTilingAnimations
+                                    withAnimation: self.defaultsManager.showTilingAnimations,
+                                    padding: self.defaultsManager.centerTilingPadding
                                 )
         case .fullscreen:      self.windowTilingService.fullScreen(
                                     withAnimation: self.defaultsManager.showTilingAnimations
@@ -255,14 +256,16 @@ extension WindowSpatialEngine {
     public func tileCenter() {
         tileWithAnimation {
             self.windowTilingService.center(
-                withAnimation: self.defaultsManager.showTilingAnimations
+                withAnimation: self.defaultsManager.showTilingAnimations,
+                padding: self.defaultsManager.centerTilingPadding
             )
         }
     }
     public func tileCenterPressed() {
         if !defaultsManager.showTilingAnimations {
             self.windowTilingService.center(
-                withAnimation: self.defaultsManager.showTilingAnimations
+                withAnimation: self.defaultsManager.showTilingAnimations,
+                padding: self.defaultsManager.centerTilingPadding
             )
             return
         }

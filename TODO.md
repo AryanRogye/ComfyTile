@@ -1,0 +1,2 @@
+- [x] Allow more control over center tiling
+- [ ] cache screenshot logic, I think this is really expensive

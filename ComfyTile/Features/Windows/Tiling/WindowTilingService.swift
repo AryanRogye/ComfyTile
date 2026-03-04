@@ -95,12 +95,11 @@ class WindowTilingService: WindowTilingProviding {
     }
     
     // MARK: - Center
-    func center(withAnimation: Bool) {
+    func center(withAnimation: Bool, padding: Double) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = focusedWindow.screen else { return }
         
-        /// This is padding around all sides of the window
-        let padding : CGFloat = 40
+        let padding: CGFloat = CGFloat(padding)
         
         let frame = screen.visibleFrame
         
