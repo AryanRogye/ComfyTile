@@ -15,48 +15,80 @@ enum ScreenshotError: Error {
     case captureFailure
 }
 
-struct ScreenshotHelper {
+
+actor ScreenshotHelper {
+    
+    struct ScreenshotInfo: Hashable {
+        let image : CGImage
+        let time: Date
+        
+        init(_ image: CGImage) {
+            self.image = image
+            self.time = .now
+        }
+        
+        public func hasBeen2Mins(now: Date = .now) -> Bool {
+            return now.timeIntervalSince(time) > 120
+        }
+    }
+
+    static var cache: [CGWindowID: ScreenshotInfo] = [:]
+    
     /// Captures a screenshot of the specified window, trying private API first then falling back to SCK
     static func capture(windowID: CGWindowID, timeoutMs: UInt64 = 1000) async throws -> CGImage {
+        
+        if let info = cache[windowID] {
+            /// if < 2 mins ago, just return the same image
+            if !info.hasBeen2Mins() {
+                return info.image
+            }
+        }
+        
         // Try private CGSHWCaptureWindowList first (works for everything, instant)
-        if let image = capturePrivateAPI(windowID: windowID) {
+        if let image = await capturePrivateAPI(windowID: windowID) {
+            cache[windowID] = ScreenshotInfo(image)
             return image
         }
         
         // Fallback to ScreenCaptureKit if private API fails
         do {
-            return try await captureSCK(windowID: windowID, timeoutMs: timeoutMs)
+            let image = try await captureSCK(windowID: windowID, timeoutMs: timeoutMs)
+            /// store in the cache
+            cache[windowID] = ScreenshotInfo(image)
+            return image
         } catch {
             throw ScreenshotError.captureFailure
         }
     }
     
     /// Try to capture using private CGSHWCaptureWindowList API (most reliable)
-    private static func capturePrivateAPI(windowID: CGWindowID) -> CGImage? {
-        let cid = CGSMainConnectionID()
-        var wid = UInt32(windowID)
-        let options: CGSWindowCaptureOptions = [.bestResolution, .fullSize]
-        
-        // 1. Call the function and get the Unmanaged Core Foundation array
-        guard let unmanagedArray = CGSHWCaptureWindowList(
-            cid,
-            &wid,
-            1,
-            options.rawValue
-        ) else {
-            // Function returned nil
-            return nil
+    private static func capturePrivateAPI(windowID: CGWindowID) async -> CGImage? {
+        await MainActor.run {
+            let cid = CGSMainConnectionID()
+            var wid = UInt32(windowID)
+            let options: CGSWindowCaptureOptions = [.bestResolution, .fullSize]
+            
+            // 1. Call the function and get the Unmanaged Core Foundation array
+            guard let unmanagedArray = CGSHWCaptureWindowList(
+                cid,
+                &wid,
+                1,
+                options.rawValue
+            ) else {
+                // Function returned nil
+                return nil
+            }
+            
+            // 2. Take ownership of the C object (moves it to ARC)
+            //    and bridge it to a Swift [CGImage] array.
+            guard let images = unmanagedArray.takeRetainedValue() as? [CGImage],
+                  let image = images.first else {
+                // Bridging failed or the array was empty
+                return nil
+            }
+            
+            return image
         }
-        
-        // 2. Take ownership of the C object (moves it to ARC)
-        //    and bridge it to a Swift [CGImage] array.
-        guard let images = unmanagedArray.takeRetainedValue() as? [CGImage],
-              let image = images.first else {
-            // Bridging failed or the array was empty
-            return nil
-        }
-        
-        return image
     }
     
     /// Try to capture using ScreenCaptureKit (fallback)
@@ -105,24 +137,24 @@ struct ScreenshotHelper {
             return image
         }
     }
-}
-
-private final class FrameCollector: NSObject, SCStreamOutput {
-    private var continuation: CheckedContinuation<CGImage, Error>?
-    private let context = CIContext(options: [.useSoftwareRenderer: false])
     
-    func waitForFrame() async throws -> CGImage {
-        try await withCheckedThrowingContinuation { self.continuation = $0 }
-    }
-    
-    func stream(_ stream: SCStream, didOutputSampleBuffer buffer: CMSampleBuffer, of type: SCStreamOutputType) {
-        guard type == .screen, let pixelBuffer = buffer.imageBuffer else { return }
-        guard CVPixelBufferGetWidth(pixelBuffer) > 1, CVPixelBufferGetHeight(pixelBuffer) > 1 else { return }
+    private final class FrameCollector: NSObject, SCStreamOutput {
+        private var continuation: CheckedContinuation<CGImage, Error>?
+        private let context = CIContext(options: [.useSoftwareRenderer: false])
         
-        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
-        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return }
+        func waitForFrame() async throws -> CGImage {
+            try await withCheckedThrowingContinuation { self.continuation = $0 }
+        }
         
-        continuation?.resume(returning: cgImage)
-        continuation = nil
+        func stream(_ stream: SCStream, didOutputSampleBuffer buffer: CMSampleBuffer, of type: SCStreamOutputType) {
+            guard type == .screen, let pixelBuffer = buffer.imageBuffer else { return }
+            guard CVPixelBufferGetWidth(pixelBuffer) > 1, CVPixelBufferGetHeight(pixelBuffer) > 1 else { return }
+            
+            let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+            guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return }
+            
+            continuation?.resume(returning: cgImage)
+            continuation = nil
+        }
     }
 }
