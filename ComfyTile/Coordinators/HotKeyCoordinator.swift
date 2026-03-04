@@ -35,6 +35,7 @@ extension KeyboardShortcuts.Name {
         .space,
         modifiers: [.control, .shift]
     ))
+    static let layoutPalette = Self("LayoutPalette")
 }
 
 @MainActor
@@ -55,6 +56,7 @@ final class HotKeyCoordinator {
         onPrimaryLeftStackedHorizontallyTile : @escaping() -> Void = {},
         onPrimaryRightStackedHorizontallyTile: @escaping() -> Void = {},
         onPrimaryTile                        : @escaping() -> Void = {},
+        onLayoutPalette                      : @escaping() -> Void = {},
         onWindowViewer      : @escaping () -> Void = {},
         onWindowViewerUp    : @escaping () -> Void = {},
         onWindowViewerEscapeEarly : @escaping () -> Void = {},
@@ -98,6 +100,9 @@ final class HotKeyCoordinator {
         }
         KeyboardShortcuts.onKeyDown(for: .primaryTile) {
             onPrimaryTile()
+        }
+        KeyboardShortcuts.onKeyDown(for: .layoutPalette) {
+            onLayoutPalette()
         }
 
         KeyboardShortcuts.onKeyDown(for: .windowViewer) {

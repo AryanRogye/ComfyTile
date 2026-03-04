@@ -19,4 +19,7 @@ extension Defaults.Keys {
     
     static let highlightFocusedWindowColor = Key<Color>("HighlightFocusedWindowColor", default: .yellow)
     static let highlightedFocusedWindowWidth = Key<Double>("HighlightedFocusedWindowWidth", default: 1.5)
+    static let windowLayoutStoreJSON = Key<String>("WindowLayoutStoreJSON", default: "")
+    // Legacy key used for one-layout draft migration.
+    static let windowLayoutDraftJSON = Key<String>("WindowLayoutDraftJSON", default: "")
 }

@@ -26,7 +26,7 @@ struct SettingsSidebar: View {
             }
         }
         .background(.clear)
-        .frame(maxWidth: 120)
+        .frame(maxWidth: 150)
     }
 }
 
@@ -54,4 +54,3 @@ private struct SidebarRow: View {
         .buttonStyle(.plain)
     }
 }
-

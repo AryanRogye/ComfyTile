@@ -72,7 +72,8 @@ class AppCoordinator {
         self.comfyTileMenuBarVM = ComfyTileMenuBarViewModel(
             permissionService: permissionService,
             windowSpatialEngine: windowSpatialEngine,
-            windowCore: appEnv.windowCore
+            windowCore: appEnv.windowCore,
+            settingsVM: settingsVM
         )
         
         self.menuBarCoordinator.start(
@@ -106,6 +107,9 @@ class AppCoordinator {
             },
             onPrimaryTile: {
                 self.windowSpatialEngine.primaryTile()
+            },
+            onLayoutPalette: {
+                self.showLayoutPaletteStub()
             },
             
             // MARK: - Window Switcher
@@ -198,6 +202,10 @@ class AppCoordinator {
         self.windowCore.highlightFocusedWindow = defaultsManager.highlightFocusedWindow
         self.windowCore.superFocusWindow = defaultsManager.superFocusWindow
         self.observeFocusedWindow()
+    }
+    
+    private func showLayoutPaletteStub() {
+        print("Layout Palette hotkey pressed (stub)")
     }
     
     internal func observeFocusedWindow() {

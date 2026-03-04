@@ -12,6 +12,7 @@ struct SettingsContent: View {
     
     @Environment(SettingsViewModel.self) var settingsVM
     @Environment(DefaultsManager.self) var defaultsManager
+    @Environment(ComfyTileMenuBarViewModel.self) var comfyTileMenuBarVM
     
     var body: some View {
         switch settingsVM.selectedTab {
@@ -21,7 +22,26 @@ struct SettingsContent: View {
             LogSettings()
         case .general:
             GeneralSettings(defaultsManager: defaultsManager)
+        case .layoutBuilder:
+            if comfyTileMenuBarVM.deferLayoutBuilderRendering {
+                LayoutBuilderLoadingView()
+            } else {
+                LayoutBuilderSettings(defaultsManager: defaultsManager)
+            }
         }
+    }
+}
+
+private struct LayoutBuilderLoadingView: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            ProgressView()
+                .controlSize(.small)
+            Text("Preparing Layout Builder...")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
