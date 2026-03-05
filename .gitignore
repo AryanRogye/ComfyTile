@@ -26,3 +26,4 @@ DerivedData/
 *.xcscmblueprint
 *.app
 buildServer.json
+Docs.md
