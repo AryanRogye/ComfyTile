@@ -1,31 +1,48 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-Source lives in `ComfyTile/`, grouped by responsibility so you can navigate by feature rather than file type.
-- `App/` holds `AppDelegate` and startup glue; update it when wiring new services.
-- `MenuBar/` contains SwiftUI menu bar scenes; keep UI-only code here.
-- `Coordinators/` manage cross-component flows like hotkeys.
-- `Services/` host macOS integrations (e.g. `PermissionService`); isolate all sandbox or API calls here.
-- `Extensions/` and `Utils/` provide shared helpers—keep extensions focused and stateless.
-- `Assets.xcassets` and `ComfyTile.entitlements` store UI assets and capability definitions.
+Source code lives in `ComfyTile/` and is organized by feature flow.
+- `ComfyTile/App/` contains app entry and startup coordination (`ComfyTileApp`, `AppDelegate`, `AppCoordinator`).
+- `ComfyTile/Coordinators/` handles cross-feature orchestration (menu bar, hotkeys, overlays, window viewer).
+- `ComfyTile/Features/Common/` contains shared platform concerns (`Input`, `Permission`, `Persistance`).
+- `ComfyTile/Features/Windows/` contains core window management (models, layout, tiling, AX/CGS bridge utilities).
+- `ComfyTile/Features/Updates/` contains Sparkle update flow (`Core`, `ViewModel`, `UI`).
+- `ComfyTile/Views/` contains SwiftUI surfaces grouped by product area (`MenuBar`, `Settings`, `TileMode`, etc.).
+- `ComfyTile/Extensions/` is for focused, stateless helpers.
+- `ComfyLogger/` and `LocalShortcuts/` are local Swift packages used by the app.
+- `updates/appcast.xml` stores the Sparkle appcast metadata for releases.
 
 ## Build, Test, and Development Commands
-- `open ComfyTile.xcodeproj` launches Xcode with the app target.
-- `xcodebuild -scheme ComfyTile -configuration Debug build` performs a CI-friendly build.
-- `xcodebuild test -scheme ComfyTileTests -destination 'platform=macOS'` runs the XCTest target after you add it to the project.
-- `swift package resolve` (from within Xcode) refreshes Swift Package Manager dependencies such as `KeyboardShortcuts`.
+- `open ComfyTile.xcworkspace` opens the workspace with local packages wired in.
+- `xcodebuild -project ComfyTile.xcodeproj -scheme ComfyTileApp -configuration Debug build` builds the app for local/CI debug validation.
+- `xcodebuild -project ComfyTile.xcodeproj -scheme Release -configuration Release build` builds with release launch settings.
+- `./scripts/gen_lsp.sh` regenerates `xcode-build-server` config for editor tooling.
+- `./scripts/resetPerms.sh` resets TCC permissions for `com.aryanrogye.ComfyTile`.
+- `./scripts/resetSparkle.sh` clears Sparkle defaults to retest update prompts.
 
 ## Coding Style & Naming Conventions
-Use Swift 5 defaults: 4-space indentation, trailing commas in multiline lists, and whitespace around control-flow keywords. Name types with `PascalCase`, properties and functions with descriptive `camelCase`, and prefer protocol-oriented extensions. Co-locate private helpers in `fileprivate` extensions and group view code with `// MARK:` sections.
+Use Swift 5 conventions: 4-space indentation, trailing commas in multiline literals, and whitespace around control-flow keywords. Use `PascalCase` for types and `camelCase` for properties/functions. Keep side effects and macOS API calls in `Features/*` or coordinators, not in SwiftUI views. Use `// MARK:` to separate logical sections, and place private helpers in `private`/`fileprivate` extensions when it improves readability.
 
 ## Testing Guidelines
-Adopt XCTest with a sibling `ComfyTileTests/` group. Name files `<Feature>Tests.swift` and methods `test_<Scenario>_<Expectation>()`. Stub macOS APIs via protocols in `Services/` to keep tests deterministic. Enforce coverage on new code by adding focused tests before opening a pull request and ensure `xcodebuild test` passes locally.
+There is currently no committed XCTest target. For new test coverage:
+- Add a `ComfyTileTests/` group and XCTest target in the Xcode project.
+- Name files `<Feature>Tests.swift` and test methods `test_<Scenario>_<Expectation>()`.
+- Isolate AX/CGS and other macOS integrations behind protocols so unit tests stay deterministic.
+- After adding tests, run `xcodebuild test -project ComfyTile.xcodeproj -scheme ComfyTileApp -destination 'platform=macOS'`.
 
 ## Commit & Pull Request Guidelines
-Follow the existing history’s concise, lower-case summaries (≤50 chars) and present-tense verbs, e.g. `add hotkey coordinator`. Reference issues in the body. Pull requests should explain the change in a readable way, do not use complex terms, talk to the user as if they were a baby, note affected directories, list validation steps (build, tests), and include screenshots or screen recordings for UI tweaks. Request a review from another contributor before merging.
+Prefer concise, imperative commit subjects (for example: `fix tiling cover flicker`). Keep subject lines short and add detail in the body when behavior changes. For pull requests:
+- Explain what changed and why in plain language.
+- List impacted directories.
+- Include validation steps you ran (`build`, `test`, manual scenarios).
+- Attach screenshots or recordings for visible UI/menu bar changes.
+- Link related issues or follow-ups.
 
 ## Security & Configuration Notes
-`ComfyTile.entitlements` and `PermissionService` manage Accessibility privileges—verify System Settings permissions after new capability changes. Avoid checking personal signing certificates into the repo and store API keys or bundle identifiers in your local Xcode configuration only.
+`ComfyTile/ComfyTile.entitlements` and `ComfyTile/Features/Common/Permission/PermissionService.swift` control accessibility and automation capabilities. Re-verify permissions in System Settings after entitlement or AX behavior changes. Do not commit signing certificates, private keys, or machine-specific bundle/signing overrides.
 
 ## Adding Files
-ComfyTile uses Groups instead of Folders, make sure any files/folders added, are included as Groups
+The Xcode project uses Groups (not folder references) for source organization.
+- Add new files/folders as groups in `ComfyTile.xcodeproj`.
+- Verify target membership for app sources, assets, and package code.
+- Keep new files under the existing feature-based structure unless there is a strong reason to introduce a new top-level area.
