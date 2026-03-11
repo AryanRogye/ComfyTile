@@ -1,5 +1,7 @@
 # Repository Guidelines
 
+- Follow swiftui-pro/
+
 ## Project Structure & Module Organization
 Source code lives in `ComfyTile/` and is organized by feature flow.
 - `ComfyTile/App/` contains app entry and startup coordination (`ComfyTileApp`, `AppDelegate`, `AppCoordinator`).

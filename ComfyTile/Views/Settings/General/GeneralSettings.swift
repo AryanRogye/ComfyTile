@@ -32,7 +32,11 @@ struct GeneralSettings: View {
 // MARK: - Center Tiling Settings
 struct CenterTilingGeneralView: View {
     @Bindable var defaultsManager : DefaultsManager
+    @Environment(ComfyTileMenuBarViewModel.self) var comfyTileMenuBarVM
+    
     var body: some View {
+        
+        @Bindable var menuBarVM = comfyTileMenuBarVM
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Center Tiling Padding")
@@ -41,21 +45,25 @@ struct CenterTilingGeneralView: View {
                     .font(.subheadline.monospacedDigit())
                     .foregroundStyle(.secondary)
             }
+            .redacted(reason: menuBarVM.showSettings == false ? .placeholder : [])
 
-            Slider(value: $defaultsManager.centerTilingPadding, in: 10...100, step: 1) {
-                EmptyView()
-            } minimumValueLabel: {
-                Text("10")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } maximumValueLabel: {
-                Text("100")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            if menuBarVM.showSettings {
+                Slider(value: $defaultsManager.centerTilingPadding, in: 10...100, step: 1) {
+                    EmptyView()
+                } minimumValueLabel: {
+                    Text("10")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } maximumValueLabel: {
+                    Text("100")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .labelsHidden()
             }
-            .labelsHidden()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .animation(.spring, value: menuBarVM.showSettings)
     }
 }
 

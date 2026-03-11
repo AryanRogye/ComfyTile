@@ -21,11 +21,21 @@ final class ComfyTileMenuBarViewModel {
     var width: CGFloat = 350
     var height: CGFloat = 300
     
+    /// trigger
+    var showSettings = false
+    private var showSettingsRevealWorkItem: DispatchWorkItem?
+    
     var selectedTab: ComfyTileTabs = .tile
     
     var panel: NSPanel?
     
     var closePanel: () -> Void = { }
+    
+    @MainActor
+    deinit {
+        showSettingsRevealWorkItem?.cancel()
+        showSettingsRevealWorkItem = nil
+    }
     
     public func getLastFocusedWindow() {
         self.lastFocusedWindow = windowCore.getFocusedWindow()
@@ -71,15 +81,27 @@ extension ComfyTileMenuBarViewModel {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 guard let panel else { return }
+                self.showSettingsRevealWorkItem?.cancel()
                 if selectedTab == .settings {
                     withAnimation(.snappy) {
                         self.width = 600
                         self.height = 400
                     }
+                    
+                    let revealWorkItem = DispatchWorkItem { [weak self] in
+                        guard let self else { return }
+                        guard self.selectedTab == .settings else { return }
+                        withAnimation(.snappy(duration: 0.16, extraBounce: 0.0)) {
+                            self.showSettings = true
+                        }
+                    }
+                    self.showSettingsRevealWorkItem = revealWorkItem
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: revealWorkItem)
                 } else {
                     withAnimation(.snappy) {
                         self.width = 350
                         self.height = 300
+                        self.showSettings = false
                     }
                 }
                 
@@ -98,4 +120,3 @@ extension ComfyTileMenuBarViewModel {
         }
     }
 }
-
