@@ -125,34 +125,6 @@ public class WindowServerBridge {
                 level: .info
             )
         }
-//        else {
-//            if let fn = getWindowWorkspaceFn, let slsMainConnection {
-//                if let cid = slsMainConnection() {
-//                    var space: UInt32 = 0
-//                    let err = fn(cid, windowID, &space)
-//                    print("RESULT: \(space): \(err)")
-//                }
-//            }
-//        }
-//        else {
-            /// TODO: WARNING: FIX THIS HERE ATTEMPT TO USE A CACHE OR JUST FOCUS IT
-//            for attempt in 0..<3 {
-//                if let found = findAXUIElement(forWindowID: windowID, pid: pid) {
-//                    ComfyLogger.WindowServerBridge.insert(
-//                        "AXElement Found, Raising",
-//                        level: .info
-//                    )
-//                    AXUIElementPerformAction(found, kAXRaiseAction as CFString)
-//                    break
-//                } else {
-//                    ComfyLogger.WindowServerBridge.insert(
-//                        "AXElement Not Found On Try: \(attempt)",
-//                        level: .warn
-//                    )
-//                }
-//            }
-        //        }
-//        self.pid_focus(pid: pid)
         
         app.activate(options: [.activateIgnoringOtherApps])
         
@@ -167,18 +139,6 @@ public class WindowServerBridge {
             )
         }
     }
-    
-//    func pid_focus(pid :pid_t) {
-//        let apps = NSWorkspace.shared.runningApplications
-//        if let app = apps.first(where: { $0.processIdentifier == pid }) {
-//            for i in 0..<3 {
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15 * Double(i)) {
-//                    app.activate(options: [.activateIgnoringOtherApps])
-//                }
-//            }
-//        }
-//    }
-
     
     // Equivalent to your findMatchingAXWindowWithPid:targetWindowID:
     func findMatchingAXWindow(pid: pid_t, targetWindowID: CGWindowID) -> AXUIElement? {
