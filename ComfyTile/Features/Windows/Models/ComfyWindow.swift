@@ -73,6 +73,7 @@ public final class ComfyWindow: Sendable {
         /// Get AXElement, Doesnt matter if nil
         let axElement : AXUIElement? = WindowServerBridge.shared.findMatchingAXWindow(pid: pid, targetWindowID: window.windowID)
         
+        
         var screenshot: CGImage? = nil
         do {
             screenshot = try await ScreenshotHelper.capture(windowID: window.windowID)

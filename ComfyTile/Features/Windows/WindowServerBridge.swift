@@ -178,6 +178,7 @@ public class WindowServerBridge {
 //            }
 //        }
 //    }
+
     
     // Equivalent to your findMatchingAXWindowWithPid:targetWindowID:
     func findMatchingAXWindow(pid: pid_t, targetWindowID: CGWindowID) -> AXUIElement? {
@@ -239,51 +240,6 @@ public class WindowServerBridge {
                 postEventRecordTo(psnPtr, buf.baseAddress!)
             }
         }
-    }
-    
-    public func findAXUIElement(forWindowID windowID: UInt32, pid: pid_t) -> AXUIElement? {
-        guard let axUIElementCreateWithRemoteToken,
-              let axUIElementGetWindow else { return nil }
-        
-        // Probe token structures until we find the right one
-        for tokenValue in UInt32(0)..<UInt32(65536) {
-            var token = [UInt8](repeating: 0, count: 20)
-            
-            token[0] = 0x00
-            token[1] = 0x62
-            token[2] = 0x00
-            token[3] = 0x00
-            
-            token[4] = UInt8(windowID & 0xFF)
-            token[5] = UInt8((windowID >> 8) & 0xFF)
-            token[6] = UInt8((windowID >> 16) & 0xFF)
-            token[7] = UInt8((windowID >> 24) & 0xFF)
-            
-            token[8]  = UInt8(tokenValue & 0xFF)
-            token[9]  = UInt8((tokenValue >> 8) & 0xFF)
-            token[10] = 0x00
-            token[11] = 0x00
-            
-            token[12] = 0x00
-            token[13] = 0x00
-            token[14] = 0x01
-            token[15] = 0x00
-            
-            let tokenData = token.withUnsafeBytes { raw in
-                CFDataCreate(kCFAllocatorDefault, raw.bindMemory(to: UInt8.self).baseAddress, 20)!
-            }
-            
-            if let element = axUIElementCreateWithRemoteToken(tokenData) {
-                var foundID: CGWindowID = 0
-                let axErr = axUIElementGetWindow(element, &foundID)
-                if axErr == .success && foundID == windowID {
-                    // keep element, caller will CFRelease if needed
-                    return element
-                }
-            }
-        }
-        
-        return nil
     }
     
     // MARK: - dlopen/dlsym plumbing

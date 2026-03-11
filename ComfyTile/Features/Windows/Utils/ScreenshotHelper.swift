@@ -15,7 +15,6 @@ enum ScreenshotError: Error {
     case captureFailure
 }
 
-
 actor ScreenshotHelper {
     
     struct ScreenshotInfo: Hashable {
@@ -33,6 +32,37 @@ actor ScreenshotHelper {
     }
 
     static var cache: [CGWindowID: ScreenshotInfo] = [:]
+    
+    private static var cleanupTask: Task<Void, Never>?
+    
+    static func startCacheCleanupLoop() {
+        guard cleanupTask == nil else { return }
+        
+        cleanupTask = Task.detached(priority: .background) {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(7200))
+                await clearExpiredCache()
+            }
+        }
+    }
+    
+    static func stopCacheCleanupLoop() {
+        cleanupTask?.cancel()
+        cleanupTask = nil
+    }
+    
+    static func clearExpiredCache(now: Date = .now) async {
+        cache = cache.filter { _, info in
+            !info.hasBeen2Mins(now: now)
+        }
+        print("Screenshot cache size after cleanup:", cache.count)
+    }
+    
+    static func clearAllCache() {
+        cache.removeAll()
+        print("Screenshot cache fully cleared")
+    }
+
     
     /// Captures a screenshot of the specified window, trying private API first then falling back to SCK
     static func capture(windowID: CGWindowID, timeoutMs: UInt64 = 1000) async throws -> CGImage {

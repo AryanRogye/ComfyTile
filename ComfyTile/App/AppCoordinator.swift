@@ -90,6 +90,12 @@ class AppCoordinator {
         
         self.hotKeyCoordinator = HotKeyCoordinator()
         self.startHotKey()
+        
+        ScreenshotHelper.startCacheCleanupLoop()
+    }
+    
+    deinit {
+        ScreenshotHelper.clearAllCache()
     }
     
     private func startHotKey() {
