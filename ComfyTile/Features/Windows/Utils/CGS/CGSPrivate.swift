@@ -57,6 +57,26 @@ func CGSCopySpacesForWindows(
     _ windowIDs: CFArray
 ) -> Unmanaged<CFArray>?
 
+@_silgen_name("CGSCopySpaces")
+func CGSCopySpaces(
+    _ cid: CGSConnectionID,
+    _ mask: Int
+) -> Unmanaged<CFArray>?
+
+@_silgen_name("_CGSRemoveWindowsFromSpaces")
+func CGSRemoveWindowsFromSpaces(
+    _ cid: CGSConnectionID,
+    _ windows: CFArray,
+    _ spaces: CFArray
+)
+
+@_silgen_name("_CGSAddWindowsToSpaces")
+func CGSAddWindowsToSpaces(
+    _ cid: CGSConnectionID,
+    _ windows: CFArray,
+    _ spaces: CFArray
+)
+
 struct CGSWindowCaptureOptions: OptionSet {
     let rawValue: UInt32
     

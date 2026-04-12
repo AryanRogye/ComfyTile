@@ -144,7 +144,6 @@ class AppCoordinator {
             onWindowViewerEscapeEarly: {
                 if self.windowViewerVM.isShown {
                     self.windowViewerCoordinator.hide()
-                    print("Called onWindowViewerEscapeEarly")
                 }
             },
             
