@@ -107,71 +107,66 @@ public class WindowServerBridge {
             // keep behavior: don't hard-fail
             return
         }
-        
+
         // 0x200 = userGenerated
         withUnsafePointer(to: psn) { psnPtr in
             setFrontProcessWithOptions(psnPtr, windowID, 0x200)
         }
         makeKeyWindow(forWindowID: windowID, psn: &psn)
-        
+
         if let element {
             ComfyLogger.WindowServerBridge.insert(
                 "AXElement Exists, Attempting To Raise",
                 level: .debug
             )
-            AXUIElementPerformAction(element, kAXRaiseAction as CFString)
+            AXUIElementPerformAction(
+                element,
+                kAXRaiseAction as CFString
+            )
+            AXUIElementSetAttributeValue(
+                element,
+                kAXMainWindowAttribute as CFString,
+                true as CFTypeRef
+            )
 
             ComfyLogger.WindowServerBridge.insert(
                 "Raising Done",
                 level: .info
             )
         }
-        
-        app.activate(options: [.activateIgnoringOtherApps])
-        
-        /// Then Check Element and bring above
-        if let axElement = element {
-            // Raise specific window using AX
-            AXUIElementPerformAction(axElement, kAXRaiseAction as CFString)
-            AXUIElementSetAttributeValue(
-                axElement,
-                kAXMainAttribute as CFString,
-                true as CFTypeRef
-            )
-        }
     }
-    
+
     // Equivalent to your findMatchingAXWindowWithPid:targetWindowID:
     func findMatchingAXWindow(pid: pid_t, targetWindowID: CGWindowID) -> AXUIElement? {
         let appAX: AXUIElement = AXUIElementCreateApplication(pid)
-        
+
         var windowsValue: CFTypeRef?
         let err = AXUIElementCopyAttributeValue(appAX, kAXWindowsAttribute as CFString, &windowsValue)
-        
+
         guard err == .success, let windowsValue else {
             return nil
         }
-        
+
         guard CFGetTypeID(windowsValue) == CFArrayGetTypeID() else {
             return nil
         }
-        
+
         let windows = windowsValue as! CFArray
         let count = CFArrayGetCount(windows)
-        
+
         for i in 0..<count {
             let raw = CFArrayGetValueAtIndex(windows, i)
             let winAX = unsafeBitCast(raw, to: AXUIElement.self)
-            
+
             var wid: CGWindowID = 0
             if axUIElementGetWindow?(winAX, &wid) == .success, wid == targetWindowID {
                 return winAX
             }
         }
-        
+
         return nil
     }
-    
+
     /// Discovers an AXUIElement for a window by brute-forcing the remote token API.
     ///
     /// construct a 20-byte token containing the PID and an incrementing
@@ -233,40 +228,43 @@ public class WindowServerBridge {
         // Slow path: brute-force via _AXUIElementCreateWithRemoteToken
         return findMatchingAXWindowBruteForce(pid: pid, targetWindowID: windowID)
     }
-    
+
     // MARK: - Private APIs (packet + token probe)
-    
+
     private func makeKeyWindow(forWindowID windowID: UInt32, psn: inout ProcessSerialNumber) {
         guard let postEventRecordTo else { return }
-        
+
         var bytes = [UInt8](repeating: 0, count: 0xF8)
-        
+
         bytes[0x04] = 0xF8
-        bytes[0x08] = 0x01
         bytes[0x3A] = 0x10
-        
-        bytes[0x3C] = UInt8(windowID & 0xFF)
-        bytes[0x3D] = UInt8((windowID >> 8) & 0xFF)
-        bytes[0x3E] = UInt8((windowID >> 16) & 0xFF)
-        bytes[0x3F] = UInt8((windowID >> 24) & 0xFF)
-        
-        let psnLow  = UInt64(UInt32(psn.lowLongOfPSN))
-        let psnHigh = UInt64(UInt32(psn.highLongOfPSN))
-        let psnValue = psnLow | (psnHigh << 32)
-        
-        for i in 0..<8 {
-            bytes[0x20 + i] = UInt8((psnValue >> (i * 8)) & 0xFF)
+
+        // Write window ID at offset 0x3C (little-endian)
+        var wid = windowID
+        memcpy(&bytes[0x3C], &wid, MemoryLayout<UInt32>.size)
+
+        // Fill PSN region with 0xFF sentinel (tells WS to use the packet-header PSN)
+        for i in 0x20..<0x30 {
+            bytes[i] = 0xFF
         }
-        
-        bytes.withUnsafeBufferPointer { buf in
+
+        // Post event twice: 0x01 then 0x02 to complete the key-window handshake
+        bytes[0x08] = 0x01
+        bytes.withUnsafeMutableBufferPointer { buf in
+            withUnsafePointer(to: psn) { psnPtr in
+                postEventRecordTo(psnPtr, buf.baseAddress!)
+            }
+        }
+        bytes[0x08] = 0x02
+        bytes.withUnsafeMutableBufferPointer { buf in
             withUnsafePointer(to: psn) { psnPtr in
                 postEventRecordTo(psnPtr, buf.baseAddress!)
             }
         }
     }
-    
+
     // MARK: - dlopen/dlsym plumbing
-    
+
     private func openHandle() {
         skylightHandle = dlopen(skylightPath, RTLD_LAZY | RTLD_GLOBAL)
         guard skylightHandle != nil else {
