@@ -84,6 +84,7 @@
 		9BAF4AA12F1978CF006536D2 /* WindowLayoutProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAF4AA02F1978CB006536D2 /* WindowLayoutProviding.swift */; };
 		9BAF4AA32F1978DF006536D2 /* WindowLayoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAF4AA22F1978DA006536D2 /* WindowLayoutService.swift */; };
 		9BF1F5B02F904964000C29C9 /* View+if.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF1F5AF2F904962000C29C9 /* View+if.swift */; };
+		9BF1F5B32F9050EA000C29C9 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF1F5B22F9050EA000C29C9 /* LocalShortcuts */; };
 		9BF2650A2F8C5EC400BAA631 /* ComfyTileDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF265092F8C5EC300BAA631 /* ComfyTileDebugView.swift */; };
 		9BF95F0E2E9326AE00776771 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
@@ -153,7 +154,6 @@
 		9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyOrClose.swift; sourceTree = "<group>"; };
 		9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutEditableRow.swift; sourceTree = "<group>"; };
 		9B9BCEC12F184D290020F3AD /* ComfyLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ComfyLogger; sourceTree = "<group>"; };
-		9B9BCEC22F184D290020F3AD /* LocalShortcuts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LocalShortcuts; sourceTree = "<group>"; };
 		9B9BCFBE2F1971ED0020F3AD /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		9B9BCFBF2F1971ED0020F3AD /* UpdateUserDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateUserDriver.swift; sourceTree = "<group>"; };
 		9B9BCFC12F1971ED0020F3AD /* CheckForUpdatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckForUpdatesView.swift; sourceTree = "<group>"; };
@@ -186,6 +186,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9BF1F5B32F9050EA000C29C9 /* LocalShortcuts in Frameworks */,
 				9B9BCED62F184DEC0020F3AD /* ComfyLogger in Frameworks */,
 				9B9BCED32F184DE00020F3AD /* LocalShortcuts in Frameworks */,
 				9B8FBF1B2F1039BF00CBF4B8 /* Sparkle in Frameworks */,
@@ -541,7 +542,6 @@
 				9B436CED2ED7824E00D79941 /* ComfyTile.icon */,
 				9B8FC05C2F10B80D00CBF4B8 /* ComfyTile */,
 				9B9BCEC12F184D290020F3AD /* ComfyLogger */,
-				9B9BCEC22F184D290020F3AD /* LocalShortcuts */,
 				9BF95ECF2E9321E000776771 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -579,6 +579,7 @@
 				9B8FBF1A2F1039BF00CBF4B8 /* Sparkle */,
 				9B9BCED22F184DE00020F3AD /* LocalShortcuts */,
 				9B9BCED52F184DEC0020F3AD /* ComfyLogger */,
+				9BF1F5B22F9050EA000C29C9 /* LocalShortcuts */,
 			);
 			productName = TilingWIndowManager_Test;
 			productReference = 9BF95ECE2E9321E000776771 /* ComfyTile.app */;
@@ -612,8 +613,8 @@
 				9BF95F0C2E9326AE00776771 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				9B4E04B62E934B05001CF411 /* XCRemoteSwiftPackageReference "Defaults" */,
 				9B8FBF192F1039BF00CBF4B8 /* XCRemoteSwiftPackageReference "Sparkle" */,
-				9B9BCED12F184DE00020F3AD /* XCLocalSwiftPackageReference "LocalShortcuts" */,
 				9B9BCED42F184DEC0020F3AD /* XCLocalSwiftPackageReference "ComfyLogger" */,
+				9BF1F5B12F9050EA000C29C9 /* XCRemoteSwiftPackageReference "LocalShortcuts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9BF95ECF2E9321E000776771 /* Products */;
@@ -964,10 +965,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		9B9BCED12F184DE00020F3AD /* XCLocalSwiftPackageReference "LocalShortcuts" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = LocalShortcuts;
-		};
 		9B9BCED42F184DEC0020F3AD /* XCLocalSwiftPackageReference "ComfyLogger" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ComfyLogger;
@@ -989,6 +986,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.8.1;
+			};
+		};
+		9BF1F5B12F9050EA000C29C9 /* XCRemoteSwiftPackageReference "LocalShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AryanRogye/LocalShortcuts";
+			requirement = {
+				branch = main;
+				kind = branch;
 			};
 		};
 		9BF95F0C2E9326AE00776771 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
@@ -1027,6 +1032,11 @@
 		9B9BCED52F184DEC0020F3AD /* ComfyLogger */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ComfyLogger;
+		};
+		9BF1F5B22F9050EA000C29C9 /* LocalShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9BF1F5B12F9050EA000C29C9 /* XCRemoteSwiftPackageReference "LocalShortcuts" */;
+			productName = LocalShortcuts;
 		};
 		9BF95F0D2E9326AE00776771 /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
