@@ -171,6 +171,68 @@ public class WindowServerBridge {
         return nil
     }
     
+    /// Discovers an AXUIElement for a window by brute-forcing the remote token API.
+    ///
+    /// construct a 20-byte token containing the PID and an incrementing
+    /// AX element ID, then call `_AXUIElementCreateWithRemoteToken` to fabricate
+    /// a reference.
+    /// This finds windows that standard `kAXWindowsAttribute` misses — minimized windows,
+    /// windows on other Spaces, and windows from apps that don't fully expose
+    /// their AX hierarchy.
+    func findMatchingAXWindowBruteForce(pid: pid_t, targetWindowID: CGWindowID) -> AXUIElement? {
+        guard let createWithToken = axUIElementCreateWithRemoteToken,
+              let getWindow = axUIElementGetWindow else { return nil }
+        
+        // Token layout (20 bytes):
+        //   [0..3]   pid            (Int32, little-endian)
+        //   [4..7]   reserved       (0)
+        //   [8..11]  magic          (0x636F_636F — "coco")
+        //   [12..19] AX element ID  (UInt64)
+        var token = Data(count: 20)
+        withUnsafeBytes(of: pid) { token.replaceSubrange(0..<4, with: $0) }
+        withUnsafeBytes(of: Int32(0)) { token.replaceSubrange(4..<8, with: $0) }
+        withUnsafeBytes(of: Int32(0x636F_636F)) { token.replaceSubrange(8..<12, with: $0) }
+        
+        for axID: UInt64 in 0..<1000 {
+            withUnsafeBytes(of: axID) { token.replaceSubrange(12..<20, with: $0) }
+            
+            guard let element = createWithToken(token as CFData) else { continue }
+            
+            // Check if this element matches the target CGWindowID
+            var wid: CGWindowID = 0
+            if getWindow(element, &wid) == .success, wid == targetWindowID {
+                // Verify it's a real window (has role=AXWindow)
+                var roleValue: CFTypeRef?
+                let roleErr = AXUIElementCopyAttributeValue(
+                    element,
+                    kAXRoleAttribute as CFString,
+                    &roleValue
+                )
+                if roleErr == .success,
+                   let role = roleValue as? String,
+                   role == (kAXWindowRole as String) {
+                    return element
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    /// Resolves an AXUIElement for a given window, trying the standard approach
+    /// first and falling back to brute-force token fabrication.
+    ///
+    /// This is the primary API for getting an AX element for any window without
+    /// requiring prior caching.
+    func resolveAXElement(pid: pid_t, windowID: CGWindowID) -> AXUIElement? {
+        // Fast path: standard kAXWindows enumeration
+        if let ax = findMatchingAXWindow(pid: pid, targetWindowID: windowID) {
+            return ax
+        }
+        // Slow path: brute-force via _AXUIElementCreateWithRemoteToken
+        return findMatchingAXWindowBruteForce(pid: pid, targetWindowID: windowID)
+    }
+    
     // MARK: - Private APIs (packet + token probe)
     
     private func makeKeyWindow(forWindowID windowID: UInt32, psn: inout ProcessSerialNumber) {

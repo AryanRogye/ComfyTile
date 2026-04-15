@@ -274,6 +274,17 @@ extension WindowCore {
                             else if let element = self.elementCache[windowID] {
                                 cw.setElement(element)
                             }
+                            /// Brute-force fallback: resolve via _AXUIElementCreateWithRemoteToken
+                            /// This catches windows on other Spaces, minimized, or hidden
+                            /// that neither standard AX nor our cache can find
+                            else if let ax = WindowServerBridge.shared.resolveAXElement(
+                                pid: cw.pid,
+                                windowID: windowID
+                            ) {
+                                let resolved = WindowElement(element: ax)
+                                cw.setElement(resolved)
+                                self.elementCache[windowID] = resolved
+                            }
                         }
                         
                         self.attachSubscriptionIfNeeded(

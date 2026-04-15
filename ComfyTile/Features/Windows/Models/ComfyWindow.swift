@@ -39,10 +39,22 @@ public final class ComfyWindow: Sendable {
     
     public func focusWindow() {
         if let id = windowID {
+            // If we have no AX element, try to resolve one on-the-fly
+            // This eliminates the need for prior caching — matches DockDoor's approach
+            var axElement = element.element
+            if axElement == nil {
+                axElement = WindowServerBridge.shared.resolveAXElement(
+                    pid: pid, windowID: id
+                )
+                // Update the element for future use
+                if let axElement {
+                    element = WindowElement(element: axElement)
+                }
+            }
             WindowServerBridge.shared.focusApp(
                 forUserWindowID: id,
                 pid: pid,
-                element: element.element,
+                element: axElement,
                 app: app
             )
         }
