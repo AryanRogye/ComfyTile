@@ -331,7 +331,7 @@ extension WindowCore {
                             }
                             /// if AXUIElement is nil, we can check our cache and update
                             else if let element = self.elementCache[windowID] {
-                                cw.setElement(element)
+                                cw.element = element
                             }
                             /// Brute-force fallback: resolve via _AXUIElementCreateWithRemoteToken
                             /// This catches windows on other Spaces, minimized, or hidden
@@ -341,7 +341,7 @@ extension WindowCore {
                                 windowID: windowID
                             ) {
                                 let resolved = WindowElement(element: ax)
-                                cw.setElement(resolved)
+                                cw.element = resolved
                                 self.elementCache[windowID] = resolved
                             }
                         }

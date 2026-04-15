@@ -73,4 +73,18 @@ public class WindowElement {
         position = frame.origin
         size = frame.size
     }
+    
+    public func toggleMinimize() {
+        guard let element else { return }
+        guard let isMinimized = try? element.isMinimized() else { return }
+        
+        let newValue: CFBoolean = isMinimized ? kCFBooleanFalse : kCFBooleanTrue
+        element.setValue(.minimized, newValue)
+    }
+    
+    public func quit() {
+        guard let element else { return }
+        guard let closeButton = try? element.closeButton() else { return }
+        try? closeButton.performAction(kAXPressAction)
+    }
 }

@@ -57,6 +57,10 @@ extension AXUIElement {
         return value
     }
     
+    func closeButton() throws -> AXUIElement? {
+        try attribute(kAXCloseButtonAttribute, AXUIElement.self)
+    }
+    
     private func setWrappedValue<T>(_ attribute: NSAccessibility.Attribute, _ value: T, _ type: AXValueType) {
         guard let value = AXValue.from(value: value, type: type) else { return }
         setValue(attribute, value)
@@ -72,6 +76,11 @@ extension AXUIElement {
     
     func setValue(_ attribute: NSAccessibility.Attribute, _ value: AnyObject) {
         AXUIElementSetAttributeValue(self, attribute.rawValue as CFString, value)
+    }
+    
+    func performAction(_ action: String) throws {
+        var unused: Void = ()
+        try axCallWhichCanThrow(AXUIElementPerformAction(self, action as CFString), &unused)
     }
     
     
