@@ -12,6 +12,9 @@ import ScreenCaptureKit
 @MainActor
 public final class WindowCore {
     
+    /**
+     * All User Windows
+     */
     public var windows: [ComfyWindow] = []
     
     /**
@@ -24,31 +27,61 @@ public final class WindowCore {
     private var elementCache: [CGWindowID: WindowElement] = [:]
     
     var bootTask : Task<Void, Never>?
-    var pollingWindowDragging : Task<Void, Never>?
+    
+    /**
+     * This is the task that holds a run of the loadTask in a non async function
+     */
     private var unAsyncLoadWindowTask: Task<Void, Never>?
+    
+    /**
+     * Main Load Window Task
+     */
     var loadWindowTask: Task<[ComfyWindow], Never>?
-    var focusedWindowTask: Task<ComfyWindow, Never>?
     
-    var highlightFocusedWindow: Bool = false
-    var superFocusWindow: Bool = false
     
-    @ObservationIgnored static let ignore_list = [
+    @ObservationIgnored
+    static let ignore_list = [
         "com.aryanrogye.ComfyTile"
     ]
     
+    /**
+     * These are all related to highlighting focused windows or
+     * super focusing, windowSubscriptions is only populated if
+     * either are true
+     */
+    var highlightFocusedWindow: Bool = false
+    var superFocusWindow: Bool = false
+    
+    /**
+     * Contains a mapping of pid -> subscription
+     */
     @ObservationIgnored
     public var windowSubscriptions: [pid_t: AXSubscription] = [:]
-
+    
+    /**
+     * What happens when a AXElement is changed
+     * this is set by other classes, but this will run only if either
+     * highlightFocusedWindow || superFocusWindow
+     */
     var onNewFrame: ((ComfyWindow?, [HighlightConfiguration], Bool) -> Void)?
-    var fullScreenDetection: ((Bool) -> Void)?
-
+    
+    
+    /**
+     * Observers are used for knowing when a app got focused
+     * and for when spaces got changed, this lets us call our
+     * getFocusedWindow function and set that window to the
+     * 0th index or the most recent cuz it is
+     */
     private var observers: [NSObjectProtocol] = []
     
     public init() {
         bootTask = Task { [weak self] in
             guard let self else { return }
+            /// Initial Load of all windows
             await self.loadWindows()
+            /// Begin Observation tracking on highlightFocusedWindow and superFocusWindow
             observeFocusedWindow()
+            /// Assign Possible Observations we wanna watch for
             assignObservers()
         }
     }
@@ -60,15 +93,53 @@ public final class WindowCore {
             center.removeObserver(observer)
         }
     }
+}
+
+// MARK: - Initial Boot
+extension WindowCore {
     
-    internal func focusAndAddToFront() {
-        if let w = getFocusedWindow(),
-           let wID = w.windowID,
-           let index = windows.firstIndex(where: { $0.windowID == wID }) {
-            addWindowToFront(at: index)
+    /**
+     * Observes focus-related toggles (`highlightFocusedWindow`, `superFocusWindow`)
+     * and dynamically manages AX subscriptions based on their state.
+     *
+     * When both are disabled, all subscriptions are cleared to avoid unnecessary work.
+     * When at least one is enabled, subscriptions are attached to track focus changes.
+     *
+     * Re-triggers itself on change to keep the observation cycle alive.
+     */
+    internal func observeFocusedWindow() {
+        withObservationTracking {
+            _ = highlightFocusedWindow;
+            _ = superFocusWindow
+        } onChange: { [weak self] in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                
+                let isHighlightFocusWindow = self.highlightFocusedWindow
+                let isSuperFocusWindow = self.superFocusWindow
+                
+                if !isHighlightFocusWindow && !isSuperFocusWindow {
+                    self.clearSubscriptions()
+                }
+                /// Else falls through if at least 1 is true
+                else {
+                    self.attachSubscriptionsOnAllWindows()
+                }
+                
+                self.emitCurrentFocusedState()
+                
+                self.observeFocusedWindow()
+            }
         }
     }
     
+    /**
+     * Subscribes to workspace-level events (**App Activation**, **Space Change**)
+     * to keep the internal window ordering in sync with system focus.
+     *
+     * Whenever the active app or space changes, the currently focused window
+     * is moved to the front of our tracked windows list.
+     */
     internal func assignObservers() {
         let center = NSWorkspace.shared.notificationCenter
         
@@ -80,7 +151,7 @@ public final class WindowCore {
             ) { [weak self] notification in
                 DispatchQueue.main.async {
                     guard let self else { return }
-                    self.focusAndAddToFront()
+                    self.addFocusedToFront()
                 }
             }
         )
@@ -92,79 +163,17 @@ public final class WindowCore {
             ) { [weak self] notification in
                 DispatchQueue.main.async {
                     guard let self else { return }
-                    self.focusAndAddToFront()
+                    self.addFocusedToFront()
                 }
             }
         )
     }
-    
-    public func focusWindow(at index: Int) {
-        if windows.indices.contains(index) {
-            windows[index].focusWindow()
-            addWindowToFront(at: index)
-        }
-    }
-    
-    public func addWindowToFront(at index: Int) {
-        if windows.indices.contains(index) {
-            /// Remove
-            let focused = windows.remove(at: index)
-            
-            /// Add to front
-            windows.insert(focused, at: 0)
-        }
-    }
-    
-    internal func observeFocusedWindow() {
-        withObservationTracking {
-            _ = highlightFocusedWindow;
-            _ = superFocusWindow
-        } onChange: {
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                
-                let isHighlightFocusWindow = self.highlightFocusedWindow
-                let isSuperFocusWindow = self.superFocusWindow
-                
-                if !isHighlightFocusWindow && !isSuperFocusWindow {
-                    clearSubscriptions()
-                }
-                /// Else falls through if at least 1 is true
-                else {
-                    attachSubscriptionsOnAllWindows()
-                }
 
-                emitCurrentFocusedState()
-                
-                self.observeFocusedWindow()
-            }
-        }
-    }
-
-    private func currentHighlightConfig() -> [HighlightConfiguration] {
-        var config: [HighlightConfiguration] = []
-        if highlightFocusedWindow {
-            config.append(.border)
-        }
-        if superFocusWindow {
-            config.append(.superFocus)
-        }
-        return config
-    }
-    
-    private func isFullScreen(on window: ComfyWindow?) -> Bool {
-        if let element = window?.element.element {
-            var value: CFTypeRef?
-            AXUIElementCopyAttributeValue(element,
-                                          kAXFullscreenAttribute as CFString,
-                                          &value)
-            if let bool = value as? Bool {
-                return bool
-            }
-        }
-        return false
-    }
-
+    /**
+     * Function Forces a onNewFrame call
+     * this can be used to give info to whoever is setting
+     * this quickly for turning/hiding states
+     */
     private func emitCurrentFocusedState() {
         let config = currentHighlightConfig()
         guard !config.isEmpty else {
@@ -173,21 +182,6 @@ public final class WindowCore {
         }
         let win = getFocusedWindow()
         onNewFrame?(win, config, isFullScreen(on: win))
-    }
-    
-    // MARK: - Helpers
-    
-    /// Global Helper
-    public static func screenUnderMouse() -> NSScreen? {
-        let loc = NSEvent.mouseLocation
-        return NSScreen.screens.first {
-            NSMouseInRect(loc, $0.frame, false)
-        }
-    }
-    
-    @MainActor
-    internal func refreshAndGetWindows() async -> [ComfyWindow] {
-        await loadWindows()
     }
 }
 
@@ -277,6 +271,7 @@ extension WindowCore {
     internal func clearSubscriptions() {
         self.windowSubscriptions.removeAll()
     }
+    
     internal func attachSubscriptionsOnAllWindows() {
         for cw in windows {
             if self.windowSubscriptions[cw.pid] == nil {
@@ -289,7 +284,6 @@ extension WindowCore {
         }
     }
 }
-
 
 // MARK: - Main Loading Of Windows
 extension WindowCore {
@@ -401,6 +395,17 @@ extension WindowCore {
             return []
         }
     }
+    
+    /**
+     * Public function to focus the window at the specified index
+     * this then ads the window to the front of the list
+     */
+    public func focusWindow(at index: Int) {
+        if windows.indices.contains(index) {
+            windows[index].focusWindow()
+            addWindowToFront(at: index)
+        }
+    }
 }
 
 // MARK: - Main Focus Window
@@ -474,6 +479,85 @@ extension WindowCore {
     }
 }
 
+// MARK: - Helpers
+extension WindowCore {
+    
+    /**
+     * Function Adds the Focused Window to the
+     * front of the windows list by making
+     * sure we have a valid windowID, we find it
+     * in our windows list and we bump
+     * it to the 0th or first index
+     */
+    internal func addFocusedToFront() {
+        if let w = getFocusedWindow(),
+           let wID = w.windowID,
+           let index = windows.firstIndex(where: { $0.windowID == wID }) {
+            addWindowToFront(at: index)
+        }
+    }
+    
+    /**
+     * Function moves the window at the specified index
+     * to the front of the windows list by making it the
+     * 0th index
+     */
+    internal func addWindowToFront(at index: Int) {
+        if windows.indices.contains(index) {
+            /// Remove
+            let focused = windows.remove(at: index)
+            
+            /// Add to front
+            windows.insert(focused, at: 0)
+        }
+    }
+    
+    /**
+     * TODO: Remember what this does its been a min
+     */
+    internal func currentHighlightConfig() -> [HighlightConfiguration] {
+        var config: [HighlightConfiguration] = []
+        if highlightFocusedWindow {
+            config.append(.border)
+        }
+        if superFocusWindow {
+            config.append(.superFocus)
+        }
+        return config
+    }
+    
+    /**
+     * Function Returns true if the window
+     * is fullscreen or not
+     */
+    internal func isFullScreen(
+        on window: ComfyWindow?
+    ) -> Bool {
+        if let element = window?.element.element {
+            var value: CFTypeRef?
+            AXUIElementCopyAttributeValue(element,
+                                          kAXFullscreenAttribute as CFString,
+                                          &value)
+            if let bool = value as? Bool {
+                return bool
+            }
+        }
+        return false
+    }
+
+    /// Global Helper
+    
+    /**
+     * Grab the screen under the mouse
+     */
+    public static func screenUnderMouse() -> NSScreen? {
+        let loc = NSEvent.mouseLocation
+        return NSScreen.screens.first {
+            NSMouseInRect(loc, $0.frame, false)
+        }
+    }
+}
+
 #if DEBUG
 extension WindowCore {
     public func debugPress() {
@@ -485,3 +569,4 @@ extension WindowCore {
     }
 }
 #endif
+

@@ -16,7 +16,11 @@ class WindowViewerViewModel {
     
     var onEscape: (() -> Void) = { }
     
-    var selected: Int = 0
+    var selected: Int = 1
+    
+    public func reset() {
+        self.selected = 1
+    }
 }
 
 @MainActor
@@ -117,14 +121,7 @@ class WindowViewerCoordinator: NSObject {
                 if modifier == [] {
                     let index = windowViewerVM.selected
                     
-                    if windowCore.windows.indices.contains(index) {
-                        let windows = windowCore.windows
-                        
-                        windows[index].focusWindow()
-                        
-                        let focused = windowCore.windows.remove(at: index)
-                        windowCore.windows.insert(focused, at: 0)
-                    }
+                    windowCore.focusWindow(at: index)
                     
                     self.windowViewerVM.onEscape()
                 }
