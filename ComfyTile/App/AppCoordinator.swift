@@ -125,10 +125,12 @@ class AppCoordinator {
             // MARK: - Window Switcher
             onWindowViewer: {
                 if self.windowViewerVM.isShown {
+                    /// += 1
                     let nextIndex = self.windowViewerVM.selected + 1
-                    guard self.windowCore.windows.indices.contains(nextIndex)
-                    else {
-                        /// If Next Index Doesnt Exist Start at 0 and return
+                    
+                    let indexExists = self.windowCore.windows.indices.contains(nextIndex)
+                    /// If Next Index Doesnt Exist Start at 0 and return
+                    guard indexExists else {
                         self.windowViewerVM.selected = 0
                         return
                     }
@@ -223,11 +225,11 @@ class AppCoordinator {
         withObservationTracking {
             _ = defaultsManager.highlightFocusedWindow;
             _ = defaultsManager.superFocusWindow
-        } onChange: {
-            DispatchQueue.main.async { [weak self] in
+        } onChange: { [weak self] in
+            DispatchQueue.main.async {
                 guard let self else { return }
-                let newHighlight = defaultsManager.highlightFocusedWindow
-                let newSuperFocus = defaultsManager.superFocusWindow
+                let newHighlight = self.defaultsManager.highlightFocusedWindow
+                let newSuperFocus = self.defaultsManager.superFocusWindow
                 
                 if self.windowCore.highlightFocusedWindow != newHighlight {
                     self.windowCore.highlightFocusedWindow = newHighlight

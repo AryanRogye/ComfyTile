@@ -69,22 +69,21 @@ final class HighlightFocusedViewModel {
     func observeFullScreen() {
         withObservationTracking {
             _ = isFullScreen
-        } onChange: {
-            DispatchQueue.main.async { [weak self] in
+        } onChange: { [weak self] in
+            DispatchQueue.main.async {
                 guard let self else { return }
-                print("IS FULLSCREEN: \(isFullScreen)")
 
-                if isFullScreen {
-                    onHide?()
+                if self.isFullScreen {
+                    self.onHide?()
                 } else {
-                    if let _ = currentFocused {
-                        onShow?(currentFocused)
+                    if let _ = self.currentFocused {
+                        self.onShow?(self.currentFocused)
                     } else {
-                        onHide?()
+                        self.onHide?()
                     }
                 }
                 
-                observeFullScreen()
+                self.observeFullScreen()
             }
         }
     }
@@ -92,15 +91,15 @@ final class HighlightFocusedViewModel {
     func observeFocused()  {
         withObservationTracking {
             _ = currentFocused;
-        } onChange: {
-            DispatchQueue.main.async { [weak self] in
+        } onChange: { [weak self] in
+            DispatchQueue.main.async {
                 guard let self else { return }
                 
-                if let _ = currentFocused, !isFullScreen {
-                    onShow?(currentFocused)
-                    syncHighlightThrottling()
+                if let _ = self.currentFocused, !self.isFullScreen {
+                    self.onShow?(self.currentFocused)
+                    self.syncHighlightThrottling()
                 } else {
-                    onHide?()
+                    self.onHide?()
                 }
                 
                 self.observeFocused()

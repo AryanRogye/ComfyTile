@@ -77,12 +77,12 @@ extension ComfyTileMenuBarViewModel {
     func observeTabs() {
         withObservationTracking {
             _ = selectedTab
-        } onChange: {
-            DispatchQueue.main.async { [weak self] in
+        } onChange: { [weak self] in
+            DispatchQueue.main.async {
                 guard let self else { return }
-                guard let panel else { return }
+                guard let panel = self.panel else { return }
                 self.showSettingsRevealWorkItem?.cancel()
-                if selectedTab == .settings {
+                if self.selectedTab == .settings {
                     withAnimation(.snappy) {
                         self.width = 600
                         self.height = 400

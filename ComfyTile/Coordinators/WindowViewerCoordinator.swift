@@ -112,8 +112,8 @@ class WindowViewerCoordinator: NSObject {
             
             if e.type == .flagsChanged && windowViewerVM.isShown {
                 let modifier = LocalShortcuts.Modifier.activeModifiers(from: e)
-                /// No Modifier Held
                 
+                /// No Modifier Held
                 if modifier == [] {
                     let index = windowViewerVM.selected
                     
