@@ -114,6 +114,7 @@ class AppCoordinator {
                 self.windowSpatialEngine.primaryTile()
             },
             
+            // MARK: - Window Switcher
             onWindowViewerBack: {
                 /// cycle back only if is shown
                 if self.windowViewerVM.isShown {
@@ -121,8 +122,6 @@ class AppCoordinator {
                     self.windowViewerVM.selected = (self.windowViewerVM.selected - 1 + count) % count
                 }
             },
-            
-            // MARK: - Window Switcher
             onWindowViewer: {
                 if self.windowViewerVM.isShown {
                     /// += 1
@@ -141,6 +140,12 @@ class AppCoordinator {
                         self.windowViewerVM.reset()
                         await self.windowCore.loadWindows()
                     }
+                }
+            },
+            onWindowViewerQuitWindow: {
+                if self.windowViewerVM.isShown {
+                    let window = self.windowCore.windows[self.windowViewerVM.selected]
+                    self.windowCore.quit(window)
                 }
             },
             onWindowViewerEscapeEarly: {

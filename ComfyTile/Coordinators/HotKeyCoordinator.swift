@@ -26,6 +26,10 @@ extension KeyboardShortcuts.Name {
         .tab,
         modifiers: .option
     ))
+    static let windowViewerQuitWindow = Self("WindowViewerQuitWindow", default: Shortcut(
+        .q,
+        modifiers: .option
+    ))
     static let windowViewerEscapeEarly = Self("WindowViewerEscapeEarly", default: Shortcut(
         .escape,
         modifiers: .option
@@ -80,7 +84,7 @@ final class HotKeyCoordinator {
         onPrimaryTile                        : @escaping() -> Void = {},
         onWindowViewerBack  : @escaping () -> Void = {},
         onWindowViewer      : @escaping () -> Void = {},
-        onWindowViewerUp    : @escaping () -> Void = {},
+        onWindowViewerQuitWindow  : @escaping () -> Void = {},
         onWindowViewerEscapeEarly : @escaping () -> Void = {},
         
         onAutoTile          : @escaping () -> Void = {},
@@ -128,14 +132,16 @@ final class HotKeyCoordinator {
         KeyboardShortcuts.onKeyDown(for: .windowViewerBack) {
             onWindowViewerBack()
         }
+        
         KeyboardShortcuts.onKeyDown(for: .windowViewer) {
             onWindowViewer()
         }
+        
+        KeyboardShortcuts.onKeyDown(for: .windowViewerQuitWindow) {
+            onWindowViewerQuitWindow()
+        }
         KeyboardShortcuts.onKeyDown(for: .windowViewerEscapeEarly) {
             onWindowViewerEscapeEarly()
-        }
-        KeyboardShortcuts.onKeyUp(for: .windowViewer) {
-            onWindowViewerUp()
         }
         
         // MARK: - Right Half
