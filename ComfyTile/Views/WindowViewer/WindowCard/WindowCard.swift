@@ -10,6 +10,7 @@ import SwiftUI
 struct WindowCard: View {
     
     let appName: String
+    let windowTitle: String
     let appIcon: NSImage?
     let appScreenshot: CGImage?
     let cardWidth: CGFloat
@@ -61,9 +62,21 @@ struct WindowCard: View {
         VStack(spacing: spacingBetween) {
             /// Top Area
             HStack(spacing: 0) {
-                trafficLights
+                WindowTrafficLights(
+                    onClose: onClose,
+                    onMinimize: onMinimize,
+                    onMaximize: onMaximize,
+                    selected: selected,
+                    shape: shape,
+                    trafficLightBackground: trafficLightBackground
+                )
                 Spacer()
-                appNameView
+                WindowTitleView(
+                    appName: appName,
+                    windowTitle: windowTitle,
+                    appIcon: appIcon,
+                    topHeight: topHeight
+                )
             }
             .padding(.horizontal, paddingAround)
             .frame(
@@ -71,7 +84,7 @@ struct WindowCard: View {
             )
             
             /// Bottom Area
-            preview
+            WindowPreview(appScreenshot: appScreenshot)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .clipShape(shape)
         }
@@ -101,81 +114,5 @@ struct WindowCard: View {
                         )
                 }
         }
-    }
-    
-    
-    @ViewBuilder
-    private var preview: some View {
-        if let appScreenshot {
-            Image(decorative: appScreenshot, scale: 1.0)
-                .resizable()
-        } else {
-            Rectangle()
-                .fill(Color.secondary)
-        }
-    }
-    
-    @ViewBuilder
-    private var appNameView: some View {
-        HStack {
-            if let appIcon {
-                Image(nsImage: appIcon)
-                    .frame(width: 20, height: 20)
-            }
-            Text(appName)
-        }
-    }
-    
-    @ViewBuilder
-    private var trafficLights: some View {
-        HStack {
-            actionButton(
-                systemName: "xmark",
-                fillColor: .red,
-                action: onClose
-            )
-            actionButton(
-                systemName: "minus",
-                fillColor: .yellow,
-                action: onMinimize
-            )
-            actionButton(
-                systemName: "arrow.up.left.and.arrow.down.right",
-                fillColor: .green,
-                action: onMaximize
-            )
-        }
-        .padding(4)
-        .padding(.horizontal, 8)
-        .background {
-            shape
-                .fill(trafficLightBackground)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 18)
-                        .fill(.clear)
-                        .stroke(
-                            .secondary.opacity(0.5),
-                            style: .init(lineWidth: 0.5)
-                        )
-                }
-        }
-    }
-    
-    @ViewBuilder
-    private func actionButton(
-        systemName: String,
-        fillColor: Color,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: 7))
-                .frame(width: 14, height: 14)
-                .background {
-                    Circle()
-                        .fill(fillColor)
-                }
-        }
-        .buttonStyle(.plain)
     }
 }

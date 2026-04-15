@@ -8,8 +8,7 @@
 import Cocoa
 import ScreenCaptureKit
 
-public final class ComfyWindow: Sendable {
-    
+public final class ComfyWindow: Sendable, Equatable {
     public var id: String {
         if let wid = windowID {
             return "\(pid):\(wid)"
@@ -131,6 +130,9 @@ public final class ComfyWindow: Sendable {
         }
     }
 
+    public static func == (lhs: ComfyWindow, rhs: ComfyWindow) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 // MARK: - Public Helpers

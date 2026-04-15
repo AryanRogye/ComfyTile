@@ -41,15 +41,26 @@ struct WindowViewer: View {
                 spacing: spacing
             ) {
                 ForEach(windowCore.windows, id: \.windowID) { window in
-                    let selected = window.id == windowCore.windows[windowViewerVM.selected].id
-
+                    
+                    /// We're basically checking if the window is selected or not
+                    /// we have to check if it exists before we set a selected cuz
+                    /// this avoids a index out of range crash if we're selected while
+                    /// we press the quit button
+                    let exists = windowCore.windows.indices.contains(windowViewerVM.selected)
+                    let selected: Bool = exists
+                        ? window.id == windowCore.windows[windowViewerVM.selected].id
+                        : false
+                    
                     WindowCard(
                         appName: window.app.localizedName ?? "Unknown",
+                        windowTitle: window.windowTitle,
                         appIcon: window.app.icon,
                         appScreenshot: window.screenshot,
                         cardWidth: cardWidth,
                         cardHeight: cardHeight,
-                        onClose: window.element.quit,
+                        onClose: {
+                            windowCore.quit(window)
+                        },
                         onMinimize: window.element.toggleMinimize,
                         onMaximize: window.maximize,
                         selected: selected,
@@ -67,6 +78,7 @@ struct WindowViewer: View {
                 }
             }
         }
+        .animation(.bouncy, value: windowCore.windows)
         .padding()
         .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 32))
         .frame(maxWidth: .infinity, maxHeight: .infinity)

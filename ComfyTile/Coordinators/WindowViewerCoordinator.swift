@@ -76,6 +76,9 @@ class WindowViewerCoordinator: NSObject {
         panel.backgroundColor = .clear
         panel.isOpaque = false
         panel.hasShadow = false
+        panel.becomesKeyOnlyIfNeeded = true
+        panel.hidesOnDeactivate = false
+        panel.animationBehavior = .none
         
         let view: NSView = NSHostingView(
             rootView: WindowViewer(

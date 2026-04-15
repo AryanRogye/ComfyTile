@@ -396,6 +396,12 @@ extension WindowCore {
         }
     }
     
+    public func quit(_ window: ComfyWindow) {
+        /// find the index
+        guard let index = windows.firstIndex(where: {$0.id == window.id }) else { return }
+        windows.remove(at: index)
+        window.element.quit()
+    }
     /**
      * Public function to focus the window at the specified index
      * this then ads the window to the front of the list

@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		9B23AB7B2F900D840028C510 /* WindowCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB7A2F900D840028C510 /* WindowCard.swift */; };
+		9B23AB7D2F901BF90028C510 /* WindowTrafficLights.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB7C2F901BF90028C510 /* WindowTrafficLights.swift */; };
+		9B23AB7F2F901C0A0028C510 /* WindowPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB7E2F901C0A0028C510 /* WindowPreview.swift */; };
+		9B23AB822F901C820028C510 /* WindowTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB812F901C820028C510 /* WindowTitleView.swift */; };
+		9B23AB8B2F9023B30028C510 /* MarqueeText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB8A2F9023B30028C510 /* MarqueeText.swift */; };
 		9B3BC0982F43A8E300A86E11 /* HighlightFocusedCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */; };
 		9B436CEE2ED7824E00D79941 /* ComfyTile.icon in Resources */ = {isa = PBXBuildFile; fileRef = 9B436CED2ED7824E00D79941 /* ComfyTile.icon */; };
 		9B490C752F0B5FFF00963D05 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B490C742F0B5FFF00963D05 /* LocalShortcuts */; };
@@ -101,6 +105,10 @@
 
 /* Begin PBXFileReference section */
 		9B23AB7A2F900D840028C510 /* WindowCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowCard.swift; sourceTree = "<group>"; };
+		9B23AB7C2F901BF90028C510 /* WindowTrafficLights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowTrafficLights.swift; sourceTree = "<group>"; };
+		9B23AB7E2F901C0A0028C510 /* WindowPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowPreview.swift; sourceTree = "<group>"; };
+		9B23AB812F901C820028C510 /* WindowTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowTitleView.swift; sourceTree = "<group>"; };
+		9B23AB8A2F9023B30028C510 /* MarqueeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarqueeText.swift; sourceTree = "<group>"; };
 		9B3BC0962F437F1500A86E11 /* Untitled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Untitled.swift; sourceTree = "<group>"; };
 		9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightFocusedCoordinator.swift; sourceTree = "<group>"; };
 		9B436CED2ED7824E00D79941 /* ComfyTile.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = ComfyTile.icon; sourceTree = "<group>"; };
@@ -196,6 +204,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9B23AB802F901C3D0028C510 /* WindowCard */ = {
+			isa = PBXGroup;
+			children = (
+				9B23AB812F901C820028C510 /* WindowTitleView.swift */,
+				9B23AB7E2F901C0A0028C510 /* WindowPreview.swift */,
+				9B23AB7C2F901BF90028C510 /* WindowTrafficLights.swift */,
+				9B23AB7A2F900D840028C510 /* WindowCard.swift */,
+			);
+			path = WindowCard;
+			sourceTree = "<group>";
+		};
 		9B68EEA12F228C62009567DF /* Appearance */ = {
 			isa = PBXGroup;
 			children = (
@@ -290,7 +309,7 @@
 		9B8FC0562F10B80D00CBF4B8 /* WindowViewer */ = {
 			isa = PBXGroup;
 			children = (
-				9B23AB7A2F900D840028C510 /* WindowCard.swift */,
+				9B23AB802F901C3D0028C510 /* WindowCard */,
 				9B8FC0552F10B80D00CBF4B8 /* WindowViewer.swift */,
 			);
 			path = WindowViewer;
@@ -362,6 +381,7 @@
 		9B8FC0C42F12ECF000CBF4B8 /* Component */ = {
 			isa = PBXGroup;
 			children = (
+				9B23AB8A2F9023B30028C510 /* MarqueeText.swift */,
 				9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */,
 				9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */,
 				9B8FC0C92F12EF5900CBF4B8 /* MenuBarModeContainer.swift */,
@@ -631,6 +651,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B8FC0B22F11EEF300CBF4B8 /* ComfyTileTabPlacement.swift in Sources */,
+				9B23AB8B2F9023B30028C510 /* MarqueeText.swift in Sources */,
 				9B8FC05D2F10B80D00CBF4B8 /* AppCoordinator.swift in Sources */,
 				9B8FC05E2F10B80D00CBF4B8 /* AppDelegate.swift in Sources */,
 				9B8FC05F2F10B80D00CBF4B8 /* HotKeyCoordinator.swift in Sources */,
@@ -671,6 +692,7 @@
 				9B9BCFC72F1971ED0020F3AD /* CheckForUpdatesView.swift in Sources */,
 				9B9BCFC82F1971ED0020F3AD /* UpdateUserDriver.swift in Sources */,
 				9B9BCFC92F1971ED0020F3AD /* ComfyTileUpdateView.swift in Sources */,
+				9B23AB822F901C820028C510 /* WindowTitleView.swift in Sources */,
 				9B9BCFCA2F1971ED0020F3AD /* UpdateController.swift in Sources */,
 				9B9BCFCB2F1971ED0020F3AD /* UpdaterViewModel.swift in Sources */,
 				9B8FC0B92F11FFC000CBF4B8 /* SettingsTopBar.swift in Sources */,
@@ -690,6 +712,8 @@
 				9B3BC0982F43A8E300A86E11 /* HighlightFocusedCoordinator.swift in Sources */,
 				9B9BCFD42F1972350020F3AD /* DefaultsKeys.swift in Sources */,
 				9B8FC0862F10B80D00CBF4B8 /* SettingsView.swift in Sources */,
+				9B23AB7F2F901C0A0028C510 /* WindowPreview.swift in Sources */,
+				9B23AB7D2F901BF90028C510 /* WindowTrafficLights.swift in Sources */,
 				9B9BCFF22F1973F90020F3AD /* AXHelpers.swift in Sources */,
 				9B9BCFF32F1973F90020F3AD /* CGSPrivate.swift in Sources */,
 				9B9BCFF42F1973F90020F3AD /* CGSTypes.swift in Sources */,
