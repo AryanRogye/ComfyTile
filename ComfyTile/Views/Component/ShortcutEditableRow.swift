@@ -10,6 +10,8 @@ import KeyboardShortcuts
 
 struct ShortcutEditableRow<Icon: View>: View {
     
+    @Environment(\.colorScheme) private var colorScheme
+    
     let onClick: () -> Void
     let roundTop: Bool
     let title: String
@@ -80,7 +82,12 @@ struct ShortcutEditableRow<Icon: View>: View {
             Text(editLabel).padding(.leading)
             Spacer()
             ShortcutRecorder(label: "", type: hotkey)
-                .shadow(color: .black.opacity(1), radius: 2, x: 0, y: 1)
+                .shadow(
+                    color: colorScheme == .dark ? .black.opacity(1) : .clear,
+                    radius: 2,
+                    x: 0,
+                    y: 1
+                )
         }
         .frame(maxWidth: .infinity, maxHeight: 30)
         .padding(.vertical, 4)
