@@ -50,6 +50,22 @@ func CGSCopyWindowProperty(
     _ outValue: UnsafeMutablePointer<CFTypeRef?>?
 ) -> Int32
 
+/**
+ * Usage:
+ * func getSpacesForWindow(in cid: CGSConnectionID, window: ComfyWindow) -> [CGSSpaceID]? {
+ *     guard let wid = window.windowID else { return nil }
+ *     let windowIDs = [NSNumber(value: Int(wid))] as CFArray
+ *     guard let unmanaged = CGSCopySpacesForWindows(
+ *         cid,
+ *         kCGSAllSpacesMask,
+ *         windowIDs
+ *     ) else {
+ *         return nil
+ *     }
+ *     let nums = unmanaged.takeRetainedValue() as NSArray as? [NSNumber] ?? []
+ *     return nums.map { CGSSpaceID($0.uint64Value) }
+ }
+ */
 @_silgen_name("CGSCopySpacesForWindows")
 func CGSCopySpacesForWindows(
     _ cid: CGSConnectionID,
@@ -57,6 +73,12 @@ func CGSCopySpacesForWindows(
     _ windowIDs: CFArray
 ) -> Unmanaged<CFArray>?
 
+/**
+ * Usage:
+ * func getSpacesArray(from cid: CGSConnectionID) -> [CGSSpaceID]? {
+ *     return CGSCopySpaces(cid, 7)?.takeRetainedValue() as? [CGSSpaceID]
+ * }
+ */
 @_silgen_name("CGSCopySpaces")
 func CGSCopySpaces(
     _ cid: CGSConnectionID,
