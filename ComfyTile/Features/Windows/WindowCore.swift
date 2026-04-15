@@ -42,11 +42,76 @@ public final class WindowCore {
     var onNewFrame: ((ComfyWindow?, [HighlightConfiguration], Bool) -> Void)?
     var fullScreenDetection: ((Bool) -> Void)?
 
+    private var observers: [NSObjectProtocol] = []
+    
     public init() {
         bootTask = Task { [weak self] in
             guard let self else { return }
             await self.loadWindows()
             observeFocusedWindow()
+            assignObservers()
+        }
+    }
+    
+    @MainActor
+    deinit {
+        let center = NSWorkspace.shared.notificationCenter
+        for observer in observers {
+            center.removeObserver(observer)
+        }
+    }
+    
+    internal func focusAndAddToFront() {
+        if let w = getFocusedWindow(),
+           let wID = w.windowID,
+           let index = windows.firstIndex(where: { $0.windowID == wID }) {
+            addWindowToFront(at: index)
+        }
+    }
+    
+    internal func assignObservers() {
+        let center = NSWorkspace.shared.notificationCenter
+        
+        observers.append(
+            center.addObserver(
+                forName: NSWorkspace.didActivateApplicationNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] notification in
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    self.focusAndAddToFront()
+                }
+            }
+        )
+        observers.append(
+            center.addObserver(
+                forName: NSWorkspace.activeSpaceDidChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] notification in
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    self.focusAndAddToFront()
+                }
+            }
+        )
+    }
+    
+    public func focusWindow(at index: Int) {
+        if windows.indices.contains(index) {
+            windows[index].focusWindow()
+            addWindowToFront(at: index)
+        }
+    }
+    
+    public func addWindowToFront(at index: Int) {
+        if windows.indices.contains(index) {
+            /// Remove
+            let focused = windows.remove(at: index)
+            
+            /// Add to front
+            windows.insert(focused, at: 0)
         }
     }
     
