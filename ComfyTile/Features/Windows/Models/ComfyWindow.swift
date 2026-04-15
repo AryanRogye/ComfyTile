@@ -108,7 +108,7 @@ public final class ComfyWindow: Sendable {
         bundleIdentifier: String?,
         pid: pid_t,
         screenshot: CGImage? = nil,
-        isInSpace: Bool,
+        isInSpace: Bool
     ) {
         self.app = app
         self.windowID = windowID
