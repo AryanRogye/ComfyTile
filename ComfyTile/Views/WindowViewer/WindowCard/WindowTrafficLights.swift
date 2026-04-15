@@ -40,10 +40,14 @@ private struct TrafficLightButton: View {
     var fillColor: Color
     var action: () -> Void
     
+    @State private var hovering = false
+    
     var body: some View {
         Button(action: action) {
             Image(systemName: systemName)
-                .font(.system(size: 7))
+                .foregroundStyle(.black.opacity(hovering ? 1 : 0.8))
+                .fontWeight(.bold)
+                .font(.system(size: hovering ? 8 : 7))
                 .frame(width: 14, height: 14)
                 .background {
                     Circle()
@@ -51,5 +55,17 @@ private struct TrafficLightButton: View {
                 }
         }
         .buttonStyle(.plain)
+        .onHover { hovering in
+            self.hovering = hovering
+        }
+        .onChange(of: hovering) { _, newValue in
+            if newValue {
+                NSHapticFeedbackManager.defaultPerformer.perform(
+                    .alignment,
+                    performanceTime: .default
+                )
+            }
+        }
+        .animation(.smooth, value: hovering)
     }
 }

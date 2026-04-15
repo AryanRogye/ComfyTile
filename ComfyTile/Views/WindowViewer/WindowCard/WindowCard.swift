@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WindowCard: View {
     
+    @Environment(\.colorScheme) private var scheme
     let appName: String
     let windowTitle: String
     let appIcon: NSImage?
@@ -43,13 +44,29 @@ struct WindowCard: View {
     }
     
     var backgroundColor: AnyShapeStyle {
-        selected
-        ? AnyShapeStyle(Color.accentColor.opacity(0.2))
-        : AnyShapeStyle(.regularMaterial)
+        (selected
+         /// Selected Background
+         ? AnyShapeStyle(Color.accentColor.opacity(0.2))
+         /// Not Selected Background
+         : (scheme == .dark
+            /// Dark Background
+            ? AnyShapeStyle(.black.opacity(0.2))
+            /// Light Background
+            : AnyShapeStyle(.regularMaterial)
+           )
+        )
     }
     
     var cardStrokeColor: Color {
-        selected ? Color.accentColor : Color.clear
+        /// If selected then show accent color
+        (selected ? Color.accentColor
+         : ( scheme == .dark
+             /// if dark mode show black border
+             ? Color.black.opacity(0.2)
+             /// if light mode show light bright border
+             : Color.white.opacity(0.2)
+           )
+        )
     }
     
     var trafficLightBackground: AnyShapeStyle {
@@ -93,14 +110,7 @@ struct WindowCard: View {
         .frame(height: cardHeight, alignment: .top)
         .background {
             shape
-                .fill(backgroundColor
-                    .shadow(
-                        .inner(
-                            color: selected ? .white : .clear,
-                            radius: 20
-                        )
-                    )
-                )
+                .fill(backgroundColor)
                 .overlay {
                     shape
                         .stroke(.white.opacity(selected ? 0.9 : 0), lineWidth: 1)
@@ -114,5 +124,6 @@ struct WindowCard: View {
                         )
                 }
         }
+        .animation(.smooth, value: selected)
     }
 }
