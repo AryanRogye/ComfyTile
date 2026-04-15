@@ -42,6 +42,13 @@ extension KeyboardShortcuts.Name {
         .space,
         modifiers: [.control, .shift]
     ))
+    
+    #if DEBUG
+    static let debug_press = Self("DEBUG: Press", default: Shortcut(
+        .m,
+        modifiers: [.option]
+    ))
+    #endif
 }
 
 @MainActor
@@ -56,6 +63,15 @@ final class HotKeyCoordinator {
     }
     
     init() {}
+    
+#if DEBUG
+    public func setDebugCompletion(completion: @escaping () -> Void) {
+        KeyboardShortcuts.onKeyDown(for: .debug_press) {
+            print("🛠 Debug shortcut triggered")
+            completion()
+        }
+    }
+#endif
     
     func start(
         onToggleSuperFocus : @escaping() -> Void = {},

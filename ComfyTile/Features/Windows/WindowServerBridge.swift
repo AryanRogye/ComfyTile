@@ -120,6 +120,8 @@ public class WindowServerBridge {
                 level: .debug
             )
             AXUIElementPerformAction(element, kAXRaiseAction as CFString)
+            AXUIElementSetAttributeValue(element, kAXMainWindowAttribute as CFString, true as CFTypeRef)
+
             ComfyLogger.WindowServerBridge.insert(
                 "Raising Done",
                 level: .info

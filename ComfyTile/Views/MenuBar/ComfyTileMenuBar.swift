@@ -88,6 +88,9 @@ struct NewComfyTileMenuBarContent: View {
                 case .layout: LayoutModeView()
                 case .settings: SettingsView()
                 case .tile: TileModeView()
+#if DEBUG
+                case .debug: ComfyTileDebugView()
+#endif
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

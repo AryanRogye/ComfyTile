@@ -397,3 +397,111 @@ extension WindowCore {
         )
     }
 }
+
+#if DEBUG
+extension WindowCore {
+    public func debugPress() {
+        print("✅ Called Debug Press")
+        
+        let currentSpaceID = CGSGetActiveSpace(CGSMainConnectionID())
+        let cid = CGSMainConnectionID()
+        
+        print("Current Space ID: \(currentSpaceID)")
+        
+        guard let spaces = getSpacesArray(from: cid) else {
+            print("Spaces Array Not Found")
+            return
+        }
+        print("All Spaces: \(spaces)")
+        
+        let uuid = CGDisplayCreateUUIDFromDisplayID(CGMainDisplayID()).takeRetainedValue()
+        let displayString = CFUUIDCreateString(nil, uuid)!
+        
+        Task {
+            for spaceID in spaces where spaceID != currentSpaceID {
+                CGSManagedDisplaySetCurrentSpace(cid, displayString, spaceID)
+                
+                // post AFTER switching, not before
+                // also this is the correct notification name
+                DistributedNotificationCenter.default().postNotificationName(
+                    NSNotification.Name("com.apple.spaces.change"),
+                    object: nil,
+                    userInfo: nil,
+                    deliverImmediately: true
+                )
+                
+                // also tell the workspace
+                NSWorkspace.shared.notificationCenter.post(
+                    name: NSWorkspace.activeSpaceDidChangeNotification,
+                    object: NSWorkspace.shared
+                )
+                
+                /// After switching focus the window
+                let w = self.getFocusedWindow()
+                w?.focusWindow()
+                
+//                try? await Task.sleep(nanoseconds: 1_000_000_000 / 2)
+            }
+            
+            for window in self.windows {
+                guard let spaces = getSpacesForWindow(in: cid, window: window) else {
+                    continue
+                }
+                
+                print("Spaces for \(window.app.bundleURL?.lastPathComponent ?? "Unknown"): \(spaces)")
+            }
+        }
+        
+//        let windowsNotInSpace = getWindowsNotInSpace(in: cid, currentSpaceID: currentSpaceID)
+//        
+//        for window in windowsNotInSpace {
+//            guard let wid = window.windowID else { continue }
+//            guard let fromID = window.spaceID else { continue }
+//            print("Attempting To Move: \(window.app.bundleURL?.lastPathComponent ?? "Unknown")")
+//            
+//            let ids = [NSNumber(value: Int(wid))] as CFArray
+//            
+//            CGSAddWindowsToSpaces(cid, ids, [currentSpaceID] as CFArray)
+//            CGSRemoveWindowsFromSpaces(cid, ids, [fromID] as CFArray)
+//        }
+//        
+//        print("=================END=================")
+    }
+    
+    /**
+     * Function gets an array of all spaces
+     */
+    internal func getSpacesArray(from cid: CGSConnectionID) -> [CGSSpaceID]? {
+        return CGSCopySpaces(cid, 7)?.takeRetainedValue() as? [CGSSpaceID]
+    }
+    
+    internal func getWindowsNotInSpace(in cid: CGSConnectionID, currentSpaceID: CGSSpaceID) -> [ComfyWindow] {
+        
+        var currentSpaceWindows: [ComfyWindow] = []
+        var notInCurrent: [ComfyWindow] = []
+        
+        let targetSpaces: Set<CGSSpaceID> = [currentSpaceID]
+        
+        for window in self.windows {
+            guard let spaces = getSpacesForWindow(in: cid, window: window) else { continue }
+            
+            let windowSpaces = Set(spaces)
+            
+            if !windowSpaces.intersection(targetSpaces).isEmpty {
+                currentSpaceWindows.append(window)
+            } else {
+                notInCurrent.append(window)
+            }
+        }
+        return notInCurrent
+    }
+    
+    internal func getSpacesForWindow(in cid: CGSConnectionID, window: ComfyWindow) -> [CGSSpaceID]? {
+        guard let wid = window.windowID else { return nil }
+        let windowIDs = [NSNumber(value: Int(wid))] as CFArray
+        guard let unmanaged = CGSCopySpacesForWindows(cid, kCGSAllSpacesMask, windowIDs) else { return nil }
+        let nums = unmanaged.takeRetainedValue() as NSArray as? [NSNumber] ?? []
+        return nums.map { CGSSpaceID($0.uint64Value) }
+    }
+}
+#endif

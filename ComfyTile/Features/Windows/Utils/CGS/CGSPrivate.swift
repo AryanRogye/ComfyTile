@@ -63,18 +63,25 @@ func CGSCopySpaces(
     _ mask: Int
 ) -> Unmanaged<CFArray>?
 
-@_silgen_name("_CGSRemoveWindowsFromSpaces")
+@_silgen_name("CGSRemoveWindowsFromSpaces")
 func CGSRemoveWindowsFromSpaces(
     _ cid: CGSConnectionID,
     _ windows: CFArray,
     _ spaces: CFArray
 )
 
-@_silgen_name("_CGSAddWindowsToSpaces")
+@_silgen_name("CGSAddWindowsToSpaces")
 func CGSAddWindowsToSpaces(
     _ cid: CGSConnectionID,
     _ windows: CFArray,
     _ spaces: CFArray
+)
+
+@_silgen_name("CGSManagedDisplaySetCurrentSpace")
+func CGSManagedDisplaySetCurrentSpace(
+    _ cid: CGSConnectionID,
+    _ display: CFString,
+    _ space: CGSSpaceID
 )
 
 struct CGSWindowCaptureOptions: OptionSet {

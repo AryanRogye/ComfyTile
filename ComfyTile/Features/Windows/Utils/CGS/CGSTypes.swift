@@ -23,5 +23,5 @@ import Foundation
 // CoreGraphics private types (CGS*)
 typealias CGSConnectionID = UInt32
 typealias CGSWindowCount  = UInt32
-typealias CGSSpaceID      = UInt64
+public typealias CGSSpaceID      = UInt64
 typealias CGSSpaceMask    = UInt64

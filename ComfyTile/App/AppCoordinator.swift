@@ -211,6 +211,12 @@ class AppCoordinator {
         self.windowCore.highlightFocusedWindow = defaultsManager.highlightFocusedWindow
         self.windowCore.superFocusWindow = defaultsManager.superFocusWindow
         self.observeFocusedWindow()
+        
+#if DEBUG
+        self.hotKeyCoordinator.setDebugCompletion {
+            self.windowCore.debugPress()
+        }
+#endif
     }
     
     internal func observeFocusedWindow() {
