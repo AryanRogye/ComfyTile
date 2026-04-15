@@ -131,7 +131,7 @@ class AppCoordinator {
                     let indexExists = self.windowCore.windows.indices.contains(nextIndex)
                     /// If Next Index Doesnt Exist Start at 0 and return
                     guard indexExists else {
-                        self.windowViewerVM.reset()
+                        self.windowViewerVM.selected = 0
                         return
                     }
                     self.windowViewerVM.selected = nextIndex
