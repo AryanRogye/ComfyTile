@@ -30,8 +30,31 @@ class WindowViewerCoordinator: NSObject {
     var windowViewerVM: WindowViewerViewModel
     var windowCore    : WindowCore
     
+    /// Main in-app key monitor.
+    /// Handles Escape and modifier state while our app is active.
+    ///
+    /// ⚠️ Important:
+    /// This ONLY fires while events are routed through our app.
+    /// If the user clicks another app while holding the modifier,
+    /// we will NOT receive the release event here.
     private var localKeyMonitor: Any?
-    private var globalKeyMonitor: Any?
+    
+    /// Global fallback for modifier tracking.
+    ///
+    /// Used specifically to detect modifier key release even when
+    /// our app is no longer active like when the user clicks another
+    /// window while holding Option
+    private var globalFlagsMonitor: Any?
+    
+    /// Observes when the app loses focus (click-away / app switch).
+    ///
+    /// This is somewhat unreliable with nonactivating panels:
+    /// - Sometimes fires exactly when we want (great for cleanup)
+    /// - Sometimes does nothing (macOS being macOS)
+    ///
+    /// We treat this as a *best-effort hint*, not a source of truth.
+    /// Core logic should NOT depend on this firing.
+    private var resignActiveObserver: Any?
     
     init(windowViewerVM : WindowViewerViewModel, windowCore : WindowCore) {
         self.windowViewerVM = windowViewerVM
@@ -41,8 +64,14 @@ class WindowViewerCoordinator: NSObject {
         /// Set Escape
         self.windowViewerVM.onEscape = { [weak self] in
             guard let self = self else { return }
+            windowViewerVM.reset()
             hide()
         }
+    }
+    
+    @MainActor
+    deinit {
+        removeKeyMonitors()
     }
     
     public func setupPanel() {
@@ -93,61 +122,93 @@ class WindowViewerCoordinator: NSObject {
         
         panel.contentView = view
         panel.makeKeyAndOrderFront(nil)
-        
     }
     
     public func show() {
         if panel == nil { setupPanel() }
         windowViewerVM.isShown = true
-        panel.makeKeyAndOrderFront(nil) // ok even if nonactivating
+        panel.makeKeyAndOrderFront(nil)
         installKeyMonitors()
     }
     
-    static let escape = LocalShortcuts.Shortcut(
-        modifier: [],
-        keys: [.escape]
-    )
-    static let option = LocalShortcuts.Shortcut(
-        modifier: [.option],
-        keys: []
-    )
-    
-    public func installKeyMonitors() {
-        // Fires when app is active; can consume the event
-        localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged]) { [weak self] e in
-            guard let self else { return e }
-            
-            if e.type == .flagsChanged && windowViewerVM.isShown {
-                let modifier = LocalShortcuts.Modifier.activeModifiers(from: e)
-                
-                /// No Modifier Held
-                if modifier == [] {
-                    let index = windowViewerVM.selected
-                    
-                    windowCore.focusWindow(at: index)
-                    
-                    self.windowViewerVM.onEscape()
-                }
-            } else {
-                let key = LocalShortcuts.Key.activeKeys(event: e)
-                if key == [.escape] {
-                    self.windowViewerVM.onEscape()
-                    return nil // swallow
-                }
-            }
-            
-            return e
-        }
-    }
-
     public func hide() {
         windowViewerVM.isShown = false
         removeKeyMonitors()
         panel?.orderOut(nil)
     }
+
+    @discardableResult
+    /**
+     * Function Returns True if event was escape
+     */
+    private func handleEvent(
+        e : NSEvent,
+    ) -> Bool {
+        if e.type == .flagsChanged && windowViewerVM.isShown {
+            let modifier = LocalShortcuts.Modifier.activeModifiers(from: e)
+            
+            /// No Modifier Held
+            if modifier == [] {
+                let index = windowViewerVM.selected
+                
+                windowCore.focusWindow(at: index)
+                
+                self.windowViewerVM.onEscape()
+            }
+        } else {
+            let key = LocalShortcuts.Key.activeKeys(event: e)
+            if key == [.escape] {
+                self.windowViewerVM.onEscape()
+                return true
+            }
+        }
+        return false
+    }
     
+    public func installKeyMonitors() {
+        globalFlagsMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.keyDown, .keyUp, .flagsChanged]
+        ) { [weak self] e in
+            guard let self else { return }
+            handleEvent(e: e)
+        }
+        localKeyMonitor = NSEvent.addLocalMonitorForEvents(
+            matching: [.keyDown, .keyUp, .flagsChanged]
+        ) { [weak self] e in
+            guard let self else { return e }
+            
+            if handleEvent(e: e) {
+                return nil
+            }
+            
+            return e
+        }
+        resignActiveObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didResignActiveNotification,
+            object: NSApp,
+            queue: .main
+        ) { [weak self] _ in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if self.windowViewerVM.isShown {
+                    self.hide()
+                }
+            }
+        }
+    }
+
     private func removeKeyMonitors() {
-        if let m = localKeyMonitor { NSEvent.removeMonitor(m); localKeyMonitor = nil }
-        if let m = globalKeyMonitor { NSEvent.removeMonitor(m); globalKeyMonitor = nil }
+        if let m = localKeyMonitor {
+            NSEvent.removeMonitor(m)
+            localKeyMonitor = nil
+        }	
+        if let g = globalFlagsMonitor {
+            NSEvent.removeMonitor(g)
+            globalFlagsMonitor = nil
+        }
+        if let resignActiveObserver {
+            NotificationCenter.default.removeObserver(resignActiveObserver)
+            self.resignActiveObserver = nil
+        }
     }
 }
