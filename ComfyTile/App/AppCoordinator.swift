@@ -113,39 +113,41 @@ class AppCoordinator {
             onPrimaryTile: {
                 self.windowSpatialEngine.primaryTile()
             },
-            
             // MARK: - Window Switcher
             onWindowViewerBack: {
                 /// cycle back only if is shown
                 if self.windowViewerVM.isShown {
-                    let count = self.windowCore.windows.count
-                    self.windowViewerVM.selected = (self.windowViewerVM.selected - 1 + count) % count
+                    self.windowViewerVM.selectPrevious()
                 }
             },
             onWindowViewer: {
                 if self.windowViewerVM.isShown {
-                    /// += 1
-                    let nextIndex = self.windowViewerVM.selected + 1
-                    
-                    let indexExists = self.windowCore.windows.indices.contains(nextIndex)
-                    /// If Next Index Doesnt Exist Start at 0 and return
-                    guard indexExists else {
-                        self.windowViewerVM.selected = 0
-                        return
-                    }
-                    self.windowViewerVM.selected = nextIndex
+                    self.windowViewerVM.selectNext()
                 } else {
                     Task {
+                        self.windowViewerVM.beginCycle(with: self.windowCore.windows)
                         self.windowViewerCoordinator.show()
-                        self.windowViewerVM.reset()
-                        await self.windowCore.loadWindows()
+
+                        let windows = await self.windowCore.loadWindows()
+                        self.windowViewerVM.refreshWindows(windows)
                     }
                 }
             },
             onWindowViewerQuitWindow: {
-                if self.windowViewerVM.isShown {
-                    let window = self.windowCore.windows[self.windowViewerVM.selected]
+                if self.windowViewerVM.isShown,
+                   let window = self.windowViewerVM.selectedWindow {
                     self.windowCore.quit(window)
+                    self.windowViewerVM.removeWindow(withID: window.id)
+
+                    if self.windowViewerVM.windows.isEmpty {
+                        self.windowViewerVM.onEscape()
+                    }
+                }
+            },
+            onWindowViewerFocusApp: {
+                if self.windowViewerVM.isShown,
+                   self.defaultsManager.allowFocusAppWindowOnWindowSwitcher {
+                    self.windowViewerVM.toggleFocusedAppFilter()
                 }
             },
             onWindowViewerEscapeEarly: {

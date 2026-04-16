@@ -34,6 +34,10 @@ extension KeyboardShortcuts.Name {
         .escape,
         modifiers: .option
     ))
+    static let windowViewerFocusApp = Self("WindowViewerFocusApp", default: Shortcut(
+        .f,
+        modifiers: .option
+    ))
     static let primaryLeftStackedHorizontallyTile = Self("PrimaryLeftStackedHorizontallyTile", default: Shortcut(
         .leftBracket,
         modifiers: [.control, .shift]
@@ -85,6 +89,7 @@ final class HotKeyCoordinator {
         onWindowViewerBack  : @escaping () -> Void = {},
         onWindowViewer      : @escaping () -> Void = {},
         onWindowViewerQuitWindow  : @escaping () -> Void = {},
+        onWindowViewerFocusApp    : @escaping () -> Void = {},
         onWindowViewerEscapeEarly : @escaping () -> Void = {},
         
         onAutoTile          : @escaping () -> Void = {},
@@ -137,6 +142,9 @@ final class HotKeyCoordinator {
             onWindowViewer()
         }
         
+        KeyboardShortcuts.onKeyDown(for: .windowViewerFocusApp) {
+            onWindowViewerFocusApp()
+        }
         KeyboardShortcuts.onKeyDown(for: .windowViewerQuitWindow) {
             onWindowViewerQuitWindow()
         }

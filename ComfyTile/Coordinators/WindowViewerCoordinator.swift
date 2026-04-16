@@ -10,19 +10,6 @@ import Combine
 import SwiftUI
 import LocalShortcuts
 
-@Observable @MainActor
-class WindowViewerViewModel {
-    var isShown = false
-    
-    var onEscape: (() -> Void) = { }
-    
-    var selected: Int = 1
-    
-    public func reset() {
-        self.selected = 1
-    }
-}
-
 @MainActor
 class WindowViewerCoordinator: NSObject {
     
@@ -112,7 +99,12 @@ class WindowViewerCoordinator: NSObject {
         let view: NSView = NSHostingView(
             rootView: WindowViewer(
                 windowViewerVM: windowViewerVM,
-                windowCore: windowCore
+                quitApp: { window in
+                    self.quit(window)
+                },
+                focusWindow: { window in
+                    self.focusAndDismiss(window)
+                }
             )
         )
         
@@ -149,9 +141,9 @@ class WindowViewerCoordinator: NSObject {
             
             /// No Modifier Held
             if modifier == [] {
-                let index = windowViewerVM.selected
-                
-                windowCore.focusWindow(at: index)
+                if let selectedWindow = windowViewerVM.selectedWindow {
+                    focus(selectedWindow)
+                }
                 
                 self.windowViewerVM.onEscape()
             }
@@ -209,6 +201,25 @@ class WindowViewerCoordinator: NSObject {
         if let resignActiveObserver {
             NotificationCenter.default.removeObserver(resignActiveObserver)
             self.resignActiveObserver = nil
+        }
+    }
+
+    private func focus(_ window: ComfyWindow) {
+        guard let index = windowCore.windows.firstIndex(where: { $0.id == window.id }) else { return }
+        windowCore.focusWindow(at: index)
+    }
+
+    private func focusAndDismiss(_ window: ComfyWindow) {
+        focus(window)
+        windowViewerVM.onEscape()
+    }
+
+    private func quit(_ window: ComfyWindow) {
+        windowCore.quit(window)
+        windowViewerVM.removeWindow(withID: window.id)
+
+        if windowViewerVM.windows.isEmpty {
+            windowViewerVM.onEscape()
         }
     }
 }

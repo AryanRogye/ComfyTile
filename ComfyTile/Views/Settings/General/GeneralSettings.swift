@@ -16,6 +16,9 @@ struct GeneralSettings: View {
             Section("Tiling") {
                 CenterTilingGeneralView(defaultsManager: defaultsManager)
             }
+            Section("Window Switching") {
+                WindowSwitcherGeneralView(defaultsManager: defaultsManager)
+            }
             /// About Section
             Section("About") {
                 UpdatesGeneralView()
@@ -26,6 +29,16 @@ struct GeneralSettings: View {
         }
         .formStyle(.grouped)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: - Window Switcher Settings
+struct WindowSwitcherGeneralView: View {
+    
+    @Bindable var defaultsManager : DefaultsManager
+
+    var body: some View {
+        Toggle("Use F to show all windows for an app", isOn: $defaultsManager.allowFocusAppWindowOnWindowSwitcher)
     }
 }
 

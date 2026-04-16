@@ -14,6 +14,12 @@ class DefaultsManager {
     var nudgeStep: Int = Defaults[.nudgeStep]
     var modiferKey: ModifierGroup = ModifierGroup(rawValue: Defaults[.modiferKey]) ?? .control
     
+    var allowFocusAppWindowOnWindowSwitcher: Bool = Defaults[.allowFocusAppWindowOnWindowSwitcher] {
+        didSet {
+            Defaults[.allowFocusAppWindowOnWindowSwitcher] = allowFocusAppWindowOnWindowSwitcher
+        }
+    }
+    
     var centerTilingPadding: Double = Defaults[.centerTilingPadding] {
         didSet {
             Defaults[.centerTilingPadding] = centerTilingPadding
