@@ -40,7 +40,7 @@ struct WindowCard: View {
     }
     
     var shape : RoundedRectangle {
-        RoundedRectangle(cornerRadius: 18)
+        RoundedRectangle(cornerRadius: 22)
     }
     
     var backgroundColor: AnyShapeStyle {

@@ -22,7 +22,7 @@ struct WindowViewer: View {
     
     /// Card WxH
     var cardWidth : CGFloat { 230 }
-    var cardHeight: CGFloat { 200 }
+    var cardHeight: CGFloat { 220 }
     
     var backgroundShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: 32)
