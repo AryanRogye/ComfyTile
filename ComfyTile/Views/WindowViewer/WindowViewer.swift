@@ -34,12 +34,13 @@ struct WindowViewer: View {
             spacing: spacing
         )]
     }
-
+    
+    @Namespace private var selectionAnimation
+    
     var body: some View {
         windows
             .padding(spacingAround)
             .animation(.spring, value: windowCore.windows)
-            .animation(.bouncy, value: windowViewerVM.selected)
             .glassEffect(
                 .regular,
                 in: backgroundShape
@@ -52,14 +53,7 @@ struct WindowViewer: View {
         LazyVGrid(columns: columns, spacing: spacing) {
             ForEach(windowCore.windows, id: \.windowID) { window in
                 
-                /// We're basically checking if the window is selected or not
-                /// we have to check if it exists before we set a selected cuz
-                /// this avoids a index out of range crash if we're selected while
-                /// we press the quit button
-                let exists = windowCore.windows.indices.contains(windowViewerVM.selected)
-                let selected: Bool = exists
-                ? window.id == windowCore.windows[windowViewerVM.selected].id
-                : false
+                let selected = isSelected(window)
                 
                 WindowCard(
                     appName: window.app.localizedName ?? "Unknown",
@@ -74,18 +68,25 @@ struct WindowViewer: View {
                     onMinimize: window.element.toggleMinimize,
                     onMaximize: window.maximize,
                     selected: selected,
+                    selectionNamespace: selectionAnimation,
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    let index = windowViewerVM.selected
-                    windowCore.windows[index].focusWindow()
-                    
-                    let focused = windowCore.windows.remove(at: index)
-                    windowCore.windows.insert(focused, at: 0)
-                    
-                    windowViewerVM.onEscape()
+                    if let index = windowCore.windows.firstIndex(where: { $0.id == window.id }) {
+                        windowCore.focusWindow(at: index)
+                        windowViewerVM.onEscape()
+                    }
                 }
             }
         }
+    }
+    
+    /// We're basically checking if the window is selected or not
+    /// we have to check if it exists before we set a selected cuz
+    /// this avoids a index out of range crash if we're selected while
+    /// we press the quit button
+    private func isSelected(_ window: ComfyWindow) -> Bool {
+        guard windowCore.windows.indices.contains(windowViewerVM.selected) else { return false }
+        return windowCore.windows[windowViewerVM.selected].id == window.id
     }
 }

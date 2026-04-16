@@ -20,6 +20,7 @@ struct WindowCard: View {
     var onMinimize: () -> Void
     var onMaximize: () -> Void
     let selected: Bool
+    let selectionNamespace: Namespace.ID
     
     /// 1/5 goes to the top
     var topHeight: CGFloat {
@@ -63,8 +64,8 @@ struct WindowCard: View {
          : ( scheme == .dark
              /// if dark mode show black border
              ? Color.black.opacity(0.2)
-             /// if light mode show light bright border
-             : Color.white.opacity(0.2)
+             /// if light mode show dark border but lighter
+             : Color.black.opacity(0.1)
            )
         )
     }
@@ -112,18 +113,24 @@ struct WindowCard: View {
             shape
                 .fill(backgroundColor)
                 .overlay {
-                    shape
-                        .stroke(.white.opacity(selected ? 0.9 : 0), lineWidth: 1)
-                        .blur(radius: 20)
+                    if selected {
+                        shape
+                            .stroke(.white.opacity(0.9), lineWidth: 1)
+                            .blur(radius: 20)
+                            .matchedGeometryEffect(id: "selected-glow", in: selectionNamespace)
+                    }
                 }
                 .overlay {
-                    shape
-                        .stroke(
-                            cardStrokeColor,
-                            lineWidth: 1.5
-                        )
+                    if selected {
+                        shape
+                            .stroke(Color.accentColor, lineWidth: 1.5)
+                            .matchedGeometryEffect(id: "selected-border", in: selectionNamespace)
+                    } else {
+                        shape
+                            .stroke(cardStrokeColor, lineWidth: 1.5)
+                    }
                 }
         }
-        .animation(.smooth, value: selected)
+        .animation(.snappy, value: selected)
     }
 }
