@@ -8,7 +8,7 @@
 import Cocoa
 import ScreenCaptureKit
 
-public final class ComfyWindow: Sendable, Equatable {
+public final class ComfyWindow: Sendable, Equatable, Hashable {
     public var id: String {
         if let wid = windowID {
             return "\(pid):\(wid)"
@@ -128,6 +128,10 @@ public final class ComfyWindow: Sendable, Equatable {
                 app: app
             )
         }
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 
     public static func == (lhs: ComfyWindow, rhs: ComfyWindow) -> Bool {

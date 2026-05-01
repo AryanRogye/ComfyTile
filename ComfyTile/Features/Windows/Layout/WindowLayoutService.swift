@@ -31,6 +31,35 @@ final class WindowLayoutService: WindowLayoutProviding {
         self.windowCore = windowCore
     }
     
+    private func seperateWindows(window: [ComfyWindow]) {
+        /// this is a temp area for us to call
+        guard let screen = NSScreen.main else { return }
+        let minX = screen.frame.minX
+        let maxY = screen.frame.maxY
+        
+        var oldPos: [ComfyWindow: CGPoint] = [:]
+        var oldFrame: [ComfyWindow: CGRect] = [:]
+        
+        for w in window {
+            if let pos = w.element.position {
+                let frame = w.element.frame
+                oldPos[w] = pos
+                oldFrame[w] = frame
+                w.element.setSize(
+                    width: 1,
+                    height: 1
+                )
+                w.element.setPosition(
+                    x: minX - frame.width * 3,
+                    y: maxY + frame.height * 3
+                )
+            }
+        }
+    }
+    
+    public func seperateAndBack(window: [ComfyWindow]) async {
+    }
+    
     // MARK: - Primary Layout
     public func primaryLayout(window: [ComfyWindow]) async {
         await primaryOnlySplit(on: window)
