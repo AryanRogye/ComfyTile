@@ -20,6 +20,20 @@ public class WindowElement {
         }
     }
     
+    public var windows: [WindowElement]? {
+        guard let windows = try? element?.windows() else { return nil }
+        var wins: [WindowElement] = []
+        for window in windows {
+            wins.append(.init(element: window))
+        }
+        return wins
+    }
+    
+    public var windowsRaw: [AXUIElement]? {
+        guard let windows = try? element?.windows() else { return nil }
+        return windows
+    }
+    
     public var frame: CGRect {
         guard let position = position, let size = size else { return .null }
         return .init(origin: position, size: size)

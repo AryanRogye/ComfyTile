@@ -94,6 +94,10 @@ extension AXUIElement {
         return try axCallWhichCanThrow(AXUIElementCopyAttributeValue(self, key as CFString, &value), &value) as? T
     }
     
+    func windows() throws -> [AXUIElement]? {
+        try attribute(kAXWindowsAttribute, [AXUIElement].self)
+    }
+    
     @MainActor
     func _cgWindowID() -> CGWindowID? {
         var id: CGWindowID = 0
