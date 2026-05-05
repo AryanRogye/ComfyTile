@@ -12,13 +12,16 @@ extension NSRect {
         on screen: NSScreen
     ) -> CGPoint {
         let rect = self
-        guard let desktopTopY = NSScreen.screens.map(\.frame.maxY).max() else {
-            return rect.origin
-        }
+        let mainDisplayTopY = NSScreen.screens
+            .first { $0.frame.origin == .zero }?
+            .frame
+            .maxY
+            ?? NSScreen.main?.frame.maxY
+            ?? screen.frame.maxY
         
         let appKitTop = rect.maxY
         
-        let axY = desktopTopY - appKitTop
+        let axY = mainDisplayTopY - appKitTop
         
         return CGPoint(x: rect.origin.x, y: axY)
     }

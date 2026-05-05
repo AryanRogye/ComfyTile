@@ -17,61 +17,10 @@ class WindowTilingService: WindowTilingProviding {
         self.windowCore = windowCore
     }
     
-    /// Keep Window Where it is, but its top point is moved up
-    func nudgeTopUp(with step: Int) {
-        guard let f = windowCore.getFocusedWindow(),
-              var frame = f.element.windowFrame else { return }
-
-        let delta: CGFloat = CGFloat(step)
-        frame.origin.y -= delta
-        frame.size.height += delta
-        
-        f.element.setPosition(x: frame.origin.x, y: frame.origin.y)
-        f.element.setSize(width: frame.width, height: frame.height)
-    }
-    
-    func nudgeTopDown(with step: Int) {
-        guard let f = windowCore.getFocusedWindow(),
-              var frame = f.element.windowFrame else { return }
-
-        let delta: CGFloat = CGFloat(step)
-        frame.origin.y += delta
-        frame.size.height -= delta
-        
-        f.element.setPosition(x: frame.origin.x, y: frame.origin.y)
-        f.element.setSize(width: frame.width, height: frame.height)
-    }
-    
-    
-    func nudgeBottomDown(with step: Int) {
-        guard let f = windowCore.getFocusedWindow() else { return }
-        
-        // current frame
-        guard var frame = f.element.windowFrame else { return }
-
-        let delta: CGFloat = CGFloat(step)
-        frame.size.height += delta
-        
-        // apply
-        f.element.setSize(width: frame.width, height: frame.height)
-    }
-    
-    func nudgeBottomUp(with step: Int) {
-        guard let f = windowCore.getFocusedWindow() else { return }
-        
-        // current frame
-        guard var frame = f.element.windowFrame else { return }
-        
-        let delta: CGFloat = CGFloat(step)
-        frame.size.height -= delta
-        
-        // apply
-        f.element.setSize(width: frame.width, height: frame.height)
-    }
-    
+    // MARK: - Full Screen
     func fullScreen(withAnimation: Bool) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
-        let screen = focusedWindow.screen else { return }
+              let screen = WindowCore.screenUnderMouse() else { return }
         
         let frame = screen.visibleFrame
         
@@ -97,7 +46,7 @@ class WindowTilingService: WindowTilingProviding {
     // MARK: - Center
     func center(withAnimation: Bool, padding: Double) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = focusedWindow.screen else { return }
+              let screen = WindowCore.screenUnderMouse() else { return }
         
         let padding: CGFloat = CGFloat(padding)
         
@@ -124,6 +73,7 @@ class WindowTilingService: WindowTilingProviding {
             )
         }
         
+        
         if withAnimation {
             animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
                 move()
@@ -137,7 +87,7 @@ class WindowTilingService: WindowTilingProviding {
     // MARK: - Move Left
     func moveLeft(withAnimation: Bool) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
-        let screen = focusedWindow.screen else { return }
+        let screen = WindowCore.screenUnderMouse() else { return }
         
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
@@ -172,7 +122,7 @@ class WindowTilingService: WindowTilingProviding {
     func moveRight(withAnimation: Bool) {
         
         guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = focusedWindow.screen else { return }
+              let screen = WindowCore.screenUnderMouse() else { return }
 
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
@@ -222,11 +172,69 @@ class WindowTilingService: WindowTilingProviding {
             move()
         }
     }
+}
+
+// MARK: - Nudging
+extension WindowTilingService {
+    /// Keep Window Where it is, but its top point is moved up
+    func nudgeTopUp(with step: Int) {
+        guard let f = windowCore.getFocusedWindow(),
+              var frame = f.element.windowFrame else { return }
+        
+        let delta: CGFloat = CGFloat(step)
+        frame.origin.y -= delta
+        frame.size.height += delta
+        
+        f.element.setPosition(x: frame.origin.x, y: frame.origin.y)
+        f.element.setSize(width: frame.width, height: frame.height)
+    }
+    
+    func nudgeTopDown(with step: Int) {
+        guard let f = windowCore.getFocusedWindow(),
+              var frame = f.element.windowFrame else { return }
+        
+        let delta: CGFloat = CGFloat(step)
+        frame.origin.y += delta
+        frame.size.height -= delta
+        
+        f.element.setPosition(x: frame.origin.x, y: frame.origin.y)
+        f.element.setSize(width: frame.width, height: frame.height)
+    }
+    
+    func nudgeBottomDown(with step: Int) {
+        guard let f = windowCore.getFocusedWindow() else { return }
+        
+        // current frame
+        guard var frame = f.element.windowFrame else { return }
+        
+        let delta: CGFloat = CGFloat(step)
+        frame.size.height += delta
+        
+        // apply
+        f.element.setSize(width: frame.width, height: frame.height)
+    }
+    
+    func nudgeBottomUp(with step: Int) {
+        guard let f = windowCore.getFocusedWindow() else { return }
+        
+        // current frame
+        guard var frame = f.element.windowFrame else { return }
+        
+        let delta: CGFloat = CGFloat(step)
+        frame.size.height -= delta
+        
+        // apply
+        f.element.setSize(width: frame.width, height: frame.height)
+    }
+}
+
+// MARK: - Helpers
+extension WindowTilingService {
     
     func getFullScreenDimensions() -> CGRect? {
         guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = focusedWindow.screen else { return nil }
-
+              let screen = WindowCore.screenUnderMouse() else { return nil }
+        
         let frame = screen.visibleFrame
         
         return CGRect(
@@ -238,7 +246,7 @@ class WindowTilingService: WindowTilingProviding {
     }
     func getLeftDimensions() -> CGRect? {
         guard let focusedWindow = windowCore.getFocusedWindow(),
-            let screen = focusedWindow.screen else { return nil }
+              let screen = WindowCore.screenUnderMouse() else { return nil }
         
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
@@ -253,10 +261,11 @@ class WindowTilingService: WindowTilingProviding {
         return rect
         
     }
+    
     func getRightDimensions() -> CGRect? {
         guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = focusedWindow.screen else { return nil }
-
+              let screen = WindowCore.screenUnderMouse() else { return nil }
+        
         let frame = screen.visibleFrame
         let halfWidth = frame.width / 2
         
@@ -269,11 +278,12 @@ class WindowTilingService: WindowTilingProviding {
         
         return rect
     }
+
     
     func getCenterDimensions() -> CGRect? {
         guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = focusedWindow.screen else { return nil }
-
+              let screen = WindowCore.screenUnderMouse() else { return nil }
+        
         /// This is padding around all sides of the window
         let padding : CGFloat = 40
         
@@ -299,4 +309,5 @@ class WindowTilingService: WindowTilingProviding {
         
         return rect
     }
+
 }
