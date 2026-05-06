@@ -228,6 +228,16 @@
 			path = Display;
 			sourceTree = "<group>";
 		};
+		9B35C8B82FAAC1E9001CC195 /* Bridge */ = {
+			isa = PBXGroup;
+			children = (
+				9B9BCFF12F1973F90020F3AD /* CGS */,
+				9B9BCFE92F1973C60020F3AD /* WindowServerBridge.swift */,
+				9B35C8AF2FAAB614001CC195 /* ComfyTile-Bridging-Header.h */,
+			);
+			path = Bridge;
+			sourceTree = "<group>";
+		};
 		9B68EEA12F228C62009567DF /* Appearance */ = {
 			isa = PBXGroup;
 			children = (
@@ -408,6 +418,7 @@
 			children = (
 				9B9BCFCE2F1972170020F3AD /* Common */,
 				9B9BCFC62F1971ED0020F3AD /* Updates */,
+				9B35C8AD2FAAB5EE001CC195 /* Display */,
 				9B9BCFCC2F1971F80020F3AD /* Windows */,
 			);
 			path = Features;
@@ -456,11 +467,8 @@
 				9B9BCFE32F1973660020F3AD /* Models */,
 				9BAF4A9F2F1978B8006536D2 /* Layout */,
 				9B9BCFDA2F1972FD0020F3AD /* Tiling */,
-				9B35C8AD2FAAB5EE001CC195 /* Display */,
-				9B9BCFE92F1973C60020F3AD /* WindowServerBridge.swift */,
 				9B8FC0172F10B80D00CBF4B8 /* WindowSpatialEngine.swift */,
 				9B9BCFF52F19748A0020F3AD /* WindowCore.swift */,
-				9B35C8AF2FAAB614001CC195 /* ComfyTile-Bridging-Header.h */,
 			);
 			path = Windows;
 			sourceTree = "<group>";
@@ -471,6 +479,7 @@
 				9B9BCFD92F1972D10020F3AD /* Permission */,
 				9B9BCFD82F1972C90020F3AD /* Persistance */,
 				9B9BCFD62F1972C30020F3AD /* Input */,
+				9B35C8B82FAAC1E9001CC195 /* Bridge */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -524,7 +533,6 @@
 			isa = PBXGroup;
 			children = (
 				9B9BCFEE2F1973F90020F3AD /* AX */,
-				9B9BCFF12F1973F90020F3AD /* CGS */,
 				9B68EEA82F22F74A009567DF /* GlobalClickMonitor.swift */,
 				9B9BCFEB2F1973DE0020F3AD /* ScreenshotHelper.swift */,
 			);
@@ -913,7 +921,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "ComfyTile/Features/Windows/ComfyTile-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "ComfyTile/Features/Common/Bridge/ComfyTile-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_MEMORY_SAFETY = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
@@ -964,7 +972,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "ComfyTile/Features/Windows/ComfyTile-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "ComfyTile/Features/Common/Bridge/ComfyTile-Bridging-Header.h";
 				SWIFT_STRICT_MEMORY_SAFETY = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
