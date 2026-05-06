@@ -21,14 +21,20 @@ final class DylibHandles: @unchecked Sendable {
 public class WindowServerBridge {
     public static let shared = WindowServerBridge(
         skylightPath: "/System/Library/PrivateFrameworks/SkyLight.framework/SkyLight",
-        hiServicesPath: "/System/Library/Frameworks/ApplicationServices.framework/Frameworks/HIServices.framework/HIServices"
+        hiServicesPath: "/System/Library/Frameworks/ApplicationServices.framework/Frameworks/HIServices.framework/HIServices",
+        displayServicesPath: "/System/Library/PrivateFrameworks/DisplayServices.framework/DisplayServices"
     )
     
     private let skylightPath: UnsafePointer<CChar>
     private let hiServicesPath: UnsafePointer<CChar>
+    private let displayServicesPath: UnsafePointer<CChar>
     
     private var skylightHandle: UnsafeMutableRawPointer?
     private var hiServicesHandle: UnsafeMutableRawPointer?
+    private var displayServicesHandle: UnsafeMutableRawPointer?
+    
+    public var setBrightness: DisplayServicesSetBrightnessFn?
+    public var getBrightness: DisplayServicesGetBrightnessFn?
     
     public var setFrontProcessWithOptions: SLPSSetFrontProcessWithOptionsFn?
     public var postEventRecordTo: SLPSPostEventRecordToFn?
@@ -36,13 +42,13 @@ public class WindowServerBridge {
     public var axUIElementGetWindow: AXUIElementGetWindowFn?
     public var axUIElementCreateWithRemoteToken: AXUIElementCreateWithRemoteTokenFn?
 
-    
-    private let lock = NSLock()
-    
     init(
         skylightPath: UnsafePointer<CChar>,
-        hiServicesPath: UnsafePointer<CChar>
+        hiServicesPath: UnsafePointer<CChar>,
+        displayServicesPath: UnsafePointer<CChar>
     ) {
+        /// Setting Paths
+        self.displayServicesPath = displayServicesPath
         self.skylightPath = skylightPath
         self.hiServicesPath = hiServicesPath
         
@@ -61,20 +67,27 @@ public class WindowServerBridge {
         setSLPSSetFrontProcessWithOptions()
         setAXUIElementGetWindow()
         setAXUIElementCreateWithRemoteToken()
+        setDisplayServicesGetBrightness()
+        setDisplayServicesSetBrightness()
     }
     
+    @MainActor
     deinit {
-        closeHandles()
+        if let h = self.skylightHandle { dlclose(h) }
+        if let h = self.hiServicesHandle { dlclose(h) }
+        if let h = self.displayServicesHandle { dlclose(h) }
     }
-    
-    nonisolated internal func closeHandles() {
-        DispatchQueue.main.async {
-            if let h = self.skylightHandle { dlclose(h) }
-            if let h = self.hiServicesHandle { dlclose(h) }
-        }
-    }
-    
-    public func focusApp(forUserWindowID windowID: UInt32, pid: pid_t, element: AXUIElement?, app: NSRunningApplication) {
+}
+
+// MARK: - Public API's
+extension WindowServerBridge {
+    /// This is the main function used to focus a window
+    public func focusApp(
+        forUserWindowID windowID: UInt32,
+        pid: pid_t,
+        element: AXUIElement?,
+        app: NSRunningApplication
+    ) {
         guard let getProcessForPID else {
             ComfyLogger.WindowServerBridge.insert(
                 "GetProcessForPID fn nil",
@@ -107,13 +120,13 @@ public class WindowServerBridge {
             // keep behavior: don't hard-fail
             return
         }
-
+        
         // 0x200 = userGenerated
         withUnsafePointer(to: psn) { psnPtr in
             setFrontProcessWithOptions(psnPtr, windowID, 0x200)
         }
         makeKeyWindow(forWindowID: windowID, psn: &psn)
-
+        
         if let element {
             ComfyLogger.WindowServerBridge.insert(
                 "AXElement Exists, Attempting To Raise",
@@ -128,45 +141,65 @@ public class WindowServerBridge {
                 kAXMainWindowAttribute as CFString,
                 true as CFTypeRef
             )
-
+            
             ComfyLogger.WindowServerBridge.insert(
                 "Raising Done",
                 level: .info
             )
         }
     }
-
-    // Equivalent to your findMatchingAXWindowWithPid:targetWindowID:
-    func findMatchingAXWindow(pid: pid_t, targetWindowID: CGWindowID) -> AXUIElement? {
+    
+    /// Function Finds Matching AXUIElement related to the windowID
+    public func findMatchingAXWindow(
+        pid: pid_t,
+        targetWindowID: CGWindowID
+    ) -> AXUIElement? {
         let appAX: AXUIElement = AXUIElementCreateApplication(pid)
-
+        
         var windowsValue: CFTypeRef?
         let err = AXUIElementCopyAttributeValue(appAX, kAXWindowsAttribute as CFString, &windowsValue)
-
+        
         guard err == .success, let windowsValue else {
             return nil
         }
-
+        
         guard CFGetTypeID(windowsValue) == CFArrayGetTypeID() else {
             return nil
         }
-
+        
         let windows = windowsValue as! CFArray
         let count = CFArrayGetCount(windows)
-
+        
         for i in 0..<count {
             let raw = CFArrayGetValueAtIndex(windows, i)
             let winAX = unsafeBitCast(raw, to: AXUIElement.self)
-
+            
             var wid: CGWindowID = 0
             if axUIElementGetWindow?(winAX, &wid) == .success, wid == targetWindowID {
                 return winAX
             }
         }
-
+        
         return nil
     }
+    
+    /// Resolves an AXUIElement for a given window, trying the standard approach
+    /// first and falling back to brute-force token fabrication.
+    ///
+    /// This is the primary API for getting an AX element for any window without
+    /// requiring prior caching.
+    public func resolveAXElement(pid: pid_t, windowID: CGWindowID) -> AXUIElement? {
+        // Fast path: standard kAXWindows enumeration
+        if let ax = findMatchingAXWindow(pid: pid, targetWindowID: windowID) {
+            return ax
+        }
+        // Slow path: brute-force via _AXUIElementCreateWithRemoteToken
+        return findMatchingAXWindowBruteForce(pid: pid, targetWindowID: windowID)
+    }
+}
 
+// MARK: - Internal Helpers
+extension WindowServerBridge {
     /// Discovers an AXUIElement for a window by brute-forcing the remote token API.
     ///
     /// construct a 20-byte token containing the PID and an incrementing
@@ -175,7 +208,7 @@ public class WindowServerBridge {
     /// This finds windows that standard `kAXWindowsAttribute` misses — minimized windows,
     /// windows on other Spaces, and windows from apps that don't fully expose
     /// their AX hierarchy.
-    func findMatchingAXWindowBruteForce(pid: pid_t, targetWindowID: CGWindowID) -> AXUIElement? {
+    internal func findMatchingAXWindowBruteForce(pid: pid_t, targetWindowID: CGWindowID) -> AXUIElement? {
         guard let createWithToken = axUIElementCreateWithRemoteToken,
               let getWindow = axUIElementGetWindow else { return nil }
         
@@ -215,81 +248,13 @@ public class WindowServerBridge {
         return nil
     }
     
-    /// Resolves an AXUIElement for a given window, trying the standard approach
-    /// first and falling back to brute-force token fabrication.
-    ///
-    /// This is the primary API for getting an AX element for any window without
-    /// requiring prior caching.
-    func resolveAXElement(pid: pid_t, windowID: CGWindowID) -> AXUIElement? {
-        // Fast path: standard kAXWindows enumeration
-        if let ax = findMatchingAXWindow(pid: pid, targetWindowID: windowID) {
-            return ax
-        }
-        // Slow path: brute-force via _AXUIElementCreateWithRemoteToken
-        return findMatchingAXWindowBruteForce(pid: pid, targetWindowID: windowID)
-    }
-
-    // MARK: - Private APIs (packet + token probe)
-
-    private func makeKeyWindow(forWindowID windowID: UInt32, psn: inout ProcessSerialNumber) {
-        guard let postEventRecordTo else { return }
-
-        var bytes = [UInt8](repeating: 0, count: 0xF8)
-
-        bytes[0x04] = 0xF8
-        bytes[0x3A] = 0x10
-
-        // Write window ID at offset 0x3C (little-endian)
-        var wid = windowID
-        memcpy(&bytes[0x3C], &wid, MemoryLayout<UInt32>.size)
-
-        // Fill PSN region with 0xFF sentinel (tells WS to use the packet-header PSN)
-        for i in 0x20..<0x30 {
-            bytes[i] = 0xFF
-        }
-
-        // Post event twice: 0x01 then 0x02 to complete the key-window handshake
-        bytes[0x08] = 0x01
-        bytes.withUnsafeMutableBufferPointer { buf in
-            withUnsafePointer(to: psn) { psnPtr in
-                postEventRecordTo(psnPtr, buf.baseAddress!)
-            }
-        }
-        bytes[0x08] = 0x02
-        bytes.withUnsafeMutableBufferPointer { buf in
-            withUnsafePointer(to: psn) { psnPtr in
-                postEventRecordTo(psnPtr, buf.baseAddress!)
-            }
-        }
-    }
-
-    // MARK: - dlopen/dlsym plumbing
-
-    private func openHandle() {
-        skylightHandle = dlopen(skylightPath, RTLD_LAZY | RTLD_GLOBAL)
-        guard skylightHandle != nil else {
-            ComfyLogger.WindowServerBridge.insert(
-                "SkyLight Handle is Null",
-                level: .error
-            )
-            exit(1)
-        }
-        
-        hiServicesHandle = dlopen(hiServicesPath, RTLD_LAZY | RTLD_GLOBAL)
-        guard hiServicesHandle != nil else {
-            ComfyLogger.WindowServerBridge.insert(
-                "HIServices Handle is Null",
-                level: .error
-            )
-            exit(1)
-        }
-        
-        ComfyLogger.WindowServerBridge.insert("✅ Handles are Ready", level: .info)
-    }
-    
-    private func sym<T>(_ handle: UnsafeMutableRawPointer?,
-                        primary: String,
-                        fallback: String) -> T {
+    /// Function Links a handle to a function name
+    /// we give a fallback because sometimes
+    /// we dont know if its frfr exported as _ or not
+    internal func sym<T>(_ handle: UnsafeMutableRawPointer?,
+                         primary: String,
+                         fallback: String
+    ) -> T {
         guard let handle else {
             ComfyLogger.WindowServerBridge.insert("Handle nil for \(primary)", level: .error)
             fatalError("Handle nil for \(primary)")
@@ -319,17 +284,102 @@ public class WindowServerBridge {
         return unsafeBitCast(p, to: T.self)
     }
     
-    private func symGlobal<T>(primary: String, fallback: String) -> T {
-        if let p = dlsym(UnsafeMutableRawPointer(bitPattern: -2), primary) { // RTLD_DEFAULT
-            return unsafeBitCast(p, to: T.self)
+    private func makeKeyWindow(forWindowID windowID: UInt32, psn: inout ProcessSerialNumber) {
+        guard let postEventRecordTo else { return }
+        
+        var bytes = [UInt8](repeating: 0, count: 0xF8)
+        
+        bytes[0x04] = 0xF8
+        bytes[0x3A] = 0x10
+        
+        // Write window ID at offset 0x3C (little-endian)
+        var wid = windowID
+        memcpy(&bytes[0x3C], &wid, MemoryLayout<UInt32>.size)
+        
+        // Fill PSN region with 0xFF sentinel (tells WS to use the packet-header PSN)
+        for i in 0x20..<0x30 {
+            bytes[i] = 0xFF
         }
-        if let p = dlsym(UnsafeMutableRawPointer(bitPattern: -2), fallback) {
-            return unsafeBitCast(p, to: T.self)
+        
+        // Post event twice: 0x01 then 0x02 to complete the key-window handshake
+        bytes[0x08] = 0x01
+        bytes.withUnsafeMutableBufferPointer { buf in
+            withUnsafePointer(to: psn) { psnPtr in
+                postEventRecordTo(psnPtr, buf.baseAddress!)
+            }
         }
-        fatalError("global dlsym failed: \(primary)/\(fallback)")
+        bytes[0x08] = 0x02
+        bytes.withUnsafeMutableBufferPointer { buf in
+            withUnsafePointer(to: psn) { psnPtr in
+                postEventRecordTo(psnPtr, buf.baseAddress!)
+            }
+        }
+    }
+}
+
+// MARK: - Handles
+extension WindowServerBridge {
+    private func openHandle() {
+        
+        let mode = RTLD_LAZY | RTLD_GLOBAL
+        
+        skylightHandle = dlopen(skylightPath, mode)
+        guard skylightHandle != nil else {
+            ComfyLogger.WindowServerBridge.insert(
+                "SkyLight Handle is Null",
+                level: .error
+            )
+            exit(1)
+        }
+        
+        hiServicesHandle = dlopen(hiServicesPath, mode)
+        guard hiServicesHandle != nil else {
+            ComfyLogger.WindowServerBridge.insert(
+                "HIServices Handle is Null",
+                level: .error
+            )
+            exit(1)
+        }
+        
+        displayServicesHandle = dlopen(displayServicesPath, mode)
+        guard displayServicesHandle != nil else {
+            ComfyLogger.WindowServerBridge.insert(
+                "DisplayServices Handle is Null",
+                level: .error
+            )
+            exit(1)
+        }
+        
+        ComfyLogger.WindowServerBridge.insert("✅ Handles are Ready", level: .info)
     }
     
-    private func setAXUIElementCreateWithRemoteToken() {
+    internal func setDisplayServicesGetBrightness() {
+        getBrightness = sym(
+            displayServicesHandle,
+            primary: "DisplayServicesGetBrightness",
+            fallback: "_DisplayServicesGetBrightness"
+        )
+        
+        ComfyLogger.WindowServerBridge.insert(
+            "✅ getBrightness Success",
+            level: .info
+        )
+    }
+    
+    internal func setDisplayServicesSetBrightness() {
+        setBrightness = sym(
+            displayServicesHandle,
+            primary: "DisplayServicesSetBrightness",
+            fallback: "_DisplayServicesSetBrightness"
+        )
+        
+        ComfyLogger.WindowServerBridge.insert(
+            "✅ setBrightness Success",
+            level: .info
+        )
+    }
+    
+    internal func setAXUIElementCreateWithRemoteToken() {
         ComfyLogger.WindowServerBridge.insert(
             "Attempting AXUIElementCreateWithRemoteToken",
             level: .debug
@@ -345,7 +395,7 @@ public class WindowServerBridge {
         )
     }
     
-    private func setAXUIElementGetWindow() {
+    internal func setAXUIElementGetWindow() {
         ComfyLogger.WindowServerBridge.insert("Attempting AXUIElementGetWindow", level: .debug)
         axUIElementGetWindow = sym(
             hiServicesHandle,
@@ -358,7 +408,7 @@ public class WindowServerBridge {
         )
     }
     
-    private func setGetProcessForPID() {
+    internal func setGetProcessForPID() {
         ComfyLogger.WindowServerBridge.insert("Attempting GetProcessForPID", level: .debug)
         getProcessForPID = sym(
             hiServicesHandle,
@@ -368,7 +418,7 @@ public class WindowServerBridge {
         ComfyLogger.WindowServerBridge.insert("✅ GetProcessForPID (or _) Success", level: .info)
     }
     
-    private func setSLPSSetFrontProcessWithOptions() {
+    internal func setSLPSSetFrontProcessWithOptions() {
         ComfyLogger.WindowServerBridge.insert(
             "Attempting SLPSSetFrontProcessWithOptions",
             level: .debug
@@ -384,7 +434,7 @@ public class WindowServerBridge {
         )
     }
     
-    private func setSLPSPostEventRecordTo() {
+    internal func setSLPSPostEventRecordTo() {
         ComfyLogger.WindowServerBridge.insert("Attempting SLPSPostEventRecordTo", level: .debug)
         postEventRecordTo = sym(
             skylightHandle,
@@ -396,7 +446,10 @@ public class WindowServerBridge {
             level: .info
         )
     }
+
 }
+
+
 /**
  * SLSMainConnectionID:
  * function _SLSMainConnectionID {
@@ -457,6 +510,12 @@ public class WindowServerBridge {
 //    _ windowID: UInt32,
 //    _ outSpace: UnsafeMutablePointer<UInt32>
 //) -> Int32
+
+public typealias DisplayServicesSetBrightnessFn =
+@convention(c) (CGDirectDisplayID, Float) -> Void
+
+public typealias DisplayServicesGetBrightnessFn =
+@convention(c) (CGDirectDisplayID, UnsafeMutablePointer<Float>) -> Void
 
 public typealias SLPSSetFrontProcessWithOptionsFn =
 @convention(c) (_ psn: UnsafePointer<ProcessSerialNumber>,

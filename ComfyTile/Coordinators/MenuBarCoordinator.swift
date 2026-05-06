@@ -27,6 +27,7 @@ class MenuBarCoordinator: NSObject {
     private var settingsVM     : SettingsViewModel?
     private var defaultsManager: DefaultsManager?
     private var windowCore: WindowCore?
+    private var displayManager: DisplayManager?
     private var updateController: UpdateController?
 
     // MARK: - Initialization
@@ -43,12 +44,14 @@ class MenuBarCoordinator: NSObject {
         settingsVM              : SettingsViewModel,
         defaultsManager         : DefaultsManager,
         windowCore              : WindowCore,
+        displayManager          : DisplayManager,
         updateController        : UpdateController
     ) {
         self.comfyTileMenuBarVM     = comfyTileMenuBarVM
         self.settingsVM             = settingsVM
         self.defaultsManager        = defaultsManager
         self.windowCore             = windowCore
+        self.displayManager         = displayManager
         self.updateController       = updateController
 
         configureClosures()
@@ -100,12 +103,14 @@ class MenuBarCoordinator: NSObject {
     // MARK: - Panel Configuration
 
     private func configurePanel() {
-        guard let comfyTileMenuBarVM = comfyTileMenuBarVM,
-              let settingsVM = settingsVM,
-              let defaultsManager = defaultsManager,
-              let windowCore = windowCore,
-              let updateController = updateController
+        guard let comfyTileMenuBarVM,
+              let settingsVM,
+              let defaultsManager,
+              let windowCore,
+              let displayManager,
+              let updateController
         else {
+            print("Could Not Configure MenuBar Because Some ViewModels Were Nil")
             return
         }
 
@@ -115,6 +120,7 @@ class MenuBarCoordinator: NSObject {
             comfyTileMenuBarVM: comfyTileMenuBarVM,
             defaultsManager: defaultsManager,
             windowCore: windowCore,
+            displayManager: displayManager,
             updateController: updateController
         )
 

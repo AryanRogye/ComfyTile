@@ -80,6 +80,7 @@ class AppCoordinator {
             settingsVM: settingsVM,
             defaultsManager: defaultsManager,
             windowCore: appEnv.windowCore,
+            displayManager: appEnv.displayManager,
             updateController: updateController
         )
         

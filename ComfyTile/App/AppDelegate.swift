@@ -8,8 +8,8 @@
 import AppKit
 
 class AppEnv {
-    let windowCore = WindowCore()
-    
+    var windowCore = WindowCore()
+    var displayManager = DisplayManager()
     
     lazy var windowTilingService: any WindowTilingProviding = WindowTilingService(
         windowCore: windowCore
