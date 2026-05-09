@@ -93,6 +93,12 @@ class AppCoordinator {
         self.startHotKey()
         
         ScreenshotHelper.startCacheCleanupLoop()
+        
+        self.windowCore.onFocusedApp = { window in
+            if let window, let bundle = window.bundleIdentifier {
+                appEnv.displayManager.activateApp(bundleID: bundle)
+            }
+        }
     }
     
     deinit {
