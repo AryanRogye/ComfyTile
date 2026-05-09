@@ -14,9 +14,18 @@ class DefaultsManager {
     var nudgeStep: Int = Defaults[.nudgeStep]
     var modiferKey: ModifierGroup = ModifierGroup(rawValue: Defaults[.modiferKey]) ?? .control
     
+    var enableSmartTiling: Bool = Defaults[.enableSmartTiling] {
+        didSet {
+            Defaults[.enableSmartTiling] = enableSmartTiling
+        }
+    }
+    
     var enableLayoutCycling: Bool = Defaults[.enableLayoutCycling] {
         didSet {
             Defaults[.enableLayoutCycling] = enableLayoutCycling
+            if !enableLayoutCycling {
+                enableSmartTiling = false
+            }
         }
     }
     

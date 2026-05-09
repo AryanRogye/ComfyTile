@@ -116,11 +116,13 @@ final class WindowSpatialEngine {
         switch tile {
         case .rightHalf:       self.windowTilingService.moveRight(
                                     withAnimation: self.defaultsManager.showTilingAnimations,
-                                    isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                                    isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                                    enableSmartTiling: self.defaultsManager.enableSmartTiling
                                 )
         case .leftHalf:        self.windowTilingService.moveLeft(
                                     withAnimation: self.defaultsManager.showTilingAnimations,
-                                    isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                                    isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                                    enableSmartTiling: self.defaultsManager.enableSmartTiling
                                 )
         case .center:          self.windowTilingService.center(
                                     withAnimation: self.defaultsManager.showTilingAnimations,
@@ -215,7 +217,8 @@ extension WindowSpatialEngine {
         tileWithAnimation {
             self.windowTilingService.moveRight(
                 withAnimation: self.defaultsManager.showTilingAnimations,
-                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                enableSmartTiling: self.defaultsManager.enableSmartTiling
             )
         }
     }
@@ -223,13 +226,15 @@ extension WindowSpatialEngine {
         if !defaultsManager.showTilingAnimations {
             self.windowTilingService.moveRight(
                 withAnimation: self.defaultsManager.showTilingAnimations,
-                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                enableSmartTiling: self.defaultsManager.enableSmartTiling
             )
             return
         }
         tileDownWithAnimation {
             self.windowTilingService.getRightDimensions(
-                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                enableSmartTiling: self.defaultsManager.enableSmartTiling
             )
         }
     }
@@ -241,7 +246,8 @@ extension WindowSpatialEngine {
         tileWithAnimation {
             self.windowTilingService.moveLeft(
                 withAnimation: self.defaultsManager.showTilingAnimations,
-                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                enableSmartTiling: self.defaultsManager.enableSmartTiling
             )
         }
     }
@@ -249,13 +255,15 @@ extension WindowSpatialEngine {
         if !defaultsManager.showTilingAnimations {
             self.windowTilingService.moveLeft(
                 withAnimation: self.defaultsManager.showTilingAnimations,
-                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                enableSmartTiling: self.defaultsManager.enableSmartTiling
             )
             return
         }
         tileDownWithAnimation {
             self.windowTilingService.getLeftDimensions(
-                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                enableSmartTiling: self.defaultsManager.enableSmartTiling
             )
         }
     }

@@ -8,28 +8,6 @@
 import Cocoa
 //import ComfyWindowingCore
 
-enum HorizontalTileLayout {
-    case half
-    case oneThird
-    case twoThirds
-    
-    var widthMultiplier: CGFloat {
-        switch self {
-        case .half:      return 0.5
-        case .oneThird:  return 1.0 / 3.0
-        case .twoThirds: return 2.0 / 3.0
-        }
-    }
-    
-    public mutating func nextLayout() {
-        switch self {
-        case .half:      self = .oneThird
-        case .oneThird:  self = .twoThirds
-        case .twoThirds: self = .half
-        }
-    }
-}
-
 class WindowTilingService: WindowTilingProviding {
     
     let windowCore: WindowCore
@@ -37,11 +15,17 @@ class WindowTilingService: WindowTilingProviding {
     
     var leftLayout: HorizontalTileLayout = .half
     var rightLayout: HorizontalTileLayout = .half
+    
+    var hasJustTiledLeft = 0
+    var hasJustTiledRight = 0
 
     init(windowCore: WindowCore) {
         self.windowCore = windowCore
     }
-    
+}
+
+// MARK: - Tiling
+extension WindowTilingService {
     // MARK: - Full Screen
     func fullScreen(withAnimation: Bool) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
@@ -57,6 +41,9 @@ class WindowTilingService: WindowTilingProviding {
                 height: frame.height
             )
         }
+        
+        hasJustTiledLeft = 0
+        hasJustTiledRight = 0
         
         if withAnimation {
             animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
@@ -98,6 +85,8 @@ class WindowTilingService: WindowTilingProviding {
             )
         }
         
+        hasJustTiledLeft = 0
+        hasJustTiledRight = 0
         
         if withAnimation {
             animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
@@ -110,19 +99,35 @@ class WindowTilingService: WindowTilingProviding {
     }
     
     // MARK: - Tile Left
-    func moveLeft(withAnimation: Bool, isLayoutCycling: Bool) {
+    func moveLeft(withAnimation: Bool, isLayoutCycling: Bool, enableSmartTiling: Bool) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
-        let screen = WindowCore.screenUnderMouse() else { return }
+              let screen = WindowCore.screenUnderMouse() else { return }
         
+        /// Screen
         let frame = screen.visibleFrame
         
-        let width: CGFloat = frame.width * (
-            isLayoutCycling
-            ? self.leftLayout.widthMultiplier
-            : 0.5
-        )
-        if isLayoutCycling {
+        let width: CGFloat
+        
+        /// LayoutCycling + SmartTiling + Never Just Tiled Left
+        /// "Prediction"
+        if isLayoutCycling && enableSmartTiling && self.hasJustTiledLeft == 0 && self.hasJustTiledRight > 0 {
+            /// Other sides "last" layout
+            let predictedLayout = self.rightLayout.last().complementary()
+            
+            width = frame.width * predictedLayout.widthMultiplier
+            
+            /// set current with predicted and cycle next
+            self.leftLayout = predictedLayout
             self.leftLayout.nextLayout()
+        }
+        /// We're Just Layout Cycling
+        else if isLayoutCycling {
+            width = frame.width * self.leftLayout.widthMultiplier
+            self.leftLayout.nextLayout()
+        }
+        /// Neither
+        else {
+            width = frame.width * 0.5
         }
         
         let rect = NSRect(
@@ -141,6 +146,11 @@ class WindowTilingService: WindowTilingProviding {
             )
         }
         
+        hasJustTiledRight = 0
+        if self.hasJustTiledLeft == 0 {
+            hasJustTiledLeft += 1
+        }
+        
         if withAnimation {
             animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
                 move()
@@ -152,22 +162,36 @@ class WindowTilingService: WindowTilingProviding {
     }
     
     // MARK: - Tile Right
-    func moveRight(withAnimation: Bool, isLayoutCycling: Bool) {
+    func moveRight(withAnimation: Bool, isLayoutCycling: Bool, enableSmartTiling: Bool) {
         
         guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = WindowCore.screenUnderMouse() else { return }
-
+        
         let frame = screen.visibleFrame
         
-        let width: CGFloat = frame.width * (
-            isLayoutCycling
-            ? self.rightLayout.widthMultiplier
-            : 0.5
-        )
-        if isLayoutCycling {
+        let width: CGFloat
+        /// LayoutCycling + SmartTiling + Never Just Tiled Left
+        /// "Prediction"
+        if isLayoutCycling && enableSmartTiling && self.hasJustTiledRight == 0 && self.hasJustTiledLeft > 0 {
+            /// Other sides "last" layout
+            let predictedLayout = self.leftLayout.last().complementary()
+            
+            width = frame.width * predictedLayout.widthMultiplier
+            
+            /// set current with predicted and cycle next
+            self.rightLayout = predictedLayout
+            self.rightLayout.nextLayout()
+
+        }
+        /// We're Just Layout Cycling
+        else if isLayoutCycling {
+            width = frame.width * self.rightLayout.widthMultiplier
             self.rightLayout.nextLayout()
         }
-
+        /// Neither
+        else {
+            width = frame.width * 0.5
+        }
         
         let rect = NSRect(
             x: frame.maxX - width,
@@ -205,6 +229,12 @@ class WindowTilingService: WindowTilingProviding {
             }
         }
         
+        hasJustTiledLeft = 0
+        if self.hasJustTiledRight == 0 {
+            hasJustTiledRight += 1
+        }
+
+        
         if withAnimation {
             animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
                 move()
@@ -214,6 +244,7 @@ class WindowTilingService: WindowTilingProviding {
             move()
         }
     }
+
 }
 
 // MARK: - Nudging
@@ -286,20 +317,24 @@ extension WindowTilingService {
         )
     }
     
-    func getLeftDimensions(isLayoutCycling: Bool) -> CGRect? {
+    func getLeftDimensions(isLayoutCycling: Bool, enableSmartTiling: Bool) -> CGRect? {
         guard let screen = WindowCore.screenUnderMouse() else { return nil }
         
         let frame = screen.visibleFrame
-        let halfWidth = frame.width * (
-            isLayoutCycling
-            ? self.leftLayout.widthMultiplier
-            : 0.5
-        )
+        let width: CGFloat
+        
+        if isLayoutCycling && enableSmartTiling && self.hasJustTiledLeft == 0 && self.hasJustTiledRight > 0 {
+            width = frame.width * self.rightLayout.last().complementary().widthMultiplier
+        } else if isLayoutCycling {
+            width = frame.width * self.leftLayout.widthMultiplier
+        } else {
+            width = frame.width * 0.5
+        }
         
         let rect = NSRect(
             x: frame.origin.x,
             y: frame.origin.y,
-            width: halfWidth,
+            width: width,
             height: frame.height
         )
         
@@ -307,15 +342,19 @@ extension WindowTilingService {
         
     }
     
-    func getRightDimensions(isLayoutCycling: Bool) -> CGRect? {
+    func getRightDimensions(isLayoutCycling: Bool, enableSmartTiling: Bool) -> CGRect? {
         guard let screen = WindowCore.screenUnderMouse() else { return nil }
         
         let frame = screen.visibleFrame
-        let width = frame.width * (
-            isLayoutCycling
-            ? self.rightLayout.widthMultiplier
-            : 0.5
-        )
+        let width: CGFloat
+        
+        if isLayoutCycling && enableSmartTiling && self.hasJustTiledRight == 0 && self.hasJustTiledLeft > 0  {
+            width = frame.width * self.leftLayout.last().complementary().widthMultiplier
+        } else if isLayoutCycling {
+            width = frame.width * self.rightLayout.widthMultiplier
+        } else {
+            width = frame.width * 0.5
+        }
         
         let rect = NSRect(
             x: frame.maxX - width,

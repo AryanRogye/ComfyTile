@@ -16,6 +16,7 @@ struct GeneralSettings: View {
             Section("Tiling") {
                 CenterTilingGeneralView(defaultsManager: defaultsManager)
                 TilingSnapBehavior(defaultsManager: defaultsManager)
+                SmartTilingBehavior(defaultsManager: defaultsManager)
             }
             Section("Window Switching") {
                 WindowSwitcherGeneralView(defaultsManager: defaultsManager)
@@ -50,6 +51,25 @@ struct TilingSnapBehavior: View {
         VStack(alignment: .leading, spacing: 8) {
             Toggle("Enable Layout Cycling", isOn: $defaultsManager.enableLayoutCycling)
                 .help("Repeatedly pressing a tiling shortcut will cycle through different sizes (1/2, 1/3).")
+        }
+    }
+}
+
+struct SmartTilingBehavior: View {
+    @Bindable var defaultsManager : DefaultsManager
+    
+    var body: some View {
+        if defaultsManager.enableLayoutCycling {
+            VStack(alignment: .leading, spacing: 8) {
+                Toggle("Enable Smart Tiling", isOn: $defaultsManager.enableSmartTiling)
+                    .help("""
+                    Intelligently fills the remaining space.
+                    (e.g., tiling 1/3 left makes the next right-tile 2/3).
+                    
+                    Keeps your workspace balanced and contained.
+                    """)
+            }
+            .animation(.bouncy, value: defaultsManager.enableLayoutCycling)
         }
     }
 }

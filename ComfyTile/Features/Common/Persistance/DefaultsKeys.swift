@@ -50,4 +50,7 @@ extension Defaults.Keys {
     
     /// This allows us to toggle between ranges while tiling like (1/2, 1/3)
     static let enableLayoutCycling = Key<Bool>("enableLayoutCycling", default: false)
+    
+    /// This allows us to do smart tiling, for example if we just did 1/3 left then the next right would be 2/3
+    static let enableSmartTiling = Key<Bool>("enableSmartTiling", default: false)
 }

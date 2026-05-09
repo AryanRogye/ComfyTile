@@ -83,6 +83,7 @@
 		9B9BCFF62F19748C0020F3AD /* WindowCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCFF52F19748A0020F3AD /* WindowCore.swift */; };
 		9BAF4AA12F1978CF006536D2 /* WindowLayoutProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAF4AA02F1978CB006536D2 /* WindowLayoutProviding.swift */; };
 		9BAF4AA32F1978DF006536D2 /* WindowLayoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAF4AA22F1978DA006536D2 /* WindowLayoutService.swift */; };
+		9BCEA8022FAFF50200E4FAF5 /* HorizontalTileLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCEA8012FAFF50200E4FAF5 /* HorizontalTileLayout.swift */; };
 		9BE82E802F91699100A1C7F0 /* WindowViewerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE82E7F2F91699100A1C7F0 /* WindowViewerViewModel.swift */; };
 		9BF1F5B02F904964000C29C9 /* View+if.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF1F5AF2F904962000C29C9 /* View+if.swift */; };
 		9BF1F5B32F9050EA000C29C9 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF1F5B22F9050EA000C29C9 /* LocalShortcuts */; };
@@ -177,6 +178,7 @@
 		9B9BCFF52F19748A0020F3AD /* WindowCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowCore.swift; sourceTree = "<group>"; };
 		9BAF4AA02F1978CB006536D2 /* WindowLayoutProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutProviding.swift; sourceTree = "<group>"; };
 		9BAF4AA22F1978DA006536D2 /* WindowLayoutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutService.swift; sourceTree = "<group>"; };
+		9BCEA8012FAFF50200E4FAF5 /* HorizontalTileLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalTileLayout.swift; sourceTree = "<group>"; };
 		9BE82E7F2F91699100A1C7F0 /* WindowViewerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowViewerViewModel.swift; sourceTree = "<group>"; };
 		9BF1F5AF2F904962000C29C9 /* View+if.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+if.swift"; sourceTree = "<group>"; };
 		9BF265092F8C5EC300BAA631 /* ComfyTileDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfyTileDebugView.swift; sourceTree = "<group>"; };
@@ -485,6 +487,7 @@
 			isa = PBXGroup;
 			children = (
 				9B9BCFE12F1973570020F3AD /* WindowAnimator.swift */,
+				9BCEA8012FAFF50200E4FAF5 /* HorizontalTileLayout.swift */,
 				9B9BCFDC2F1973030020F3AD /* WindowTilingProviding.swift */,
 				9B9BCFDD2F1973030020F3AD /* WindowTilingService.swift */,
 			);
@@ -697,6 +700,7 @@
 				9B9BCFF62F19748C0020F3AD /* WindowCore.swift in Sources */,
 				9B8FC0822F10B80D00CBF4B8 /* ShortcutRecorder.swift in Sources */,
 				9B8FC0832F10B80D00CBF4B8 /* TileShapeView.swift in Sources */,
+				9BCEA8022FAFF50200E4FAF5 /* HorizontalTileLayout.swift in Sources */,
 				9B8FC0842F10B80D00CBF4B8 /* View+sectionBackground.swift in Sources */,
 				9BF1F5B02F904964000C29C9 /* View+if.swift in Sources */,
 				9B8FC0852F10B80D00CBF4B8 /* ComfyTileMenuBar.swift in Sources */,
