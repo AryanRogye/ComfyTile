@@ -15,6 +15,7 @@ struct GeneralSettings: View {
         Form {
             Section("Tiling") {
                 CenterTilingGeneralView(defaultsManager: defaultsManager)
+                TilingSnapBehavior(defaultsManager: defaultsManager)
             }
             Section("Window Switching") {
                 WindowSwitcherGeneralView(defaultsManager: defaultsManager)
@@ -39,6 +40,17 @@ struct WindowSwitcherGeneralView: View {
 
     var body: some View {
         Toggle("Use F to show all windows for an app", isOn: $defaultsManager.allowFocusAppWindowOnWindowSwitcher)
+    }
+}
+
+struct TilingSnapBehavior: View {
+    @Bindable var defaultsManager : DefaultsManager
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Toggle("Enable Layout Cycling", isOn: $defaultsManager.enableLayoutCycling)
+                .help("Repeatedly pressing a tiling shortcut will cycle through different sizes (1/2, 1/3).")
+        }
     }
 }
 

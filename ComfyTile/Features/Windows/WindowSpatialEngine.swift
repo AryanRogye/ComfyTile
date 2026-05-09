@@ -115,10 +115,12 @@ final class WindowSpatialEngine {
     public func action(for tile: TilingMode) {
         switch tile {
         case .rightHalf:       self.windowTilingService.moveRight(
-                                    withAnimation: self.defaultsManager.showTilingAnimations
+                                    withAnimation: self.defaultsManager.showTilingAnimations,
+                                    isLayoutCycling: self.defaultsManager.enableLayoutCycling
                                 )
         case .leftHalf:        self.windowTilingService.moveLeft(
-                                    withAnimation: self.defaultsManager.showTilingAnimations
+                                    withAnimation: self.defaultsManager.showTilingAnimations,
+                                    isLayoutCycling: self.defaultsManager.enableLayoutCycling
                                 )
         case .center:          self.windowTilingService.center(
                                     withAnimation: self.defaultsManager.showTilingAnimations,
@@ -212,19 +214,23 @@ extension WindowSpatialEngine {
     public func tileRight() {
         tileWithAnimation {
             self.windowTilingService.moveRight(
-                withAnimation: self.defaultsManager.showTilingAnimations
+                withAnimation: self.defaultsManager.showTilingAnimations,
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling
             )
         }
     }
     public func tileRightPressed() {
         if !defaultsManager.showTilingAnimations {
             self.windowTilingService.moveRight(
-                withAnimation: self.defaultsManager.showTilingAnimations
+                withAnimation: self.defaultsManager.showTilingAnimations,
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling
             )
             return
         }
         tileDownWithAnimation {
-            self.windowTilingService.getRightDimensions()
+            self.windowTilingService.getRightDimensions(
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+            )
         }
     }
 }
@@ -234,19 +240,23 @@ extension WindowSpatialEngine {
     public func tileLeft() {
         tileWithAnimation {
             self.windowTilingService.moveLeft(
-                withAnimation: self.defaultsManager.showTilingAnimations
+                withAnimation: self.defaultsManager.showTilingAnimations,
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling
             )
         }
     }
     public func tileLeftPressed() {
         if !defaultsManager.showTilingAnimations {
             self.windowTilingService.moveLeft(
-                withAnimation: self.defaultsManager.showTilingAnimations
+                withAnimation: self.defaultsManager.showTilingAnimations,
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling
             )
             return
         }
         tileDownWithAnimation {
-            self.windowTilingService.getLeftDimensions()
+            self.windowTilingService.getLeftDimensions(
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+            )
         }
     }
 }

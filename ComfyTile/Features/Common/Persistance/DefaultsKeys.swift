@@ -47,4 +47,7 @@ extension Defaults.Keys {
     
     /// This allows us to focus a apps window on the window switcher
     static let allowFocusAppWindowOnWindowSwitcher = Key<Bool>("AllowFocusAppWindowOnWindowSwitcher", default: true)
+    
+    /// This allows us to toggle between ranges while tiling like (1/2, 1/3)
+    static let enableLayoutCycling = Key<Bool>("enableLayoutCycling", default: false)
 }

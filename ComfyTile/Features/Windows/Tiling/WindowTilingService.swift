@@ -8,11 +8,36 @@
 import Cocoa
 //import ComfyWindowingCore
 
+enum HorizontalTileLayout {
+    case half
+    case oneThird
+    case twoThirds
+    
+    var widthMultiplier: CGFloat {
+        switch self {
+        case .half:      return 0.5
+        case .oneThird:  return 1.0 / 3.0
+        case .twoThirds: return 2.0 / 3.0
+        }
+    }
+    
+    public mutating func nextLayout() {
+        switch self {
+        case .half:      self = .oneThird
+        case .oneThird:  self = .twoThirds
+        case .twoThirds: self = .half
+        }
+    }
+}
+
 class WindowTilingService: WindowTilingProviding {
     
     let windowCore: WindowCore
     let animator = WindowAnimator()
     
+    var leftLayout: HorizontalTileLayout = .half
+    var rightLayout: HorizontalTileLayout = .half
+
     init(windowCore: WindowCore) {
         self.windowCore = windowCore
     }
@@ -84,18 +109,26 @@ class WindowTilingService: WindowTilingProviding {
         }
     }
     
-    // MARK: - Move Left
-    func moveLeft(withAnimation: Bool) {
+    // MARK: - Tile Left
+    func moveLeft(withAnimation: Bool, isLayoutCycling: Bool) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
         let screen = WindowCore.screenUnderMouse() else { return }
         
         let frame = screen.visibleFrame
-        let halfWidth = frame.width / 2
+        
+        let width: CGFloat = frame.width * (
+            isLayoutCycling
+            ? self.leftLayout.widthMultiplier
+            : 0.5
+        )
+        if isLayoutCycling {
+            self.leftLayout.nextLayout()
+        }
         
         let rect = NSRect(
             x: frame.origin.x,
             y: frame.origin.y,
-            width: halfWidth,
+            width: width,
             height: frame.height
         )
         
@@ -118,19 +151,28 @@ class WindowTilingService: WindowTilingProviding {
         }
     }
     
-    // MARK: - Move Right
-    func moveRight(withAnimation: Bool) {
+    // MARK: - Tile Right
+    func moveRight(withAnimation: Bool, isLayoutCycling: Bool) {
         
         guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = WindowCore.screenUnderMouse() else { return }
 
         let frame = screen.visibleFrame
-        let halfWidth = frame.width / 2
+        
+        let width: CGFloat = frame.width * (
+            isLayoutCycling
+            ? self.rightLayout.widthMultiplier
+            : 0.5
+        )
+        if isLayoutCycling {
+            self.rightLayout.nextLayout()
+        }
+
         
         let rect = NSRect(
-            x: frame.origin.x + halfWidth,
+            x: frame.maxX - width,
             y: frame.origin.y,
-            width: halfWidth,
+            width: width,
             height: frame.height
         )
         
@@ -232,8 +274,7 @@ extension WindowTilingService {
 extension WindowTilingService {
     
     func getFullScreenDimensions() -> CGRect? {
-        guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = WindowCore.screenUnderMouse() else { return nil }
+        guard let screen = WindowCore.screenUnderMouse() else { return nil }
         
         let frame = screen.visibleFrame
         
@@ -244,12 +285,16 @@ extension WindowTilingService {
             height : frame.height
         )
     }
-    func getLeftDimensions() -> CGRect? {
-        guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = WindowCore.screenUnderMouse() else { return nil }
+    
+    func getLeftDimensions(isLayoutCycling: Bool) -> CGRect? {
+        guard let screen = WindowCore.screenUnderMouse() else { return nil }
         
         let frame = screen.visibleFrame
-        let halfWidth = frame.width / 2
+        let halfWidth = frame.width * (
+            isLayoutCycling
+            ? self.leftLayout.widthMultiplier
+            : 0.5
+        )
         
         let rect = NSRect(
             x: frame.origin.x,
@@ -262,17 +307,20 @@ extension WindowTilingService {
         
     }
     
-    func getRightDimensions() -> CGRect? {
-        guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = WindowCore.screenUnderMouse() else { return nil }
+    func getRightDimensions(isLayoutCycling: Bool) -> CGRect? {
+        guard let screen = WindowCore.screenUnderMouse() else { return nil }
         
         let frame = screen.visibleFrame
-        let halfWidth = frame.width / 2
+        let width = frame.width * (
+            isLayoutCycling
+            ? self.rightLayout.widthMultiplier
+            : 0.5
+        )
         
         let rect = NSRect(
-            x: frame.origin.x + halfWidth,
+            x: frame.maxX - width,
             y: frame.origin.y,
-            width: halfWidth,
+            width: width,
             height: frame.height
         )
         
@@ -281,8 +329,7 @@ extension WindowTilingService {
 
     
     func getCenterDimensions() -> CGRect? {
-        guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = WindowCore.screenUnderMouse() else { return nil }
+        guard let screen = WindowCore.screenUnderMouse() else { return nil }
         
         /// This is padding around all sides of the window
         let padding : CGFloat = 40
@@ -309,5 +356,4 @@ extension WindowTilingService {
         
         return rect
     }
-
 }

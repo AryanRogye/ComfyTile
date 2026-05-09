@@ -16,11 +16,12 @@ protocol WindowTilingProviding {
     
     func getFullScreenDimensions() -> CGRect?
     func getCenterDimensions() -> CGRect?
-    func getRightDimensions() -> CGRect?
-    func getLeftDimensions() -> CGRect?
+    func getRightDimensions(isLayoutCycling: Bool) -> CGRect?
+    func getLeftDimensions(isLayoutCycling: Bool) -> CGRect?
     
     func fullScreen(withAnimation: Bool)
     func center(withAnimation: Bool, padding: Double)
-    func moveRight(withAnimation: Bool)
-    func moveLeft(withAnimation: Bool)
+    func moveRight(withAnimation: Bool, isLayoutCycling: Bool)
+    func moveLeft(withAnimation: Bool, isLayoutCycling: Bool)
+    
 }

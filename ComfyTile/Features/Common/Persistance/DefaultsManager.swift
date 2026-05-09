@@ -14,6 +14,12 @@ class DefaultsManager {
     var nudgeStep: Int = Defaults[.nudgeStep]
     var modiferKey: ModifierGroup = ModifierGroup(rawValue: Defaults[.modiferKey]) ?? .control
     
+    var enableLayoutCycling: Bool = Defaults[.enableLayoutCycling] {
+        didSet {
+            Defaults[.enableLayoutCycling] = enableLayoutCycling
+        }
+    }
+    
     var allowFocusAppWindowOnWindowSwitcher: Bool = Defaults[.allowFocusAppWindowOnWindowSwitcher] {
         didSet {
             Defaults[.allowFocusAppWindowOnWindowSwitcher] = allowFocusAppWindowOnWindowSwitcher
