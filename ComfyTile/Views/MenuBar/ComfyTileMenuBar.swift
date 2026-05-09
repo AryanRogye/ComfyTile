@@ -12,8 +12,8 @@ public struct ComfyTileMenuBarRootView: View {
     @Bindable var comfyTileMenuBarVM: ComfyTileMenuBarViewModel
     @Bindable var defaultsManager: DefaultsManager
     @Bindable var windowCore: WindowCore
+    @Bindable var displayManager: DisplayManager
     @Bindable var updateController: UpdateController
-    
     
     public var body: some View {
         VStack(spacing: 0) {
@@ -21,6 +21,7 @@ public struct ComfyTileMenuBarRootView: View {
                 NewComfyTileMenuBarContent()
                     .environment(defaultsManager)
                     .environment(windowCore)
+                    .environment(displayManager)
                     .environment(comfyTileMenuBarVM)
                     .environment(updateController)
                     .environment(settingsVM)
@@ -34,41 +35,6 @@ public struct ComfyTileMenuBarRootView: View {
     }
 }
 
-struct PermissionView: View {
-    
-    @Bindable var vm : ComfyTileMenuBarViewModel
-    @State private var clickedPermissions: Bool = false
-
-    var body: some View {
-        VStack {
-            Text("👀 ComfyTile can’t see your windows yet.\nTurn on Accessibility so it can actually do its job.")
-
-            Spacer()
-            Button(action: {
-                clickedPermissions = true
-                vm.permissionService.requestPermission()
-                vm.closePanel()
-            }) {
-                if clickedPermissions {
-                    Text("😐 macOS still pretending we don’t exist?")
-                } else {
-                    Text("Request Accessibility")
-                }
-            }
-            if clickedPermissions {
-                Text("Sometimes macOS is just being stubborn. 😅")
-                Button(action: {
-                    try? vm.permissionService.resetAccessibility()
-                }) {
-                    Text("Reset Accessibility For ComfyTile")
-                }
-            }
-        }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
 // MARK: - New Copy
 struct NewComfyTileMenuBarContent: View {
     @Environment(ComfyTileMenuBarViewModel.self) var comfyTileMenuBarVM
@@ -76,13 +42,8 @@ struct NewComfyTileMenuBarContent: View {
     @Environment(DefaultsManager.self) var defaultsManager
     
     var body: some View {
-        @Bindable var defaultsManager = defaultsManager
         @Bindable var vm = comfyTileMenuBarVM
-        VStack(spacing: 0) {
-            if defaultsManager.comfyTileTabPlacement == .top {
-                ComfyTileTabBar(tabPlacement: $defaultsManager.comfyTileTabPlacement)
-                    .transition(.move(edge: .top))
-            }
+        ComfyTileMenuBarTabContainer {
             VStack {
                 switch vm.selectedTab {
                 case .layout: LayoutModeView()
@@ -95,11 +56,6 @@ struct NewComfyTileMenuBarContent: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             ComfyTileUpdateView(updateController: updateController)
-            if defaultsManager.comfyTileTabPlacement == .bottom {
-                ComfyTileTabBar(tabPlacement: $defaultsManager.comfyTileTabPlacement)
-                    .transition(.move(edge: .bottom))
-            }
         }
-        .animation(.snappy(duration: 0.25, extraBounce: 0.1), value: defaultsManager.comfyTileTabPlacement)
     }
 }

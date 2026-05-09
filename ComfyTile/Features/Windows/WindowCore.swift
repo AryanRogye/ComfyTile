@@ -28,6 +28,8 @@ public final class WindowCore {
     
     var bootTask : Task<Void, Never>?
     
+    var onFocusedApp: ((ComfyWindow?) -> Void)?
+    
     /**
      * This is the task that holds a run of the loadTask in a non async function
      */
@@ -151,7 +153,8 @@ extension WindowCore {
             ) { [weak self] notification in
                 DispatchQueue.main.async {
                     guard let self else { return }
-                    self.addFocusedToFront()
+                    let w = self.addFocusedToFront()
+                    self.onFocusedApp?(w)
                 }
             }
         )
@@ -163,7 +166,8 @@ extension WindowCore {
             ) { [weak self] notification in
                 DispatchQueue.main.async {
                     guard let self else { return }
-                    self.addFocusedToFront()
+                    let w = self.addFocusedToFront()
+                    self.onFocusedApp?(w)
                 }
             }
         )
@@ -495,12 +499,16 @@ extension WindowCore {
      * in our windows list and we bump
      * it to the 0th or first index
      */
-    internal func addFocusedToFront() {
+    @discardableResult
+    internal func addFocusedToFront() -> ComfyWindow? {
         if let w = getFocusedWindow(),
            let wID = w.windowID,
            let index = windows.firstIndex(where: { $0.windowID == wID }) {
             addWindowToFront(at: index)
+            return w
         }
+        
+        return nil
     }
     
     /**
