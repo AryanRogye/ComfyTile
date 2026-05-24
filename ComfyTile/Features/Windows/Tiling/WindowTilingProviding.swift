@@ -15,12 +15,12 @@ protocol WindowTilingProviding {
     func nudgeBottomUp(with step: Int)
     
     func getFullScreenDimensions() -> CGRect?
-    func getCenterDimensions() -> CGRect?
+    func getCenterDimensions(padding: Double, isLayoutCycling: Bool) -> CGRect?
     func getRightDimensions(isLayoutCycling: Bool, enableSmartTiling: Bool) -> CGRect?
     func getLeftDimensions(isLayoutCycling: Bool, enableSmartTiling: Bool) -> CGRect?
     
     func fullScreen(withAnimation: Bool)
-    func center(withAnimation: Bool, padding: Double)
+    func center(withAnimation: Bool, padding: Double, isLayoutCycling: Bool)
     func moveRight(withAnimation: Bool, isLayoutCycling: Bool, enableSmartTiling: Bool)
     func moveLeft(withAnimation: Bool, isLayoutCycling: Bool, enableSmartTiling: Bool)
     

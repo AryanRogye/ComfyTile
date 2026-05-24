@@ -15,9 +15,11 @@ class WindowTilingService: WindowTilingProviding {
     
     var leftLayout: HorizontalTileLayout = .half
     var rightLayout: HorizontalTileLayout = .half
-    
+    var centerLayout: CenterTileLayout = .center
+
     var hasJustTiledLeft = 0
     var hasJustTiledRight = 0
+    var hasJustTiledCenter = 0
 
     init(windowCore: WindowCore) {
         self.windowCore = windowCore
@@ -44,7 +46,8 @@ extension WindowTilingService {
         
         hasJustTiledLeft = 0
         hasJustTiledRight = 0
-        
+        hasJustTiledCenter = 0
+
         if withAnimation {
             animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
                 move()
@@ -56,24 +59,47 @@ extension WindowTilingService {
     }
     
     // MARK: - Center
-    func center(withAnimation: Bool, padding: Double) {
+    func center(withAnimation: Bool, padding: Double, isLayoutCycling: Bool) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = WindowCore.screenUnderMouse() else { return }
-        
-        let padding: CGFloat = CGFloat(padding)
-        
+
         let frame = screen.visibleFrame
-        
-        let centeredSize = CGSize(
-            width: frame.width - (padding * 2),
-            height: frame.height - (padding * 2)
-        )
-        
-        let centeredOrigin = CGPoint(
-            x: frame.origin.x + padding,
-            y: frame.origin.y + (padding)
-        )
-        
+
+        let layout = isLayoutCycling ? centerLayout : .center
+
+        let centeredSize: CGSize
+        let centeredOrigin: CGPoint
+
+        let padding: CGFloat = CGFloat(padding)
+
+        switch layout {
+        case .center:
+
+            centeredSize = CGSize(
+                width: frame.width - (padding * 2),
+                height: frame.height - (padding * 2)
+            )
+            centeredOrigin = CGPoint(
+                x: frame.origin.x + padding,
+                y: frame.origin.y + padding
+            )
+
+        case .centerExpanded:
+            centeredSize = CGSize(
+                width: frame.width - (padding * 2),
+                height: frame.height
+            )
+            centeredOrigin = CGPoint(
+                x: frame.origin.x + padding,
+                y: frame.origin.y
+            )
+        }
+
+        if isLayoutCycling {
+            centerLayout.nextLayout()
+        }
+
+
         /// Creating Target Rect
         let rect = NSRect(x: centeredOrigin.x, y: centeredOrigin.y, width: centeredSize.width, height: centeredSize.height)
         let pos = rect.axPosition(on: screen)
@@ -87,7 +113,11 @@ extension WindowTilingService {
         
         hasJustTiledLeft = 0
         hasJustTiledRight = 0
-        
+
+        if hasJustTiledCenter == 0 {
+            hasJustTiledCenter += 1
+        }
+
         if withAnimation {
             animator.animate(focusedWindow: focusedWindow, to: pos, duration: 0.13) {
                 move()
@@ -147,6 +177,7 @@ extension WindowTilingService {
         }
         
         hasJustTiledRight = 0
+        hasJustTiledCenter = 0
         if self.hasJustTiledLeft == 0 {
             hasJustTiledLeft += 1
         }
@@ -230,6 +261,7 @@ extension WindowTilingService {
         }
         
         hasJustTiledLeft = 0
+        hasJustTiledCenter = 0
         if self.hasJustTiledRight == 0 {
             hasJustTiledRight += 1
         }
@@ -367,24 +399,42 @@ extension WindowTilingService {
     }
 
     
-    func getCenterDimensions() -> CGRect? {
+    func getCenterDimensions(padding: Double, isLayoutCycling: Bool) -> CGRect? {
         guard let screen = WindowCore.screenUnderMouse() else { return nil }
-        
-        /// This is padding around all sides of the window
-        let padding : CGFloat = 40
-        
+
         let frame = screen.visibleFrame
-        
-        let centeredSize = CGSize(
-            width: frame.width - (padding * 2),
-            height: frame.height - (padding * 2)
-        )
-        
-        let centeredOrigin = CGPoint(
-            x: frame.origin.x + padding,
-            y: frame.origin.y + (padding)
-        )
-        
+
+        let layout = isLayoutCycling ? centerLayout : .center
+
+        let centeredSize: CGSize
+        let centeredOrigin: CGPoint
+
+
+        let padding: CGFloat = CGFloat(padding)
+
+        switch layout {
+        case .center:
+
+            centeredSize = CGSize(
+                width: frame.width - (padding * 2),
+                height: frame.height - (padding * 2)
+            )
+            centeredOrigin = CGPoint(
+                x: frame.origin.x + padding,
+                y: frame.origin.y + padding
+            )
+
+        case .centerExpanded:
+            centeredSize = CGSize(
+                width: frame.width - (padding * 2),
+                height: frame.height
+            )
+            centeredOrigin = CGPoint(
+                x: frame.origin.x + padding,
+                y: frame.origin.y
+            )
+        }
+
         /// Creating Target Rect
         let rect = NSRect(
             x: centeredOrigin.x,

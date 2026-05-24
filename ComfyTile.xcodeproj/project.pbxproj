@@ -12,6 +12,8 @@
 		9B23AB7F2F901C0A0028C510 /* WindowPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB7E2F901C0A0028C510 /* WindowPreview.swift */; };
 		9B23AB822F901C820028C510 /* WindowTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB812F901C820028C510 /* WindowTitleView.swift */; };
 		9B23AB8B2F9023B30028C510 /* MarqueeText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB8A2F9023B30028C510 /* MarqueeText.swift */; };
+		9B3121512FC3952500C9D7B5 /* HorizontalTileLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3121502FC3952500C9D7B5 /* HorizontalTileLayout.swift */; };
+		9B3121532FC3952D00C9D7B5 /* CenterTileLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3121522FC3952D00C9D7B5 /* CenterTileLayout.swift */; };
 		9B3BC0982F43A8E300A86E11 /* HighlightFocusedCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */; };
 		9B436CEE2ED7824E00D79941 /* ComfyTile.icon in Resources */ = {isa = PBXBuildFile; fileRef = 9B436CED2ED7824E00D79941 /* ComfyTile.icon */; };
 		9B490C752F0B5FFF00963D05 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B490C742F0B5FFF00963D05 /* LocalShortcuts */; };
@@ -83,7 +85,6 @@
 		9B9BCFF62F19748C0020F3AD /* WindowCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCFF52F19748A0020F3AD /* WindowCore.swift */; };
 		9BAF4AA12F1978CF006536D2 /* WindowLayoutProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAF4AA02F1978CB006536D2 /* WindowLayoutProviding.swift */; };
 		9BAF4AA32F1978DF006536D2 /* WindowLayoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BAF4AA22F1978DA006536D2 /* WindowLayoutService.swift */; };
-		9BCEA8022FAFF50200E4FAF5 /* HorizontalTileLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCEA8012FAFF50200E4FAF5 /* HorizontalTileLayout.swift */; };
 		9BE82E802F91699100A1C7F0 /* WindowViewerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE82E7F2F91699100A1C7F0 /* WindowViewerViewModel.swift */; };
 		9BF1F5B02F904964000C29C9 /* View+if.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF1F5AF2F904962000C29C9 /* View+if.swift */; };
 		9BF1F5B32F9050EA000C29C9 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF1F5B22F9050EA000C29C9 /* LocalShortcuts */; };
@@ -110,6 +111,8 @@
 		9B23AB7E2F901C0A0028C510 /* WindowPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowPreview.swift; sourceTree = "<group>"; };
 		9B23AB812F901C820028C510 /* WindowTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowTitleView.swift; sourceTree = "<group>"; };
 		9B23AB8A2F9023B30028C510 /* MarqueeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarqueeText.swift; sourceTree = "<group>"; };
+		9B3121502FC3952500C9D7B5 /* HorizontalTileLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalTileLayout.swift; sourceTree = "<group>"; };
+		9B3121522FC3952D00C9D7B5 /* CenterTileLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterTileLayout.swift; sourceTree = "<group>"; };
 		9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightFocusedCoordinator.swift; sourceTree = "<group>"; };
 		9B436CED2ED7824E00D79941 /* ComfyTile.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = ComfyTile.icon; sourceTree = "<group>"; };
 		9B68EE9B2F227711009567DF /* AXSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AXSubscription.swift; sourceTree = "<group>"; };
@@ -178,7 +181,6 @@
 		9B9BCFF52F19748A0020F3AD /* WindowCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowCore.swift; sourceTree = "<group>"; };
 		9BAF4AA02F1978CB006536D2 /* WindowLayoutProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutProviding.swift; sourceTree = "<group>"; };
 		9BAF4AA22F1978DA006536D2 /* WindowLayoutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLayoutService.swift; sourceTree = "<group>"; };
-		9BCEA8012FAFF50200E4FAF5 /* HorizontalTileLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalTileLayout.swift; sourceTree = "<group>"; };
 		9BE82E7F2F91699100A1C7F0 /* WindowViewerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowViewerViewModel.swift; sourceTree = "<group>"; };
 		9BF1F5AF2F904962000C29C9 /* View+if.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+if.swift"; sourceTree = "<group>"; };
 		9BF265092F8C5EC300BAA631 /* ComfyTileDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfyTileDebugView.swift; sourceTree = "<group>"; };
@@ -213,6 +215,15 @@
 				9B23AB7A2F900D840028C510 /* WindowCard.swift */,
 			);
 			path = WindowCard;
+			sourceTree = "<group>";
+		};
+		9B31214F2FC3951B00C9D7B5 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				9B3121522FC3952D00C9D7B5 /* CenterTileLayout.swift */,
+				9B3121502FC3952500C9D7B5 /* HorizontalTileLayout.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		9B68EEA12F228C62009567DF /* Appearance */ = {
@@ -486,8 +497,8 @@
 		9B9BCFDA2F1972FD0020F3AD /* Tiling */ = {
 			isa = PBXGroup;
 			children = (
+				9B31214F2FC3951B00C9D7B5 /* Models */,
 				9B9BCFE12F1973570020F3AD /* WindowAnimator.swift */,
-				9BCEA8012FAFF50200E4FAF5 /* HorizontalTileLayout.swift */,
 				9B9BCFDC2F1973030020F3AD /* WindowTilingProviding.swift */,
 				9B9BCFDD2F1973030020F3AD /* WindowTilingService.swift */,
 			);
@@ -700,7 +711,6 @@
 				9B9BCFF62F19748C0020F3AD /* WindowCore.swift in Sources */,
 				9B8FC0822F10B80D00CBF4B8 /* ShortcutRecorder.swift in Sources */,
 				9B8FC0832F10B80D00CBF4B8 /* TileShapeView.swift in Sources */,
-				9BCEA8022FAFF50200E4FAF5 /* HorizontalTileLayout.swift in Sources */,
 				9B8FC0842F10B80D00CBF4B8 /* View+sectionBackground.swift in Sources */,
 				9BF1F5B02F904964000C29C9 /* View+if.swift in Sources */,
 				9B8FC0852F10B80D00CBF4B8 /* ComfyTileMenuBar.swift in Sources */,
@@ -710,6 +720,7 @@
 				9B9BCFD32F1972350020F3AD /* DefaultsManager.swift in Sources */,
 				9B3BC0982F43A8E300A86E11 /* HighlightFocusedCoordinator.swift in Sources */,
 				9B9BCFD42F1972350020F3AD /* DefaultsKeys.swift in Sources */,
+				9B3121512FC3952500C9D7B5 /* HorizontalTileLayout.swift in Sources */,
 				9B8FC0862F10B80D00CBF4B8 /* SettingsView.swift in Sources */,
 				9B23AB7F2F901C0A0028C510 /* WindowPreview.swift in Sources */,
 				9B23AB7D2F901BF90028C510 /* WindowTrafficLights.swift in Sources */,
@@ -720,6 +731,7 @@
 				9B8FC08A2F10B80D00CBF4B8 /* TilingCover.swift in Sources */,
 				9B8FC08B2F10B80D00CBF4B8 /* WindowViewer.swift in Sources */,
 				9B9BCFD02F1972190020F3AD /* PermissionService.swift in Sources */,
+				9B3121532FC3952D00C9D7B5 /* CenterTileLayout.swift in Sources */,
 				9B8FC08C2F10B80D00CBF4B8 /* ComfyTileApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

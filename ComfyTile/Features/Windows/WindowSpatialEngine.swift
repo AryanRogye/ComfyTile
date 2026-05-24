@@ -126,7 +126,8 @@ final class WindowSpatialEngine {
                                 )
         case .center:          self.windowTilingService.center(
                                     withAnimation: self.defaultsManager.showTilingAnimations,
-                                    padding: self.defaultsManager.centerTilingPadding
+                                    padding: self.defaultsManager.centerTilingPadding,
+                                    isLayoutCycling: self.defaultsManager.enableLayoutCycling
                                 )
         case .fullscreen:      self.windowTilingService.fullScreen(
                                     withAnimation: self.defaultsManager.showTilingAnimations
@@ -275,7 +276,8 @@ extension WindowSpatialEngine {
         tileWithAnimation {
             self.windowTilingService.center(
                 withAnimation: self.defaultsManager.showTilingAnimations,
-                padding: self.defaultsManager.centerTilingPadding
+                padding: self.defaultsManager.centerTilingPadding,
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling
             )
         }
     }
@@ -283,12 +285,16 @@ extension WindowSpatialEngine {
         if !defaultsManager.showTilingAnimations {
             self.windowTilingService.center(
                 withAnimation: self.defaultsManager.showTilingAnimations,
-                padding: self.defaultsManager.centerTilingPadding
+                padding: self.defaultsManager.centerTilingPadding,
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling
             )
             return
         }
         tileDownWithAnimation {
-            self.windowTilingService.getCenterDimensions()
+            self.windowTilingService.getCenterDimensions(
+                padding: self.defaultsManager.centerTilingPadding,
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+            )
         }
     }
 }
