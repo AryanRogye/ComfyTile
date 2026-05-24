@@ -13,8 +13,11 @@ public struct ComfyTileMenuBarRootView: View {
     @Bindable var defaultsManager: DefaultsManager
     @Bindable var windowCore: WindowCore
     @Bindable var updateController: UpdateController
-    
-    
+
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: 12)
+    }
+
     public var body: some View {
         VStack(spacing: 0) {
             if comfyTileMenuBarVM.permissionService.isAccessibilityEnabled {
@@ -30,7 +33,8 @@ public struct ComfyTileMenuBarRootView: View {
                 )
             }
         }
-        .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.regular.interactive(), in: shape)
+        .clipShape(shape)
     }
 }
 

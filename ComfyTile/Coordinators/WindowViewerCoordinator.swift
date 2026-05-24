@@ -42,7 +42,10 @@ class WindowViewerCoordinator: NSObject {
     /// We treat this as a *best-effort hint*, not a source of truth.
     /// Core logic should NOT depend on this firing.
     private var resignActiveObserver: Any?
-    
+
+    /// Screen used on the panel last
+    private var lastScreen: NSScreen?
+
     init(windowViewerVM : WindowViewerViewModel, windowCore : WindowCore) {
         self.windowViewerVM = windowViewerVM
         self.windowCore = windowCore
@@ -63,6 +66,7 @@ class WindowViewerCoordinator: NSObject {
     
     public func setupPanel() {
         guard let screen = WindowCore.screenUnderMouse() else { return }
+        lastScreen = screen
         panel = FocusablePanel(
             contentRect: .zero,
             styleMask: [.borderless, .nonactivatingPanel, .fullSizeContentView],
@@ -118,6 +122,14 @@ class WindowViewerCoordinator: NSObject {
     
     public func show() {
         if panel == nil { setupPanel() }
+
+        guard let screen = WindowCore.screenUnderMouse() else { return }
+        /// move if not the same screen to avoid redrawing
+        if lastScreen != screen {
+            panel.setFrame(screen.frame, display: true)
+            lastScreen = screen
+        }
+
         windowViewerVM.isShown = true
         panel.makeKeyAndOrderFront(nil)
         installKeyMonitors()

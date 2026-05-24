@@ -138,7 +138,7 @@ class MenuBarCoordinator: NSObject {
 
         let containerView = NSView(frame: NSRect(x: 0, y: 0, width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height))
         containerView.wantsLayer = true
-        containerView.layer?.masksToBounds = true
+        containerView.layer?.masksToBounds = false
 
         if let hostingView = hostingController?.view {
             hostingView.frame = containerView.bounds
