@@ -11,10 +11,10 @@ class AppEnv {
 
     lazy var appServices = AppServices()
 
-    let windowCore = WindowCore()
-    
+    var windowCore = WindowCore()
+
     lazy var windowTilingService: any WindowTilingProviding = WindowTilingService(
-        windowCore: windowCore
+        windowCore: windowCore,
     )
     lazy var windowLayoutService: any WindowLayoutProviding = WindowLayoutService(
         windowCore: windowCore

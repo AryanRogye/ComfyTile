@@ -68,6 +68,7 @@ class AppCoordinator {
             windowLayoutService: windowLayoutService,
             windowTilingService: windowTilingService,
             defaultsManager: defaultsManager,
+            displayManager: displayManager,
             tilingCoverCoordinator: tilingCoverCoordinator
         )
         
@@ -92,8 +93,16 @@ class AppCoordinator {
             windowViewerVM: windowViewerVM,
             windowCore: appEnv.windowCore
         )
-        
         self.hotKeyCoordinator = HotKeyCoordinator()
+
+        self.windowTilingService.setPaddingForScreen { screen in
+            guard let id = screen.displayID else { return nil }
+            guard let displayInfp = self.displayManager.displayInfo(for: id) else { return nil }
+            if let padding = displayInfp.padding {
+                return CGFloat(padding)
+            }
+            return nil
+        }
         self.startHotKey()
         
         ScreenshotHelper.startCacheCleanupLoop()

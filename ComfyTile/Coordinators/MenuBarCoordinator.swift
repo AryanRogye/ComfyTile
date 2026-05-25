@@ -147,6 +147,7 @@ class MenuBarCoordinator: NSObject {
 
         if let hostingView = hostingController?.view {
             hostingView.frame = containerView.bounds
+            hostingView.layer?.backgroundColor = NSColor.clear.cgColor
             let width: AppKit.NSView.AutoresizingMask = .width
             let height: AppKit.NSView.AutoresizingMask = .height
             hostingView.autoresizingMask = [width, height]
@@ -155,8 +156,36 @@ class MenuBarCoordinator: NSObject {
 
         panel.contentView = containerView
 
+//        makePanelGlass(panel)
         self.panel = panel
         self.comfyTileMenuBarVM?.panel = panel
+    }
+
+    internal func makePanelGlass(_ panel: NSPanel) {
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = true
+
+        guard let hostingView = panel.contentView else { return }
+        // Make a container view to hold both
+        let containerView = NSView(frame: hostingView.frame)
+        containerView.autoresizingMask = [.width, .height]
+
+        // Glass goes in the container as the base
+        let glassView = NSGlassEffectView()
+        glassView.style = .regular
+        glassView.frame = containerView.bounds
+        glassView.autoresizingMask = [.width, .height]
+        containerView.addSubview(glassView)
+
+        // Hosting view goes on top inside the container
+        hostingView.removeFromSuperview()
+        hostingView.frame = containerView.bounds
+        hostingView.autoresizingMask = [.width, .height]
+        containerView.addSubview(hostingView)
+
+        // Container becomes the window's content view
+        panel.contentView = containerView
     }
 
     // MARK: - Panel Toggle

@@ -70,9 +70,9 @@ struct CenterTilingAdvancedGeneralView: View {
         VStack(alignment: .leading) {
             if menuBarVM.showSettings {
                 Toggle("Advanced Center Padding", isOn: $defaultsManager.advancedCenterTilingPadding)
+                    .help("If enabled, and a monitor doesnt have padding, will default to center padding")
             }
             if defaultsManager.advancedCenterTilingPadding && menuBarVM.showSettings {
-                Divider()
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(Array(displayManager.screenSnapshots.keys), id: \.self) { key in
                         if let image = displayManager.snapshot(for: key) {
@@ -163,7 +163,7 @@ struct DisplayCard: View {
             Slider(value: Binding(
                 get: { displayManager.displayInfo(for: key)?.padding ?? 0 },
                 set: { displayManager.updatePadding(for: key, padding: $0) }
-            ), in: 0...40, step: 1) {
+            ), in: 10...100, step: 1) {
                 EmptyView()
             }
             .labelsHidden()
@@ -175,7 +175,14 @@ struct DisplayCard: View {
             .disabled(!displayManager.isPaddingEnabled(for: key))
         }
         .padding(8)
-        .background(.quaternary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .background {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color.opposite.opacity(0.18))
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .strokeBorder(.primary.opacity(0.08))
+        }
     }
 }
 

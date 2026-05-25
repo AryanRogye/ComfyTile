@@ -83,9 +83,20 @@ extension ComfyTileMenuBarViewModel {
                 guard let panel = self.panel else { return }
                 self.showSettingsRevealWorkItem?.cancel()
                 if self.selectedTab == .settings {
+
+                    let screen = WindowCore.screenUnderMouse()
+
+                    let screenHeight: CGFloat
+
+                    if let screen {
+                        screenHeight = screen.visibleFrame.height / 2
+                    } else {
+                        screenHeight = 400
+                    }
+
                     withAnimation(.snappy) {
                         self.width = 600
-                        self.height = 400
+                        self.height = screenHeight
                     }
                     
                     let revealWorkItem = DispatchWorkItem { [weak self] in
