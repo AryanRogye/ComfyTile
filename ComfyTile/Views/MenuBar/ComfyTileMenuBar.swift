@@ -13,6 +13,7 @@ public struct ComfyTileMenuBarRootView: View {
     @Bindable var defaultsManager: DefaultsManager
     @Bindable var windowCore: WindowCore
     @Bindable var updateController: UpdateController
+    @Bindable var displayManager  : DisplayManager
 
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: 12)
@@ -27,6 +28,7 @@ public struct ComfyTileMenuBarRootView: View {
                     .environment(comfyTileMenuBarVM)
                     .environment(updateController)
                     .environment(settingsVM)
+                    .environment(displayManager)
             } else {
                 PermissionView(
                     vm: comfyTileMenuBarVM

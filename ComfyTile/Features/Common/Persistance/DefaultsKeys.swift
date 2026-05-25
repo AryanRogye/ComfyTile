@@ -44,7 +44,9 @@ extension Defaults.Keys {
     
     /// usually min of 10, and high of 100 is nice
     static let centerTilingPadding = Key<Double>("CenterTilingPadding", default: 40.0)
-    
+
+    static let advancedCenterTilingPadding = Key<Bool>("AdvancedCenterTilingPadding", default: false)
+
     /// This allows us to focus a apps window on the window switcher
     static let allowFocusAppWindowOnWindowSwitcher = Key<Bool>("AllowFocusAppWindowOnWindowSwitcher", default: true)
     

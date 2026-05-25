@@ -141,10 +141,10 @@ class WindowViewerCoordinator: NSObject {
         panel?.orderOut(nil)
     }
 
-    @discardableResult
     /**
      * Function Returns True if event was escape
      */
+    @discardableResult
     private func handleEvent(
         e : NSEvent,
     ) -> Bool {

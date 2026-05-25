@@ -15,9 +15,11 @@ struct GeneralSettings: View {
         Form {
             Section("Tiling") {
                 CenterTilingGeneralView(defaultsManager: defaultsManager)
+                CenterTilingAdvancedGeneralView(defaultsManager: defaultsManager)
                 TilingSnapBehavior(defaultsManager: defaultsManager)
                 SmartTilingBehavior(defaultsManager: defaultsManager)
             }
+
             Section("Window Switching") {
                 WindowSwitcherGeneralView(defaultsManager: defaultsManager)
             }
@@ -31,123 +33,5 @@ struct GeneralSettings: View {
         }
         .formStyle(.grouped)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-// MARK: - Window Switcher Settings
-struct WindowSwitcherGeneralView: View {
-    
-    @Bindable var defaultsManager : DefaultsManager
-
-    var body: some View {
-        Toggle("Use F to show all windows for an app", isOn: $defaultsManager.allowFocusAppWindowOnWindowSwitcher)
-    }
-}
-
-struct TilingSnapBehavior: View {
-    @Bindable var defaultsManager : DefaultsManager
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Toggle("Enable Layout Cycling", isOn: $defaultsManager.enableLayoutCycling)
-                .help("Repeatedly pressing a tiling shortcut will cycle through different sizes (1/2, 1/3).")
-        }
-    }
-}
-
-struct SmartTilingBehavior: View {
-    @Bindable var defaultsManager : DefaultsManager
-    
-    var body: some View {
-        if defaultsManager.enableLayoutCycling {
-            VStack(alignment: .leading, spacing: 8) {
-                Toggle("Enable Smart Tiling", isOn: $defaultsManager.enableSmartTiling)
-                    .help("""
-                    Intelligently fills the remaining space.
-                    (e.g., tiling 1/3 left makes the next right-tile 2/3).
-                    
-                    Keeps your workspace balanced and contained.
-                    """)
-            }
-            .animation(.bouncy, value: defaultsManager.enableLayoutCycling)
-        }
-    }
-}
-
-// MARK: - Center Tiling Settings
-struct CenterTilingGeneralView: View {
-    @Bindable var defaultsManager : DefaultsManager
-    @Environment(ComfyTileMenuBarViewModel.self) var comfyTileMenuBarVM
-    
-    var body: some View {
-        
-        @Bindable var menuBarVM = comfyTileMenuBarVM
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("Center Tiling Padding")
-                Spacer()
-                Text("\(Int(defaultsManager.centerTilingPadding)) px")
-                    .font(.subheadline.monospacedDigit())
-                    .foregroundStyle(.secondary)
-            }
-            .redacted(reason: menuBarVM.showSettings == false ? .placeholder : [])
-
-            if menuBarVM.showSettings {
-                Slider(value: $defaultsManager.centerTilingPadding, in: 10...100, step: 1) {
-                    EmptyView()
-                } minimumValueLabel: {
-                    Text("10")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } maximumValueLabel: {
-                    Text("100")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .labelsHidden()
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .animation(.spring, value: menuBarVM.showSettings)
-    }
-}
-
-// MARK: - Updates General View
-struct UpdatesGeneralView: View {
-    @Environment(UpdateController.self) var updateController
-
-    var body: some View {
-        VStack {
-            if let updateNotFoundError = updateController.updaterVM.updateNotFoundError,
-               updateController.updaterVM.showUpdateNotFoundError {
-                Text(updateNotFoundError)
-                Button {
-                    updateController.updaterVM.updateNotFoundError = nil
-                    updateController.updaterVM.showUpdateNotFoundError = false
-                    updateController.updaterVM.showUserInitiatedUpdate = false
-                } label: {
-                    Text("Ok")
-                }
-            } else {
-                if updateController.updaterVM.showUserInitiatedUpdate {
-                    HStack {
-                        Button {
-                            updateController.updaterVM.cancelUserInitiatedUpdate()
-                        } label: {
-                            Text("Cancel")
-                                .frame(maxWidth: .infinity)
-                        }
-                        
-                        ProgressView()
-                            .progressViewStyle(.linear)
-                            .frame(maxWidth: .infinity)
-                    }
-                    
-                } else {
-                    CheckForUpdatesView(updater: updateController.updater)
-                }
-            }
-        }
-        .animation(.easeInOut, value: updateController.updaterVM.showUserInitiatedUpdate)
     }
 }

@@ -14,6 +14,12 @@
 		9B23AB8B2F9023B30028C510 /* MarqueeText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB8A2F9023B30028C510 /* MarqueeText.swift */; };
 		9B3121512FC3952500C9D7B5 /* HorizontalTileLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3121502FC3952500C9D7B5 /* HorizontalTileLayout.swift */; };
 		9B3121532FC3952D00C9D7B5 /* CenterTileLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3121522FC3952D00C9D7B5 /* CenterTileLayout.swift */; };
+		9B31215F2FC3B5C000C9D7B5 /* DisplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B31215E2FC3B5C000C9D7B5 /* DisplayManager.swift */; };
+		9B3121612FC3B60700C9D7B5 /* NSScreen+displayID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3121602FC3B60200C9D7B5 /* NSScreen+displayID.swift */; };
+		9B3121632FC3B70200C9D7B5 /* AppServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3121622FC3B70200C9D7B5 /* AppServices.swift */; };
+		9B3121652FC3B90E00C9D7B5 /* TilingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3121642FC3B90C00C9D7B5 /* TilingSettings.swift */; };
+		9B3121672FC3B95A00C9D7B5 /* WindowSwitchingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3121662FC3B95500C9D7B5 /* WindowSwitchingSettings.swift */; };
+		9B3121692FC3B96D00C9D7B5 /* AboutSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3121682FC3B96B00C9D7B5 /* AboutSettings.swift */; };
 		9B3BC0982F43A8E300A86E11 /* HighlightFocusedCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */; };
 		9B436CEE2ED7824E00D79941 /* ComfyTile.icon in Resources */ = {isa = PBXBuildFile; fileRef = 9B436CED2ED7824E00D79941 /* ComfyTile.icon */; };
 		9B490C752F0B5FFF00963D05 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B490C742F0B5FFF00963D05 /* LocalShortcuts */; };
@@ -22,6 +28,8 @@
 		9B68EEA32F228C6C009567DF /* AppearanceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B68EEA22F228C6A009567DF /* AppearanceSettings.swift */; };
 		9B68EEA72F22D124009567DF /* ComfySCWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B68EEA62F22D123009567DF /* ComfySCWindow.swift */; };
 		9B68EEA92F22F74F009567DF /* GlobalClickMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B68EEA82F22F74A009567DF /* GlobalClickMonitor.swift */; };
+		9B794CBC2FC42F55009C8A46 /* DisplayObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B794CBB2FC42F55009C8A46 /* DisplayObserver.swift */; };
+		9B794CBE2FC42F68009C8A46 /* DisplayInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B794CBD2FC42F68009C8A46 /* DisplayInfo.swift */; };
 		9B8FBD922F0F033400CBF4B8 /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B8FBD912F0F033400CBF4B8 /* ComfyLogger */; };
 		9B8FBF1B2F1039BF00CBF4B8 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9B8FBF1A2F1039BF00CBF4B8 /* Sparkle */; };
 		9B8FC05D2F10B80D00CBF4B8 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC00F2F10B80D00CBF4B8 /* AppCoordinator.swift */; };
@@ -113,12 +121,20 @@
 		9B23AB8A2F9023B30028C510 /* MarqueeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarqueeText.swift; sourceTree = "<group>"; };
 		9B3121502FC3952500C9D7B5 /* HorizontalTileLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalTileLayout.swift; sourceTree = "<group>"; };
 		9B3121522FC3952D00C9D7B5 /* CenterTileLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterTileLayout.swift; sourceTree = "<group>"; };
+		9B31215E2FC3B5C000C9D7B5 /* DisplayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayManager.swift; sourceTree = "<group>"; };
+		9B3121602FC3B60200C9D7B5 /* NSScreen+displayID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+displayID.swift"; sourceTree = "<group>"; };
+		9B3121622FC3B70200C9D7B5 /* AppServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppServices.swift; sourceTree = "<group>"; };
+		9B3121642FC3B90C00C9D7B5 /* TilingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TilingSettings.swift; sourceTree = "<group>"; };
+		9B3121662FC3B95500C9D7B5 /* WindowSwitchingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowSwitchingSettings.swift; sourceTree = "<group>"; };
+		9B3121682FC3B96B00C9D7B5 /* AboutSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutSettings.swift; sourceTree = "<group>"; };
 		9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightFocusedCoordinator.swift; sourceTree = "<group>"; };
 		9B436CED2ED7824E00D79941 /* ComfyTile.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = ComfyTile.icon; sourceTree = "<group>"; };
 		9B68EE9B2F227711009567DF /* AXSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AXSubscription.swift; sourceTree = "<group>"; };
 		9B68EEA22F228C6A009567DF /* AppearanceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSettings.swift; sourceTree = "<group>"; };
 		9B68EEA62F22D123009567DF /* ComfySCWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfySCWindow.swift; sourceTree = "<group>"; };
 		9B68EEA82F22F74A009567DF /* GlobalClickMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalClickMonitor.swift; sourceTree = "<group>"; };
+		9B794CBB2FC42F55009C8A46 /* DisplayObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayObserver.swift; sourceTree = "<group>"; };
+		9B794CBD2FC42F68009C8A46 /* DisplayInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayInfo.swift; sourceTree = "<group>"; };
 		9B8FC00F2F10B80D00CBF4B8 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		9B8FC0102F10B80D00CBF4B8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9B8FC0122F10B80D00CBF4B8 /* HotKeyCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyCoordinator.swift; sourceTree = "<group>"; };
@@ -226,6 +242,16 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		9B31215D2FC3B5BA00C9D7B5 /* Monitor */ = {
+			isa = PBXGroup;
+			children = (
+				9B31215E2FC3B5C000C9D7B5 /* DisplayManager.swift */,
+				9B794CBD2FC42F68009C8A46 /* DisplayInfo.swift */,
+				9B794CBB2FC42F55009C8A46 /* DisplayObserver.swift */,
+			);
+			path = Monitor;
+			sourceTree = "<group>";
+		};
 		9B68EEA12F228C62009567DF /* Appearance */ = {
 			isa = PBXGroup;
 			children = (
@@ -259,6 +285,7 @@
 		9B8FC0222F10B80D00CBF4B8 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9B3121602FC3B60200C9D7B5 /* NSScreen+displayID.swift */,
 				9BF1F5AF2F904962000C29C9 /* View+if.swift */,
 				9B8FC0942F119FAF00CBF4B8 /* NSRect+axPosition.swift */,
 				9B8FC01A2F10B80D00CBF4B8 /* Bundle.swift */,
@@ -367,6 +394,9 @@
 			isa = PBXGroup;
 			children = (
 				9B8FC0B62F11FF6800CBF4B8 /* GeneralSettings.swift */,
+				9B3121642FC3B90C00C9D7B5 /* TilingSettings.swift */,
+				9B3121662FC3B95500C9D7B5 /* WindowSwitchingSettings.swift */,
+				9B3121682FC3B96B00C9D7B5 /* AboutSettings.swift */,
 			);
 			path = General;
 			sourceTree = "<group>";
@@ -402,6 +432,7 @@
 		9B9BCFBD2F1971EB0020F3AD /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				9B31215D2FC3B5BA00C9D7B5 /* Monitor */,
 				9B9BCFCE2F1972170020F3AD /* Common */,
 				9B9BCFC62F1971ED0020F3AD /* Updates */,
 				9B9BCFCC2F1971F80020F3AD /* Windows */,
@@ -480,6 +511,7 @@
 		9B9BCFD82F1972C90020F3AD /* Persistance */ = {
 			isa = PBXGroup;
 			children = (
+				9B3121622FC3B70200C9D7B5 /* AppServices.swift */,
 				9B9BCFD12F1972350020F3AD /* DefaultsManager.swift */,
 				9B9BCFD22F1972350020F3AD /* DefaultsKeys.swift */,
 			);
@@ -674,6 +706,7 @@
 				9BE82E802F91699100A1C7F0 /* WindowViewerViewModel.swift in Sources */,
 				9B9BCFE52F19736B0020F3AD /* ComfyWindow.swift in Sources */,
 				9BAF4AA32F1978DF006536D2 /* WindowLayoutService.swift in Sources */,
+				9B794CBC2FC42F55009C8A46 /* DisplayObserver.swift in Sources */,
 				9B8FC0622F10B80D00CBF4B8 /* TilingCoverCoordinator.swift in Sources */,
 				9B8FC0632F10B80D00CBF4B8 /* WindowCoordinator.swift in Sources */,
 				9B8FC0AD2F11D7BE00CBF4B8 /* ComfyTileTabBar.swift in Sources */,
@@ -681,10 +714,12 @@
 				9B8FC0C12F12306D00CBF4B8 /* TileModeView.swift in Sources */,
 				9B9BCFE72F19738D0020F3AD /* WindowElement.swift in Sources */,
 				9B8FC0652F10B80D00CBF4B8 /* WindowViewerCoordinator.swift in Sources */,
+				9B3121632FC3B70200C9D7B5 /* AppServices.swift in Sources */,
 				9B68EEA72F22D124009567DF /* ComfySCWindow.swift in Sources */,
 				9B8FC0CA2F12EF5C00CBF4B8 /* MenuBarModeContainer.swift in Sources */,
 				9B8FC0C32F12307100CBF4B8 /* LayoutModeView.swift in Sources */,
 				9B8FC0D52F130B7700CBF4B8 /* HotKeyOrClose.swift in Sources */,
+				9B3121692FC3B96D00C9D7B5 /* AboutSettings.swift in Sources */,
 				9B8FC0662F10B80D00CBF4B8 /* Bundle.swift in Sources */,
 				9B8FC0D72F130E7500CBF4B8 /* ShortcutEditableRow.swift in Sources */,
 				9B68EE9C2F227716009567DF /* AXSubscription.swift in Sources */,
@@ -692,7 +727,9 @@
 				9B8FC0692F10B80D00CBF4B8 /* FocusablePanel.swift in Sources */,
 				9B68EEA92F22F74F009567DF /* GlobalClickMonitor.swift in Sources */,
 				9B8FC0B72F11FF6800CBF4B8 /* GeneralSettings.swift in Sources */,
+				9B31215F2FC3B5C000C9D7B5 /* DisplayManager.swift in Sources */,
 				9B8FC0BD2F1201A700CBF4B8 /* SettingsSidebar.swift in Sources */,
+				9B3121612FC3B60700C9D7B5 /* NSScreen+displayID.swift in Sources */,
 				9B8FC0B42F11EF1300CBF4B8 /* ComfyTileTabs.swift in Sources */,
 				9B8FC06B2F10B80D00CBF4B8 /* NSColor+toSIMD.swift in Sources */,
 				9B8FC0A92F11AB9E00CBF4B8 /* MenuBarCoordinator.swift in Sources */,
@@ -704,13 +741,16 @@
 				9B9BCFCA2F1971ED0020F3AD /* UpdateController.swift in Sources */,
 				9B9BCFCB2F1971ED0020F3AD /* UpdaterViewModel.swift in Sources */,
 				9B8FC0B92F11FFC000CBF4B8 /* SettingsTopBar.swift in Sources */,
+				9B3121672FC3B95A00C9D7B5 /* WindowSwitchingSettings.swift in Sources */,
 				9B8FC0BB2F12019700CBF4B8 /* SettingsContent.swift in Sources */,
 				9B8FC0C82F12ECFB00CBF4B8 /* MenuBarModeRow.swift in Sources */,
 				9B8FC0AB2F11B08400CBF4B8 /* SettingsViewModel.swift in Sources */,
 				9B8FC0952F119FB400CBF4B8 /* NSRect+axPosition.swift in Sources */,
 				9B9BCFF62F19748C0020F3AD /* WindowCore.swift in Sources */,
 				9B8FC0822F10B80D00CBF4B8 /* ShortcutRecorder.swift in Sources */,
+				9B794CBE2FC42F68009C8A46 /* DisplayInfo.swift in Sources */,
 				9B8FC0832F10B80D00CBF4B8 /* TileShapeView.swift in Sources */,
+				9B3121652FC3B90E00C9D7B5 /* TilingSettings.swift in Sources */,
 				9B8FC0842F10B80D00CBF4B8 /* View+sectionBackground.swift in Sources */,
 				9BF1F5B02F904964000C29C9 /* View+if.swift in Sources */,
 				9B8FC0852F10B80D00CBF4B8 /* ComfyTileMenuBar.swift in Sources */,

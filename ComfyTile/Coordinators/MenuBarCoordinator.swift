@@ -28,6 +28,7 @@ class MenuBarCoordinator: NSObject {
     private var defaultsManager: DefaultsManager?
     private var windowCore: WindowCore?
     private var updateController: UpdateController?
+    private var displayManager: DisplayManager?
 
     // MARK: - Initialization
 
@@ -43,13 +44,15 @@ class MenuBarCoordinator: NSObject {
         settingsVM              : SettingsViewModel,
         defaultsManager         : DefaultsManager,
         windowCore              : WindowCore,
-        updateController        : UpdateController
+        updateController        : UpdateController,
+        displayManager          : DisplayManager
     ) {
         self.comfyTileMenuBarVM     = comfyTileMenuBarVM
         self.settingsVM             = settingsVM
         self.defaultsManager        = defaultsManager
         self.windowCore             = windowCore
         self.updateController       = updateController
+        self.displayManager         = displayManager
 
         configureClosures()
         configureStatusItem()
@@ -104,7 +107,8 @@ class MenuBarCoordinator: NSObject {
               let settingsVM = settingsVM,
               let defaultsManager = defaultsManager,
               let windowCore = windowCore,
-              let updateController = updateController
+              let updateController = updateController,
+              let displayManager = displayManager
         else {
             return
         }
@@ -115,7 +119,8 @@ class MenuBarCoordinator: NSObject {
             comfyTileMenuBarVM: comfyTileMenuBarVM,
             defaultsManager: defaultsManager,
             windowCore: windowCore,
-            updateController: updateController
+            updateController: updateController,
+            displayManager: displayManager
         )
 
         // Create hosting controller
