@@ -10,12 +10,13 @@ import SwiftUI
 struct GeneralSettings: View {
     
     @Bindable var defaultsManager : DefaultsManager
-    
+    @Environment(ComfyTileMenuBarViewModel.self) var menuBarVM
+
     var body: some View {
         Form {
             Section("Tiling") {
-                CenterTilingGeneralView(defaultsManager: defaultsManager)
-                CenterTilingAdvancedGeneralView(defaultsManager: defaultsManager)
+                CenterTilingGeneralView(defaultsManager: defaultsManager, menuBarVM: menuBarVM)
+                CenterTilingAdvancedGeneralView(defaultsManager: defaultsManager, menuBarVM: menuBarVM)
                 TilingSnapBehavior(defaultsManager: defaultsManager)
                 SmartTilingBehavior(defaultsManager: defaultsManager)
             }

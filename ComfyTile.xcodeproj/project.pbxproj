@@ -31,6 +31,9 @@
 		9B794CBC2FC42F55009C8A46 /* DisplayObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B794CBB2FC42F55009C8A46 /* DisplayObserver.swift */; };
 		9B794CBE2FC42F68009C8A46 /* DisplayInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B794CBD2FC42F68009C8A46 /* DisplayInfo.swift */; };
 		9B794D1C2FC43C9D009C8A46 /* Color+opposite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B794D1B2FC43C98009C8A46 /* Color+opposite.swift */; };
+		9B794D1E2FC4DD42009C8A46 /* ProfileWithPointOfInterestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B794D1D2FC4DD36009C8A46 /* ProfileWithPointOfInterestView.swift */; };
+		9B794D212FC4E4CD009C8A46 /* ProfileWithInterests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B794D202FC4E4C9009C8A46 /* ProfileWithInterests.swift */; };
+		9B794D232FC4E4DD009C8A46 /* OSLog+comfyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B794D222FC4E4DA009C8A46 /* OSLog+comfyView.swift */; };
 		9B8FBD922F0F033400CBF4B8 /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B8FBD912F0F033400CBF4B8 /* ComfyLogger */; };
 		9B8FBF1B2F1039BF00CBF4B8 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9B8FBF1A2F1039BF00CBF4B8 /* Sparkle */; };
 		9B8FC05D2F10B80D00CBF4B8 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC00F2F10B80D00CBF4B8 /* AppCoordinator.swift */; };
@@ -137,6 +140,9 @@
 		9B794CBB2FC42F55009C8A46 /* DisplayObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayObserver.swift; sourceTree = "<group>"; };
 		9B794CBD2FC42F68009C8A46 /* DisplayInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayInfo.swift; sourceTree = "<group>"; };
 		9B794D1B2FC43C98009C8A46 /* Color+opposite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+opposite.swift"; sourceTree = "<group>"; };
+		9B794D1D2FC4DD36009C8A46 /* ProfileWithPointOfInterestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileWithPointOfInterestView.swift; sourceTree = "<group>"; };
+		9B794D202FC4E4C9009C8A46 /* ProfileWithInterests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileWithInterests.swift; sourceTree = "<group>"; };
+		9B794D222FC4E4DA009C8A46 /* OSLog+comfyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OSLog+comfyView.swift"; sourceTree = "<group>"; };
 		9B8FC00F2F10B80D00CBF4B8 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		9B8FC0102F10B80D00CBF4B8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9B8FC0122F10B80D00CBF4B8 /* HotKeyCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyCoordinator.swift; sourceTree = "<group>"; };
@@ -260,6 +266,16 @@
 				9B68EEA22F228C6A009567DF /* AppearanceSettings.swift */,
 			);
 			path = Appearance;
+			sourceTree = "<group>";
+		};
+		9B794D1F2FC4E4B9009C8A46 /* Profiling */ = {
+			isa = PBXGroup;
+			children = (
+				9B794D222FC4E4DA009C8A46 /* OSLog+comfyView.swift */,
+				9B794D202FC4E4C9009C8A46 /* ProfileWithInterests.swift */,
+				9B794D1D2FC4DD36009C8A46 /* ProfileWithPointOfInterestView.swift */,
+			);
+			path = Profiling;
 			sourceTree = "<group>";
 		};
 		9B8FC0112F10B80D00CBF4B8 /* App */ = {
@@ -435,6 +451,7 @@
 		9B9BCFBD2F1971EB0020F3AD /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				9B794D1F2FC4E4B9009C8A46 /* Profiling */,
 				9B31215D2FC3B5BA00C9D7B5 /* Monitor */,
 				9B9BCFCE2F1972170020F3AD /* Common */,
 				9B9BCFC62F1971ED0020F3AD /* Updates */,
@@ -738,6 +755,7 @@
 				9B8FC06B2F10B80D00CBF4B8 /* NSColor+toSIMD.swift in Sources */,
 				9B8FC0A92F11AB9E00CBF4B8 /* MenuBarCoordinator.swift in Sources */,
 				9B8FC06C2F10B80D00CBF4B8 /* View+destroyViewWindow.swift in Sources */,
+				9B794D212FC4E4CD009C8A46 /* ProfileWithInterests.swift in Sources */,
 				9B9BCFC72F1971ED0020F3AD /* CheckForUpdatesView.swift in Sources */,
 				9B9BCFC82F1971ED0020F3AD /* UpdateUserDriver.swift in Sources */,
 				9B9BCFC92F1971ED0020F3AD /* ComfyTileUpdateView.swift in Sources */,
@@ -753,6 +771,7 @@
 				9B9BCFF62F19748C0020F3AD /* WindowCore.swift in Sources */,
 				9B8FC0822F10B80D00CBF4B8 /* ShortcutRecorder.swift in Sources */,
 				9B794CBE2FC42F68009C8A46 /* DisplayInfo.swift in Sources */,
+				9B794D1E2FC4DD42009C8A46 /* ProfileWithPointOfInterestView.swift in Sources */,
 				9B8FC0832F10B80D00CBF4B8 /* TileShapeView.swift in Sources */,
 				9B3121652FC3B90E00C9D7B5 /* TilingSettings.swift in Sources */,
 				9B8FC0842F10B80D00CBF4B8 /* View+sectionBackground.swift in Sources */,
@@ -768,6 +787,7 @@
 				9B8FC0862F10B80D00CBF4B8 /* SettingsView.swift in Sources */,
 				9B23AB7F2F901C0A0028C510 /* WindowPreview.swift in Sources */,
 				9B23AB7D2F901BF90028C510 /* WindowTrafficLights.swift in Sources */,
+				9B794D232FC4E4DD009C8A46 /* OSLog+comfyView.swift in Sources */,
 				9B9BCFF22F1973F90020F3AD /* AXHelpers.swift in Sources */,
 				9B9BCFF32F1973F90020F3AD /* CGSPrivate.swift in Sources */,
 				9B9BCFF42F1973F90020F3AD /* CGSTypes.swift in Sources */,

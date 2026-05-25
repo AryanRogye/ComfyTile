@@ -6,17 +6,19 @@
 //
 
 import SwiftUI
+import os.signpost
 
 // MARK: - Center Tiling Settings
 struct CenterTilingGeneralView: View {
     @Bindable var defaultsManager : DefaultsManager
-    @Environment(ComfyTileMenuBarViewModel.self) var comfyTileMenuBarVM
+    @Bindable var menuBarVM: ComfyTileMenuBarViewModel
+
+    // State to hold the ID so we can access it from a button
+    @State private var activeSignpostID: OSSignpostID? = nil
+    let log = OSLog.comfyView
 
     var body: some View {
-
-        @Bindable var menuBarVM = comfyTileMenuBarVM
-
-        VStack(alignment: .leading, spacing: 4) {
+        LazyVStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Center Tiling Padding")
                 Spacer()
@@ -50,8 +52,10 @@ struct CenterTilingGeneralView: View {
 // MARK: - Center Tiling Advanced General View
 struct CenterTilingAdvancedGeneralView: View {
     @Bindable var defaultsManager : DefaultsManager
-    @Environment(ComfyTileMenuBarViewModel.self) var comfyTileMenuBarVM
+    @Bindable var menuBarVM: ComfyTileMenuBarViewModel
     @Environment(DisplayManager.self) var displayManager
+
+    @AppStorage("HideAdvancedCenterTilingPadding") var hideAdvancedCenterTilingPadding: Bool = false
 
     var spacing   : CGFloat { 12 }
     var cardWidth : CGFloat { 160 }
@@ -64,24 +68,34 @@ struct CenterTilingAdvancedGeneralView: View {
     }
 
     var body: some View {
-        @Bindable var menuBarVM = comfyTileMenuBarVM
-
         /// Advanced Center Padding Toggle
-        VStack(alignment: .leading) {
+        LazyVStack(alignment: .leading) {
             if menuBarVM.showSettings {
                 Toggle("Advanced Center Padding", isOn: $defaultsManager.advancedCenterTilingPadding)
                     .help("If enabled, and a monitor doesnt have padding, will default to center padding")
             }
             if defaultsManager.advancedCenterTilingPadding && menuBarVM.showSettings {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(Array(displayManager.screenSnapshots.keys), id: \.self) { key in
-                        if let image = displayManager.snapshot(for: key) {
-                            DisplayCard(
-                                key: key,
-                                image: image,
-                                displayManager: displayManager
-                            )
-                            .frame(maxWidth: .infinity)
+
+                Button(action: {
+                    hideAdvancedCenterTilingPadding.toggle()
+                }) {
+                    Text(hideAdvancedCenterTilingPadding ? "Show" :"Hide")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+
+                if !hideAdvancedCenterTilingPadding {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(Array(displayManager.screenSnapshots.keys), id: \.self) { key in
+                            if let image = displayManager.snapshot(for: key) {
+                                DisplayCard(
+                                    key: key,
+                                    image: image,
+                                    displayManager: displayManager
+                                )
+                                .frame(maxWidth: .infinity)
+                            }
                         }
                     }
                 }
@@ -90,6 +104,7 @@ struct CenterTilingAdvancedGeneralView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .animation(.spring, value: menuBarVM.showSettings)
         .animation(.spring, value: defaultsManager.advancedCenterTilingPadding)
+        .animation(.spring, value: hideAdvancedCenterTilingPadding)
     }
 }
 
