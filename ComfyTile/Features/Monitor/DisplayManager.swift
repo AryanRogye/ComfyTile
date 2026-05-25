@@ -29,6 +29,8 @@ final class DisplayManager {
     var screenSnapshots: [CGDirectDisplayID: NSImage] = [:]
     var displayInfos: [DisplayInfo] = []
 
+    let defaultPadding: Double = 40
+
 
     init(ctx: ModelContext) {
         self.ctx = ctx
@@ -59,11 +61,12 @@ final class DisplayManager {
 
             /// Populates screensnapshots this way the UI can show it
             for displayInfo in displayInfos {
-                screenSnapshots[displayInfo.screenID] = makePlaceholderImage(
+                screenSnapshots[displayInfo.screenID] = getWallpaperImage(
                     size:  CGSize(
                         width: displayInfo.width,
                         height: displayInfo.height
-                    )
+                    ),
+                    for: displayInfo.screenID
                 )
             }
         } catch {
@@ -96,7 +99,7 @@ final class DisplayManager {
         let info = DisplayInfo(
             name: displayName(for: id),
             screenID: id,
-            padding: 0,
+            padding: defaultPadding,
             width: screen.frame.width,
             height: screen.frame.height
         )
@@ -174,7 +177,7 @@ final class DisplayManager {
         for screen in NSScreen.screens {
             guard let id = screen.displayID else { continue }
 
-            screenSnapshots[id] = makePlaceholderImage(size: screen.frame.size)
+            screenSnapshots[id] = getWallpaperImage(size: screen.frame.size, for: id)
         }
 
         /// check current snapshots for the monitor
@@ -186,14 +189,29 @@ final class DisplayManager {
         }
     }
 
-    private func makePlaceholderImage(size: CGSize) -> NSImage {
-        let image = NSImage(size: size)
 
-        image.lockFocus()
-        NSColor.lightGray.setFill()
-        NSBezierPath(rect: NSRect(origin: .zero, size: size)).fill()
-        image.unlockFocus()
 
-        return image
+    private func getWallpaperImage(size: CGSize, for displayID: CGDirectDisplayID) -> NSImage {
+
+        func makePlaceholderImage(size: CGSize) -> NSImage {
+            let image = NSImage(size: size)
+
+            image.lockFocus()
+            NSColor.lightGray.setFill()
+            NSBezierPath(rect: NSRect(origin: .zero, size: size)).fill()
+            image.unlockFocus()
+
+            return image
+        }
+
+        /// we will find displayID in NSScreens, if doesnt exist we will default to the main
+        guard let screen = NSScreen.screens.first(where: { $0.displayID == displayID }) ?? NSScreen.main else { return makePlaceholderImage(size: size) }
+
+        if let wallpaperURL = NSWorkspace.shared.desktopImageURL(for: screen),
+           let image = NSImage(contentsOf: wallpaperURL)  {
+            return image
+        }
+
+        return makePlaceholderImage(size: size)
     }
 }
