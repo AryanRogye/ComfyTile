@@ -40,7 +40,13 @@ class DefaultsManager {
             Defaults[.centerTilingPadding] = centerTilingPadding
         }
     }
-    
+
+    var advancedCenterTilingPadding: Bool = Defaults[.advancedCenterTilingPadding] {
+        didSet {
+            Defaults[.advancedCenterTilingPadding] = advancedCenterTilingPadding
+        }
+    }
+
     var highlightFocusedWindow: Bool = Defaults[.highlightFocusedWindow] {
         didSet {
             Defaults[.highlightFocusedWindow] = highlightFocusedWindow

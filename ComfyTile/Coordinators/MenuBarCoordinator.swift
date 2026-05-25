@@ -28,6 +28,7 @@ class MenuBarCoordinator: NSObject {
     private var defaultsManager: DefaultsManager?
     private var windowCore: WindowCore?
     private var updateController: UpdateController?
+    private var displayManager: DisplayManager?
 
     // MARK: - Initialization
 
@@ -43,13 +44,15 @@ class MenuBarCoordinator: NSObject {
         settingsVM              : SettingsViewModel,
         defaultsManager         : DefaultsManager,
         windowCore              : WindowCore,
-        updateController        : UpdateController
+        updateController        : UpdateController,
+        displayManager          : DisplayManager
     ) {
         self.comfyTileMenuBarVM     = comfyTileMenuBarVM
         self.settingsVM             = settingsVM
         self.defaultsManager        = defaultsManager
         self.windowCore             = windowCore
         self.updateController       = updateController
+        self.displayManager         = displayManager
 
         configureClosures()
         configureStatusItem()
@@ -104,7 +107,8 @@ class MenuBarCoordinator: NSObject {
               let settingsVM = settingsVM,
               let defaultsManager = defaultsManager,
               let windowCore = windowCore,
-              let updateController = updateController
+              let updateController = updateController,
+              let displayManager = displayManager
         else {
             return
         }
@@ -115,7 +119,8 @@ class MenuBarCoordinator: NSObject {
             comfyTileMenuBarVM: comfyTileMenuBarVM,
             defaultsManager: defaultsManager,
             windowCore: windowCore,
-            updateController: updateController
+            updateController: updateController,
+            displayManager: displayManager
         )
 
         // Create hosting controller
@@ -138,10 +143,11 @@ class MenuBarCoordinator: NSObject {
 
         let containerView = NSView(frame: NSRect(x: 0, y: 0, width: comfyTileMenuBarVM.width, height: comfyTileMenuBarVM.height))
         containerView.wantsLayer = true
-        containerView.layer?.masksToBounds = true
+        containerView.layer?.masksToBounds = false
 
         if let hostingView = hostingController?.view {
             hostingView.frame = containerView.bounds
+            hostingView.layer?.backgroundColor = NSColor.clear.cgColor
             let width: AppKit.NSView.AutoresizingMask = .width
             let height: AppKit.NSView.AutoresizingMask = .height
             hostingView.autoresizingMask = [width, height]
@@ -150,8 +156,36 @@ class MenuBarCoordinator: NSObject {
 
         panel.contentView = containerView
 
+//        makePanelGlass(panel)
         self.panel = panel
         self.comfyTileMenuBarVM?.panel = panel
+    }
+
+    internal func makePanelGlass(_ panel: NSPanel) {
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = true
+
+        guard let hostingView = panel.contentView else { return }
+        // Make a container view to hold both
+        let containerView = NSView(frame: hostingView.frame)
+        containerView.autoresizingMask = [.width, .height]
+
+        // Glass goes in the container as the base
+        let glassView = NSGlassEffectView()
+        glassView.style = .regular
+        glassView.frame = containerView.bounds
+        glassView.autoresizingMask = [.width, .height]
+        containerView.addSubview(glassView)
+
+        // Hosting view goes on top inside the container
+        hostingView.removeFromSuperview()
+        hostingView.frame = containerView.bounds
+        hostingView.autoresizingMask = [.width, .height]
+        containerView.addSubview(hostingView)
+
+        // Container becomes the window's content view
+        panel.contentView = containerView
     }
 
     // MARK: - Panel Toggle

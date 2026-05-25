@@ -21,8 +21,16 @@ class WindowTilingService: WindowTilingProviding {
     var hasJustTiledRight = 0
     var hasJustTiledCenter = 0
 
-    init(windowCore: WindowCore) {
+    var paddingForScreen: ((NSScreen) -> CGFloat?)?
+
+    init(
+        windowCore: WindowCore,
+    ) {
         self.windowCore = windowCore
+    }
+
+    public func setPaddingForScreen(_ padding: @escaping (NSScreen) -> CGFloat?) {
+        self.paddingForScreen = padding
     }
 }
 
@@ -59,7 +67,7 @@ extension WindowTilingService {
     }
     
     // MARK: - Center
-    func center(withAnimation: Bool, padding: Double, isLayoutCycling: Bool) {
+    func center(withAnimation: Bool, padding: Double, isLayoutCycling: Bool, isUsingAdvancedPadding: Bool) {
         guard let focusedWindow = windowCore.getFocusedWindow(),
               let screen = WindowCore.screenUnderMouse() else { return }
 
@@ -70,27 +78,35 @@ extension WindowTilingService {
         let centeredSize: CGSize
         let centeredOrigin: CGPoint
 
-        let padding: CGFloat = CGFloat(padding)
+        /// Padding Config
+        let centerPadding: CGFloat
+
+        if isUsingAdvancedPadding {
+            centerPadding = paddingForScreen?(screen) ?? CGFloat(padding)
+        } else {
+            centerPadding = CGFloat(padding)
+        }
+
 
         switch layout {
         case .center:
 
             centeredSize = CGSize(
-                width: frame.width - (padding * 2),
-                height: frame.height - (padding * 2)
+                width: frame.width - (centerPadding * 2),
+                height: frame.height - (centerPadding * 2)
             )
             centeredOrigin = CGPoint(
-                x: frame.origin.x + padding,
-                y: frame.origin.y + padding
+                x: frame.origin.x + centerPadding,
+                y: frame.origin.y + centerPadding
             )
 
         case .centerExpanded:
             centeredSize = CGSize(
-                width: frame.width - (padding * 2),
+                width: frame.width - (centerPadding * 2),
                 height: frame.height
             )
             centeredOrigin = CGPoint(
-                x: frame.origin.x + padding,
+                x: frame.origin.x + centerPadding,
                 y: frame.origin.y
             )
         }
@@ -399,7 +415,7 @@ extension WindowTilingService {
     }
 
     
-    func getCenterDimensions(padding: Double, isLayoutCycling: Bool) -> CGRect? {
+    func getCenterDimensions(padding: Double, isLayoutCycling: Bool, isUsingAdvancedPadding: Bool) -> CGRect? {
         guard let screen = WindowCore.screenUnderMouse() else { return nil }
 
         let frame = screen.visibleFrame
@@ -410,27 +426,35 @@ extension WindowTilingService {
         let centeredOrigin: CGPoint
 
 
-        let padding: CGFloat = CGFloat(padding)
+        /// Padding Config
+        let centerPadding: CGFloat
+
+        if isUsingAdvancedPadding {
+            centerPadding = paddingForScreen?(screen) ?? CGFloat(padding)
+        } else {
+            centerPadding = CGFloat(padding)
+        }
+
 
         switch layout {
         case .center:
 
             centeredSize = CGSize(
-                width: frame.width - (padding * 2),
-                height: frame.height - (padding * 2)
+                width: frame.width - (centerPadding * 2),
+                height: frame.height - (centerPadding * 2)
             )
             centeredOrigin = CGPoint(
-                x: frame.origin.x + padding,
-                y: frame.origin.y + padding
+                x: frame.origin.x + centerPadding,
+                y: frame.origin.y + centerPadding
             )
 
         case .centerExpanded:
             centeredSize = CGSize(
-                width: frame.width - (padding * 2),
+                width: frame.width - (centerPadding * 2),
                 height: frame.height
             )
             centeredOrigin = CGPoint(
-                x: frame.origin.x + padding,
+                x: frame.origin.x + centerPadding,
                 y: frame.origin.y
             )
         }

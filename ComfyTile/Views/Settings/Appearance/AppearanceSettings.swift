@@ -16,12 +16,12 @@ struct AppearanceSettings: View {
 
     var body: some View {
         Form {
-            Section("Tab Bar") {
-                tabBarPicker
-            }
-            
             Section("Animations") {
                 tilingAnimations
+            }
+
+            Section("Settings") {
+                tabBarPicker
             }
 
             Section("Focused Window") {
@@ -87,7 +87,7 @@ struct AppearanceSettings: View {
     }
     
     private var tabBarPicker: some View {
-        Picker("Position", selection: $defaultsManager.comfyTileTabPlacement) {
+        Picker("Settings Tab Position", selection: $defaultsManager.comfyTileTabPlacement) {
             ForEach(ComfyTileTabPlacement.allCases, id: \.self) { tab in
                 Text(tab.rawValue)
             }

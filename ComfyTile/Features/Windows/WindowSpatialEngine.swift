@@ -85,6 +85,7 @@ final class WindowSpatialEngine {
     let windowTilingService  : WindowTilingProviding
     let windowLayoutService  : WindowLayoutProviding
     let defaultsManager      : DefaultsManager
+    let displayManager       : DisplayManager
     let tilingCoverCoordinator: TilingCoverCoordinator
     
     init(
@@ -92,12 +93,14 @@ final class WindowSpatialEngine {
         windowLayoutService : WindowLayoutProviding,
         windowTilingService : WindowTilingProviding,
         defaultsManager     : DefaultsManager,
+        displayManager       : DisplayManager,
         tilingCoverCoordinator : TilingCoverCoordinator
     ) {
         self.windowCore = windowCore
         self.windowLayoutService = windowLayoutService
         self.windowTilingService  = windowTilingService
         self.defaultsManager      = defaultsManager
+        self.displayManager = displayManager
         self.tilingCoverCoordinator = tilingCoverCoordinator
     }
     
@@ -127,7 +130,8 @@ final class WindowSpatialEngine {
         case .center:          self.windowTilingService.center(
                                     withAnimation: self.defaultsManager.showTilingAnimations,
                                     padding: self.defaultsManager.centerTilingPadding,
-                                    isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                                    isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                                    isUsingAdvancedPadding: self.defaultsManager.advancedCenterTilingPadding
                                 )
         case .fullscreen:      self.windowTilingService.fullScreen(
                                     withAnimation: self.defaultsManager.showTilingAnimations
@@ -277,7 +281,8 @@ extension WindowSpatialEngine {
             self.windowTilingService.center(
                 withAnimation: self.defaultsManager.showTilingAnimations,
                 padding: self.defaultsManager.centerTilingPadding,
-                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                isUsingAdvancedPadding: self.defaultsManager.advancedCenterTilingPadding
             )
         }
     }
@@ -286,14 +291,16 @@ extension WindowSpatialEngine {
             self.windowTilingService.center(
                 withAnimation: self.defaultsManager.showTilingAnimations,
                 padding: self.defaultsManager.centerTilingPadding,
-                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                isUsingAdvancedPadding: self.defaultsManager.advancedCenterTilingPadding
             )
             return
         }
         tileDownWithAnimation {
             self.windowTilingService.getCenterDimensions(
                 padding: self.defaultsManager.centerTilingPadding,
-                isLayoutCycling: self.defaultsManager.enableLayoutCycling
+                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                isUsingAdvancedPadding: self.defaultsManager.advancedCenterTilingPadding
             )
         }
     }

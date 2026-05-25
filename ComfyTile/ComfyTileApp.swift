@@ -12,9 +12,6 @@ import SwiftUI
 @main
 struct ComfyTileApp: App {
 
-    init() {
-    }
-
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {

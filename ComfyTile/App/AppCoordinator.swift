@@ -45,11 +45,13 @@ class AppCoordinator {
     /// Core Windowing
     private let windowCore          : WindowCore
     private let defaultsManager     = DefaultsManager()
+    private let displayManager      : DisplayManager
     private let windowSpatialEngine : WindowSpatialEngine
     private var permissionService : PermissionService
 
     init(appEnv: AppEnv) {
         self.permissionService = PermissionService()
+        self.displayManager = DisplayManager(ctx: appEnv.appServices.context)
         self.windowCore = appEnv.windowCore
         self.windowTilingService = appEnv.windowTilingService
         self.windowLayoutService = appEnv.windowLayoutService
@@ -66,6 +68,7 @@ class AppCoordinator {
             windowLayoutService: windowLayoutService,
             windowTilingService: windowTilingService,
             defaultsManager: defaultsManager,
+            displayManager: displayManager,
             tilingCoverCoordinator: tilingCoverCoordinator
         )
         
@@ -74,21 +77,32 @@ class AppCoordinator {
             windowSpatialEngine: windowSpatialEngine,
             windowCore: appEnv.windowCore
         )
-        
+
+        self.displayManager.start()
+
         self.menuBarCoordinator.start(
             comfyTileMenuBarVM: comfyTileMenuBarVM,
             settingsVM: settingsVM,
             defaultsManager: defaultsManager,
             windowCore: appEnv.windowCore,
-            updateController: updateController
+            updateController: updateController,
+            displayManager: displayManager
         )
         
         self.windowViewerCoordinator = WindowViewerCoordinator(
             windowViewerVM: windowViewerVM,
             windowCore: appEnv.windowCore
         )
-        
         self.hotKeyCoordinator = HotKeyCoordinator()
+
+        self.windowTilingService.setPaddingForScreen { screen in
+            guard let id = screen.displayID else { return nil }
+            guard let displayInfp = self.displayManager.displayInfo(for: id) else { return nil }
+            if let padding = displayInfp.padding {
+                return CGFloat(padding)
+            }
+            return nil
+        }
         self.startHotKey()
         
         ScreenshotHelper.startCacheCleanupLoop()
@@ -97,7 +111,7 @@ class AppCoordinator {
     deinit {
         ScreenshotHelper.clearAllCache()
     }
-    
+
     private func startHotKey() {
         hotKeyCoordinator.start(
             onToggleSuperFocus: {
