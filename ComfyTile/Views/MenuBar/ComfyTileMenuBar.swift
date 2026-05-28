@@ -48,6 +48,8 @@ struct PermissionView: View {
     var body: some View {
         VStack {
             Text("👀 ComfyTile can’t see your windows yet.\nTurn on Accessibility so it can actually do its job.")
+                .font(.largeTitle)
+                .frame(maxHeight: .infinity, alignment: .center)
 
             Spacer()
             Button(action: {
@@ -71,7 +73,7 @@ struct PermissionView: View {
             }
         }
         .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
 }
 

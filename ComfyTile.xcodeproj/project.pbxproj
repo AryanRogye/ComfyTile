@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B1FE3D02FC7EF5900C68CBB /* PrivateSCWindowFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1FE3CF2FC7EF5900C68CBB /* PrivateSCWindowFactory.swift */; };
 		9B23AB7B2F900D840028C510 /* WindowCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB7A2F900D840028C510 /* WindowCard.swift */; };
 		9B23AB7D2F901BF90028C510 /* WindowTrafficLights.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB7C2F901BF90028C510 /* WindowTrafficLights.swift */; };
 		9B23AB7F2F901C0A0028C510 /* WindowPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B23AB7E2F901C0A0028C510 /* WindowPreview.swift */; };
@@ -118,6 +119,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9B1FE3CF2FC7EF5900C68CBB /* PrivateSCWindowFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateSCWindowFactory.swift; sourceTree = "<group>"; };
 		9B23AB7A2F900D840028C510 /* WindowCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowCard.swift; sourceTree = "<group>"; };
 		9B23AB7C2F901BF90028C510 /* WindowTrafficLights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowTrafficLights.swift; sourceTree = "<group>"; };
 		9B23AB7E2F901C0A0028C510 /* WindowPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowPreview.swift; sourceTree = "<group>"; };
@@ -574,6 +576,7 @@
 				9B9BCFF12F1973F90020F3AD /* CGS */,
 				9B68EEA82F22F74A009567DF /* GlobalClickMonitor.swift */,
 				9B9BCFEB2F1973DE0020F3AD /* ScreenshotHelper.swift */,
+				9B1FE3CF2FC7EF5900C68CBB /* PrivateSCWindowFactory.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -734,6 +737,7 @@
 				9B8FC0C12F12306D00CBF4B8 /* TileModeView.swift in Sources */,
 				9B9BCFE72F19738D0020F3AD /* WindowElement.swift in Sources */,
 				9B8FC0652F10B80D00CBF4B8 /* WindowViewerCoordinator.swift in Sources */,
+				9B1FE3D02FC7EF5900C68CBB /* PrivateSCWindowFactory.swift in Sources */,
 				9B3121632FC3B70200C9D7B5 /* AppServices.swift in Sources */,
 				9B68EEA72F22D124009567DF /* ComfySCWindow.swift in Sources */,
 				9B8FC0CA2F12EF5C00CBF4B8 /* MenuBarModeContainer.swift in Sources */,

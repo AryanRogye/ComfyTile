@@ -143,6 +143,7 @@ class AppCoordinator {
                         self.windowViewerCoordinator.show()
 
                         let windows = await self.windowCore.loadWindows()
+                        guard self.windowViewerVM.isShown else { return }
                         self.windowViewerVM.refreshWindows(windows)
                     }
                 }

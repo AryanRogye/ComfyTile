@@ -86,6 +86,13 @@ class WindowViewerViewModel {
         selected = initialSelectedIndex(for: windows)
     }
 
+    public func endCycle() {
+        focusedAppPID = nil
+        allWindows = []
+        windows = []
+        selected = 0
+    }
+
     private func applyCurrentFilter(preferredSelectedWindowID: String? = nil) {
         if let focusedAppPID,
            allWindows.contains(where: { $0.pid == focusedAppPID }) {

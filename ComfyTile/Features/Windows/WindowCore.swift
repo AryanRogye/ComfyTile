@@ -37,8 +37,7 @@ public final class WindowCore {
      * Main Load Window Task
      */
     var loadWindowTask: Task<[ComfyWindow], Never>?
-    
-    
+
     @ObservationIgnored
     static let ignore_list = [
         "com.aryanrogye.ComfyTile"
@@ -294,31 +293,15 @@ extension WindowCore {
             completion()
         }
     }
-    
+
     @discardableResult
     public func loadWindows() async -> [ComfyWindow] {
-        var allWindows: [SCWindow]
-        
-        /// Use ScreenRecordingKit to get all windows the user owns
-        do {
-            let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
-            allWindows = content.windows
-        } catch {
-            print("There Was an Error Getting the Windows With SCShareableContent: \(error)")
-            return []
-        }
-        
-        /// return [] on no windows found
-        if allWindows.isEmpty {
-            print("No Windows Found")
-            return []
-        }
-        
-        let cscWindows: [ComfySCWindow] = ComfySCWindow.toComfySCWindows(allWindows)
-        
-        loadWindowTask = Task.detached(priority: .userInitiated) { [weak self, cscWindows] in
+        loadWindowTask = Task.detached(priority: .userInitiated) { [weak self] in
             guard let self else { return [] }
             var userWindows: [ComfyWindow] = []
+
+            let cscWindows: [ComfySCWindow] = await SCWindowFactory.getComfyWindowsPrivately(onScreenWindowsOnly: false)
+
             for w in cscWindows {
                 /// Create a ComfyWindow Object
                 if let cw = await ComfyWindow(window: w) {
@@ -575,4 +558,3 @@ extension WindowCore {
     }
 }
 #endif
-

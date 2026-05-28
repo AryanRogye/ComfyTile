@@ -60,6 +60,35 @@ final class ProfileWithInterests {
         }
     }
 
+    @MainActor
+    public func interval<T>(
+        _ intervalName: StaticString,
+        _ work: () throws -> T
+    ) rethrows -> T {
+        let id = OSSignpostID(log: log)
+
+        os_signpost(.begin, log: log, name: intervalName, signpostID: id)
+        defer {
+            os_signpost(.end, log: log, name: intervalName, signpostID: id)
+        }
+
+        return try work()
+    }
+
+    @MainActor
+    public func interval<T>(
+        _ intervalName: StaticString,
+        _ work: () async throws -> T
+    ) async rethrows -> T {
+        let id = OSSignpostID(log: log)
+
+        os_signpost(.begin, log: log, name: intervalName, signpostID: id)
+        defer {
+            os_signpost(.end, log: log, name: intervalName, signpostID: id)
+        }
+
+        return try await work()
+    }
 
     func toggleProfiling() {
         if let id = activeSignpostID {

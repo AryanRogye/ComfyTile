@@ -39,15 +39,21 @@ struct WindowViewer: View {
     @Namespace private var selectionAnimation
     
     var body: some View {
-        windows
-            .padding(spacingAround)
-            .animation(.spring, value: windowViewerVM.windows)
-            .glassEffect(
-                .regular,
-                in: backgroundShape
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.horizontal, 300)
+        Group {
+            if windowViewerVM.isShown {
+                windows
+                    .padding(spacingAround)
+                    .animation(.spring, value: windowViewerVM.windows)
+                    .glassEffect(
+                        .regular,
+                        in: backgroundShape
+                    )
+                    .padding(.horizontal, 300)
+            } else {
+                Color.clear
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     private var windows: some View {

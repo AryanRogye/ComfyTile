@@ -137,6 +137,7 @@ class WindowViewerCoordinator: NSObject {
     
     public func hide() {
         windowViewerVM.isShown = false
+        windowViewerVM.endCycle()
         removeKeyMonitors()
         panel?.orderOut(nil)
     }
