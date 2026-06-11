@@ -549,9 +549,11 @@ extension WindowCore {
 
 #if DEBUG
 extension WindowCore {
-    public func debugPress() {
+    public func debugPress(completion: @escaping () -> Void) {
         print()
         print("✅ =================DEBUG START=================")
+        
+        completion()
 
         print("✅ ==================DEBUG END==================")
         print()

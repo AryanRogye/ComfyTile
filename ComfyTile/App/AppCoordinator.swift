@@ -277,7 +277,14 @@ class AppCoordinator {
         
 #if DEBUG
         self.hotKeyCoordinator.setDebugCompletion {
-            self.windowCore.debugPress()
+            self.windowCore.debugPress {
+                Task {
+                    let windows = await self.windowCore.loadWindows()
+                    await self.windowLayoutService.seperateAndBack(
+                        window: windows.filter(\.isInSpace)
+                    )
+                }
+            }
         }
 #endif
     }
