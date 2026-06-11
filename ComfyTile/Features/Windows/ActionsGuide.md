@@ -49,6 +49,12 @@ There are two variants:
 2. Create Functions in [WindowTilingProviding](./Tiling/WindowTilingProviding.swift)
     - Tiling needs dimension functions for animations
 3. Implement Functions in WindowTilingService+______.swift
+    - Use `NSScreen.visibleFrame` so actions respect the menu bar and Dock.
+    - AppKit screen coordinates use a bottom-left origin. SwiftUI `Canvas`
+      coordinates use a top-left origin, so service and icon geometry express
+      vertical placement differently.
+    - For related actions with identical movement behavior, prefer a shared
+      geometry/movement helper instead of duplicating animation code.
 4. Add new case to [TilingMode](./Models/TilingMode.swift)
     - Add the new case to the `hotkey` and `tileShape` switches
 5. make a new shape in [TileShapeView](../../Views/MenuBar/Components/TileShapeView.swift) because [TilingMode](./Models/TilingMode.swift) requires a `var tileShape: TileShape` for each property
@@ -64,6 +70,8 @@ There are two variants:
         }
         ```
     - If Tiling, 2 Functions will be created, verb function and verb function + Pressed()
+    - `onKeyDown` calls the `Pressed()` function to show the preview.
+    - `onKeyUp` calls the final action to hide the preview and move the window.
     - For Example: 
         ```swift
         public func tileBottomHalf() {
@@ -81,6 +89,13 @@ There are two variants:
             }
         }
         ```
+8. If a new Swift file was created, add it to the `Tiling` group in
+   `ComfyTile.xcodeproj` and verify it belongs to the `ComfyTile` target. This
+   project uses explicit Xcode groups, so placing a file on disk is not enough.
+9. Validate the app:
+    ```bash
+    xcodebuild -project ComfyTile.xcodeproj -scheme ComfyTileApp -configuration Debug build
+    ```
 ---
 ### Layout Actions
 
@@ -112,3 +127,41 @@ Layouts apply a predefined window arrangement.
         }
     }
     ```
+
+---
+
+## Window Action Checklist
+
+Use this checklist before considering a new action complete:
+
+- Add shortcut names and down/up handlers in `HotKeyCoordinator`.
+- Wire the handlers in `AppCoordinator`.
+- Add move and preview-dimension functions to the relevant provider protocol.
+- Implement the action in its service.
+- Add the action to `TilingMode` or `LayoutMode`.
+- Add its menu icon or tile shape when applicable.
+- Route it through `WindowSpatialEngine`.
+- Add new Swift files to the Xcode group and app target.
+- Build the Debug configuration.
+
+## Corner Tiling Geometry
+
+Corner actions divide `NSScreen.visibleFrame` into four equal rectangles:
+
+```swift
+let frame = screen.visibleFrame
+let width = frame.width / 2
+let height = frame.height / 2
+
+let topLeft = CGRect(
+    x: frame.minX,
+    y: frame.minY + height,
+    width: width,
+    height: height
+)
+```
+
+The other corners use the same dimensions, adding `width` to `x` for
+right-side corners and using `frame.minY` for bottom-side corners. Keep preview
+dimensions and final movement rectangles sourced from the same helper so they
+cannot drift apart.

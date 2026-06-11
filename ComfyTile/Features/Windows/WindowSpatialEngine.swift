@@ -62,6 +62,18 @@ final class WindowSpatialEngine {
         case .topHalf:          self.windowTilingService.moveTopHalf(
                                     withAnimation: self.defaultsManager.showTilingAnimations
                                 )
+        case .topLeft:          self.windowTilingService.moveTopLeft(
+                                    withAnimation: self.defaultsManager.showTilingAnimations
+                                )
+        case .topRight:         self.windowTilingService.moveTopRight(
+                                    withAnimation: self.defaultsManager.showTilingAnimations
+                                )
+        case .bottomLeft:       self.windowTilingService.moveBottomLeft(
+                                    withAnimation: self.defaultsManager.showTilingAnimations
+                                )
+        case .bottomRight:      self.windowTilingService.moveBottomRight(
+                                    withAnimation: self.defaultsManager.showTilingAnimations
+                                )
         case .center:          self.windowTilingService.center(
                                     withAnimation: self.defaultsManager.showTilingAnimations,
                                     padding: self.defaultsManager.centerTilingPadding,
@@ -192,6 +204,70 @@ extension WindowSpatialEngine {
         tileDownWithAnimation {
             self.windowTilingService.getBottomHalfDimensions()
         }
+    }
+}
+
+// MARK: - Tile Corners
+extension WindowSpatialEngine {
+    public func tileTopLeft() {
+        tileCorner { self.windowTilingService.moveTopLeft(withAnimation: $0) }
+    }
+
+    public func tileTopLeftPressed() {
+        tileCornerPressed(
+            move: { self.windowTilingService.moveTopLeft(withAnimation: $0) },
+            dimensions: windowTilingService.getTopLeftDimensions
+        )
+    }
+
+    public func tileTopRight() {
+        tileCorner { self.windowTilingService.moveTopRight(withAnimation: $0) }
+    }
+
+    public func tileTopRightPressed() {
+        tileCornerPressed(
+            move: { self.windowTilingService.moveTopRight(withAnimation: $0) },
+            dimensions: windowTilingService.getTopRightDimensions
+        )
+    }
+
+    public func tileBottomLeft() {
+        tileCorner { self.windowTilingService.moveBottomLeft(withAnimation: $0) }
+    }
+
+    public func tileBottomLeftPressed() {
+        tileCornerPressed(
+            move: { self.windowTilingService.moveBottomLeft(withAnimation: $0) },
+            dimensions: windowTilingService.getBottomLeftDimensions
+        )
+    }
+
+    public func tileBottomRight() {
+        tileCorner { self.windowTilingService.moveBottomRight(withAnimation: $0) }
+    }
+
+    public func tileBottomRightPressed() {
+        tileCornerPressed(
+            move: { self.windowTilingService.moveBottomRight(withAnimation: $0) },
+            dimensions: windowTilingService.getBottomRightDimensions
+        )
+    }
+
+    private func tileCorner(move: @escaping (Bool) -> Void) {
+        tileWithAnimation {
+            move(self.defaultsManager.showTilingAnimations)
+        }
+    }
+
+    private func tileCornerPressed(
+        move: (Bool) -> Void,
+        dimensions: @escaping () -> CGRect?
+    ) {
+        guard defaultsManager.showTilingAnimations else {
+            move(false)
+            return
+        }
+        tileDownWithAnimation(dimensions)
     }
 }
 

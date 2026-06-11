@@ -12,6 +12,10 @@ enum TilingMode: String, CaseIterable {
     case leftHalf
     case bottomHalf
     case topHalf
+    case topLeft
+    case topRight
+    case bottomLeft
+    case bottomRight
     case center
     case fullscreen
     case nudgeBottomUp
@@ -29,6 +33,14 @@ enum TilingMode: String, CaseIterable {
             KeyboardShortcuts.Name.RightHalf
         case .leftHalf:
             KeyboardShortcuts.Name.LeftHalf
+        case .topLeft:
+            KeyboardShortcuts.Name.TopLeft
+        case .topRight:
+            KeyboardShortcuts.Name.TopRight
+        case .bottomLeft:
+            KeyboardShortcuts.Name.BottomLeft
+        case .bottomRight:
+            KeyboardShortcuts.Name.BottomRight
         case .center:
             KeyboardShortcuts.Name.Center
         case .fullscreen:
@@ -54,6 +66,14 @@ enum TilingMode: String, CaseIterable {
                 .right
         case .leftHalf:
                 .left
+        case .topLeft:
+                .topLeft
+        case .topRight:
+                .topRight
+        case .bottomLeft:
+                .bottomLeft
+        case .bottomRight:
+                .bottomRight
         case .center:
                 .center
         case .fullscreen:
