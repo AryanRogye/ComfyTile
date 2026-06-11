@@ -36,7 +36,7 @@ public final class ComfyWindow: Sendable, Equatable {
     public let screenshot : CGImage?
     public var isInSpace  : Bool
     
-    init?(
+    public init?(
         window: ComfySCWindow
     ) async {
         guard let app = window.owningApplication,
@@ -85,7 +85,7 @@ public final class ComfyWindow: Sendable, Equatable {
         self.isInSpace = isInSpace
     }
     
-    init(
+    public init(
         app: NSRunningApplication,
         windowID: CGWindowID?,
         windowTitle     : String,

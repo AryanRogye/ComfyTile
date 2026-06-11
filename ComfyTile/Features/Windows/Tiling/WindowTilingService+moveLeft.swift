@@ -9,10 +9,10 @@ import Cocoa
 
 extension WindowTilingService {
     // MARK: - Tile
-    func moveLeft(withAnimation: Bool, isLayoutCycling: Bool, enableSmartTiling: Bool) {
-        guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = WindowCore.screenUnderMouse() else { return }
-        
+    public func moveLeft(withAnimation: Bool, isLayoutCycling: Bool, enableSmartTiling: Bool) {
+        let (focusedWindow, screen) = getFocusedAndScreen()
+        guard let focusedWindow, let screen else { return }
+
         /// Screen
         let frame = screen.visibleFrame
         
@@ -73,7 +73,7 @@ extension WindowTilingService {
     }
     
     // MARK: - Dimensions
-    func getLeftDimensions(isLayoutCycling: Bool, enableSmartTiling: Bool) -> CGRect? {
+    public func getLeftDimensions(isLayoutCycling: Bool, enableSmartTiling: Bool) -> CGRect? {
         guard let screen = WindowCore.screenUnderMouse() else { return nil }
         
         let frame = screen.visibleFrame

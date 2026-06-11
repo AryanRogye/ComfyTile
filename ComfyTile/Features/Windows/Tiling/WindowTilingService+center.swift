@@ -9,10 +9,10 @@ import Cocoa
 
 extension WindowTilingService {
     // MARK: - Tile
-    func center(withAnimation: Bool, padding: Double, isLayoutCycling: Bool, isUsingAdvancedPadding: Bool) {
-        guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = WindowCore.screenUnderMouse() else { return }
-        
+    public func center(withAnimation: Bool, padding: Double, isLayoutCycling: Bool, isUsingAdvancedPadding: Bool) {
+        let (focusedWindow, screen) = getFocusedAndScreen()
+        guard let focusedWindow, let screen else { return }
+
         let frame = screen.visibleFrame
         
         let layout = isLayoutCycling ? centerLayout : .center
@@ -87,7 +87,7 @@ extension WindowTilingService {
     }
 
     // MARK: - Dimensions
-    func getCenterDimensions(padding: Double, isLayoutCycling: Bool, isUsingAdvancedPadding: Bool) -> CGRect? {
+    public func getCenterDimensions(padding: Double, isLayoutCycling: Bool, isUsingAdvancedPadding: Bool) -> CGRect? {
         guard let screen = WindowCore.screenUnderMouse() else { return nil }
         
         let frame = screen.visibleFrame

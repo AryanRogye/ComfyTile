@@ -8,7 +8,7 @@
 import Cocoa
 //import ComfyWindowingCore
 
-class WindowTilingService: WindowTilingProviding {
+public class WindowTilingService: WindowTilingProviding {
     
     let windowCore: WindowCore
     let animator = WindowAnimator()
@@ -22,11 +22,15 @@ class WindowTilingService: WindowTilingProviding {
     var hasJustTiledCenter = 0
 
     var paddingForScreen: ((NSScreen) -> CGFloat?)?
+    internal let getFocusedAndScreen: () -> (ComfyWindow?, NSScreen?)
 
-    init(
+    public init(
         windowCore: WindowCore,
+        getFocusedAndScreen: @escaping () -> (ComfyWindow?, NSScreen?)
+
     ) {
         self.windowCore = windowCore
+        self.getFocusedAndScreen = getFocusedAndScreen
     }
 
     public func setPaddingForScreen(_ padding: @escaping (NSScreen) -> CGFloat?) {
@@ -43,7 +47,7 @@ class WindowTilingService: WindowTilingProviding {
 // MARK: - Nudging
 extension WindowTilingService {
     /// Keep Window Where it is, but its top point is moved up
-    func nudgeTopUp(with step: Int) {
+    public func nudgeTopUp(with step: Int) {
         guard let f = windowCore.getFocusedWindow(),
               var frame = f.element.windowFrame else { return }
         
@@ -55,7 +59,7 @@ extension WindowTilingService {
         f.element.setSize(width: frame.width, height: frame.height)
     }
     
-    func nudgeTopDown(with step: Int) {
+    public func nudgeTopDown(with step: Int) {
         guard let f = windowCore.getFocusedWindow(),
               var frame = f.element.windowFrame else { return }
         
@@ -67,7 +71,7 @@ extension WindowTilingService {
         f.element.setSize(width: frame.width, height: frame.height)
     }
     
-    func nudgeBottomDown(with step: Int) {
+    public func nudgeBottomDown(with step: Int) {
         guard let f = windowCore.getFocusedWindow() else { return }
         
         // current frame
@@ -80,7 +84,7 @@ extension WindowTilingService {
         f.element.setSize(width: frame.width, height: frame.height)
     }
     
-    func nudgeBottomUp(with step: Int) {
+    public func nudgeBottomUp(with step: Int) {
         guard let f = windowCore.getFocusedWindow() else { return }
         
         // current frame

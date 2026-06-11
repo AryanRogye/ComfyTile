@@ -14,8 +14,12 @@ class AppEnv {
     var windowCore = WindowCore()
 
     lazy var windowTilingService: any WindowTilingProviding = WindowTilingService(
-        windowCore: windowCore,
-    )
+        windowCore: windowCore) {
+            (
+                self.windowCore.getFocusedWindow(),
+                WindowCore.screenUnderMouse()
+            )
+        }
     lazy var windowLayoutService: any WindowLayoutProviding = WindowLayoutService(
         windowCore: windowCore
     )

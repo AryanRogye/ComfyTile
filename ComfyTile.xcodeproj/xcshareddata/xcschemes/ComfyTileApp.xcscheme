@@ -37,6 +37,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "9BFE64112FDA4CE000F3D216"
                BuildableName = "ComfyTileTests.xctest"
+               BlueprintName = "ComfyTileTests"
                ReferencedContainer = "container:ComfyTile.xcodeproj">
             </BuildableReference>
          </TestableReference>

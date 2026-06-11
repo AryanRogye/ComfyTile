@@ -7,7 +7,7 @@
 
 import AppKit
 
-protocol WindowTilingProviding {
+public protocol WindowTilingProviding {
 
     func setPaddingForScreen(_ padding: @escaping (NSScreen) -> CGFloat?)
 

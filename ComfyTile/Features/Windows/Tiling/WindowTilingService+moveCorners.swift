@@ -15,42 +15,45 @@ private enum WindowCorner {
 }
 
 extension WindowTilingService {
-    func moveTopLeft(withAnimation: Bool) {
+    public func moveTopLeft(withAnimation: Bool) {
         move(to: .topLeft, withAnimation: withAnimation)
     }
 
-    func moveTopRight(withAnimation: Bool) {
+    public func moveTopRight(withAnimation: Bool) {
         move(to: .topRight, withAnimation: withAnimation)
     }
 
-    func moveBottomLeft(withAnimation: Bool) {
+    public func moveBottomLeft(withAnimation: Bool) {
         move(to: .bottomLeft, withAnimation: withAnimation)
     }
 
-    func moveBottomRight(withAnimation: Bool) {
+    public func moveBottomRight(withAnimation: Bool) {
         move(to: .bottomRight, withAnimation: withAnimation)
     }
 
-    func getTopLeftDimensions() -> CGRect? {
+    public func getTopLeftDimensions() -> CGRect? {
         cornerRect(for: .topLeft)
     }
 
-    func getTopRightDimensions() -> CGRect? {
+    public func getTopRightDimensions() -> CGRect? {
         cornerRect(for: .topRight)
     }
 
-    func getBottomLeftDimensions() -> CGRect? {
+    public func getBottomLeftDimensions() -> CGRect? {
         cornerRect(for: .bottomLeft)
     }
 
-    func getBottomRightDimensions() -> CGRect? {
+    public func getBottomRightDimensions() -> CGRect? {
         cornerRect(for: .bottomRight)
     }
 
     private func move(to corner: WindowCorner, withAnimation: Bool) {
-        guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = WindowCore.screenUnderMouse(),
-              let rect = cornerRect(for: corner, on: screen) else { return }
+        let (focusedWindow, screen) = getFocusedAndScreen()
+        
+        guard let focusedWindow, let screen, let rect =
+                cornerRect(for: corner, on: screen) else {
+            return
+        }
 
         let position = rect.axPosition(on: screen)
         let resize = {

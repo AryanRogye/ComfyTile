@@ -9,10 +9,10 @@ import Cocoa
 
 extension WindowTilingService {
     
-    func moveTopHalf(withAnimation: Bool) {
-        guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = WindowCore.screenUnderMouse() else { return }
-        
+    public func moveTopHalf(withAnimation: Bool) {
+        let (focusedWindow, screen) = getFocusedAndScreen()
+        guard let focusedWindow, let screen else { return }
+
         /// Screen
         let frame = screen.visibleFrame
         
@@ -47,7 +47,7 @@ extension WindowTilingService {
         }
     }
     
-    func getTopHalfDimensions() -> CGRect? {
+    public func getTopHalfDimensions() -> CGRect? {
         guard let screen = WindowCore.screenUnderMouse() else { return nil }
         
         /// Screen

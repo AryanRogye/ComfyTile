@@ -9,9 +9,9 @@ import Cocoa
 
 extension WindowTilingService {
     // MARK: - Tile
-    func fullScreen(withAnimation: Bool) {
-        guard let focusedWindow = windowCore.getFocusedWindow(),
-              let screen = WindowCore.screenUnderMouse() else { return }
+    public func fullScreen(withAnimation: Bool) {
+        let (focusedWindow, screen) = getFocusedAndScreen()
+        guard let focusedWindow, let screen else { return }
         
         let frame = screen.visibleFrame
         
@@ -37,7 +37,7 @@ extension WindowTilingService {
     }
     
     // MARK: - Dimensions
-    func getFullScreenDimensions() -> CGRect? {
+    public func getFullScreenDimensions() -> CGRect? {
         guard let screen = WindowCore.screenUnderMouse() else { return nil }
         
         let frame = screen.visibleFrame
