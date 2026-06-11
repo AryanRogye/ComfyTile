@@ -213,6 +213,31 @@ class AppCoordinator {
             onLeftHalfUp: {
                 self.windowSpatialEngine.tileLeft()
             },
+            // MARK: - Corners
+            onTopLeftDown: {
+                self.windowSpatialEngine.tileTopLeftPressed()
+            },
+            onTopLeftUp: {
+                self.windowSpatialEngine.tileTopLeft()
+            },
+            onTopRightDown: {
+                self.windowSpatialEngine.tileTopRightPressed()
+            },
+            onTopRightUp: {
+                self.windowSpatialEngine.tileTopRight()
+            },
+            onBottomLeftDown: {
+                self.windowSpatialEngine.tileBottomLeftPressed()
+            },
+            onBottomLeftUp: {
+                self.windowSpatialEngine.tileBottomLeft()
+            },
+            onBottomRightDown: {
+                self.windowSpatialEngine.tileBottomRightPressed()
+            },
+            onBottomRightUp: {
+                self.windowSpatialEngine.tileBottomRight()
+            },
             // MARK: - Center
             onCenterDown: {
                 self.windowSpatialEngine.tileCenterPressed()

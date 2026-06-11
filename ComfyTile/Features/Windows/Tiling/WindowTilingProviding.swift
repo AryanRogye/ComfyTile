@@ -22,6 +22,10 @@ protocol WindowTilingProviding {
     func getLeftDimensions(isLayoutCycling: Bool, enableSmartTiling: Bool) -> CGRect?
     func getTopHalfDimensions() -> CGRect?
     func getBottomHalfDimensions() -> CGRect?
+    func getTopLeftDimensions() -> CGRect?
+    func getTopRightDimensions() -> CGRect?
+    func getBottomLeftDimensions() -> CGRect?
+    func getBottomRightDimensions() -> CGRect?
     
     func fullScreen(withAnimation: Bool)
     func center(withAnimation: Bool, padding: Double, isLayoutCycling: Bool, isUsingAdvancedPadding: Bool)
@@ -29,4 +33,8 @@ protocol WindowTilingProviding {
     func moveLeft(withAnimation: Bool, isLayoutCycling: Bool, enableSmartTiling: Bool)
     func moveTopHalf(withAnimation: Bool)
     func moveBottomHalf(withAnimation: Bool)
+    func moveTopLeft(withAnimation: Bool)
+    func moveTopRight(withAnimation: Bool)
+    func moveBottomLeft(withAnimation: Bool)
+    func moveBottomRight(withAnimation: Bool)
 }

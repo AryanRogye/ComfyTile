@@ -15,6 +15,10 @@ enum TileShape {
     full,
     left,
     right,
+    topLeft,
+    topRight,
+    bottomLeft,
+    bottomRight,
     nudgeTopUp,
     nudgeTopDown,
     nudgeBottomUp,
@@ -26,10 +30,47 @@ enum TileShape {
         switch self {
         case .left, .right:                     HorizontalTileSideView(side: self,  color: color)
         case .topHalf, .bottomHalf:             VerticalTileSideView(side: self, color: color)
+        case .topLeft, .topRight,
+             .bottomLeft, .bottomRight:         CornerTileView(side: self, color: color)
         case .center, .full:                    CenterTileView(side: self,  color: color)
         case .nudgeTopUp, .nudgeTopDown,
              .nudgeBottomUp, .nudgeBottomDown:  NudgeTileView(side: self, color: color)
         }
+    }
+}
+
+struct CornerTileView: View {
+    var side: TileShape
+    var color: Color
+
+    var body: some View {
+        Canvas { context, size in
+            let cornerRadius = min(size.width, size.height) * 0.16
+            let halfWidth = size.width / 2
+            let halfHeight = size.height / 2
+            let fullRect = CGRect(origin: .zero, size: size)
+            let fullPath = RoundedRectangle(cornerRadius: cornerRadius).path(in: fullRect)
+
+            context.fill(fullPath, with: .color(color.opacity(0.2)))
+
+            let selectedRect = switch side {
+            case .topLeft:
+                CGRect(x: 0, y: 0, width: halfWidth, height: halfHeight)
+            case .topRight:
+                CGRect(x: halfWidth, y: 0, width: halfWidth, height: halfHeight)
+            case .bottomLeft:
+                CGRect(x: 0, y: halfHeight, width: halfWidth, height: halfHeight)
+            case .bottomRight:
+                CGRect(x: halfWidth, y: halfHeight, width: halfWidth, height: halfHeight)
+            default:
+                fullRect
+            }
+
+            var selectedContext = context
+            selectedContext.clip(to: Path(selectedRect))
+            selectedContext.fill(fullPath, with: .color(color))
+        }
+        .aspectRatio(1, contentMode: .fit)
     }
 }
 

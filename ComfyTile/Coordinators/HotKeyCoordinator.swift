@@ -14,6 +14,10 @@ extension KeyboardShortcuts.Name {
     static let Center   = Self("Center")
     static let TopHalf  = Self("Top Half")
     static let BottomHalf = Self("Bottom Half")
+    static let TopLeft = Self("Top Left")
+    static let TopRight = Self("Top Right")
+    static let BottomLeft = Self("Bottom Left")
+    static let BottomRight = Self("Bottom Right")
     static let Maximize = Self("Maximize")
     static let NudgeBottomDown = Self("NudgeBottomDown")
     static let NudgeBottomUp = Self("NudgeBottomUp")
@@ -113,6 +117,15 @@ final class HotKeyCoordinator {
         
         onLeftHalfDown      : @escaping () -> Void,
         onLeftHalfUp        : @escaping () -> Void,
+
+        onTopLeftDown       : @escaping () -> Void,
+        onTopLeftUp         : @escaping () -> Void,
+        onTopRightDown      : @escaping () -> Void,
+        onTopRightUp        : @escaping () -> Void,
+        onBottomLeftDown    : @escaping () -> Void,
+        onBottomLeftUp      : @escaping () -> Void,
+        onBottomRightDown   : @escaping () -> Void,
+        onBottomRightUp     : @escaping () -> Void,
         
         onCenterDown        : @escaping () -> Void = {},
         onCenterUp          : @escaping () -> Void = {},
@@ -191,6 +204,32 @@ final class HotKeyCoordinator {
         }
         KeyboardShortcuts.onKeyUp(for: .TopHalf) {
             onTopHalfUp()
+        }
+
+        // MARK: - Corners
+        KeyboardShortcuts.onKeyDown(for: .TopLeft) {
+            onTopLeftDown()
+        }
+        KeyboardShortcuts.onKeyUp(for: .TopLeft) {
+            onTopLeftUp()
+        }
+        KeyboardShortcuts.onKeyDown(for: .TopRight) {
+            onTopRightDown()
+        }
+        KeyboardShortcuts.onKeyUp(for: .TopRight) {
+            onTopRightUp()
+        }
+        KeyboardShortcuts.onKeyDown(for: .BottomLeft) {
+            onBottomLeftDown()
+        }
+        KeyboardShortcuts.onKeyUp(for: .BottomLeft) {
+            onBottomLeftUp()
+        }
+        KeyboardShortcuts.onKeyDown(for: .BottomRight) {
+            onBottomRightDown()
+        }
+        KeyboardShortcuts.onKeyUp(for: .BottomRight) {
+            onBottomRightUp()
         }
 
         

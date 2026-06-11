@@ -27,6 +27,7 @@
 		9B3800822FD8E03B00F0243F /* WindowTilingService+moveRight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3800812FD8E03900F0243F /* WindowTilingService+moveRight.swift */; };
 		9B3800842FD8E09700F0243F /* WindowTilingService+moveTopHalf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3800832FD8E08A00F0243F /* WindowTilingService+moveTopHalf.swift */; };
 		9B3800862FD8E0A000F0243F /* WindowTilingService+moveBottomHalf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3800852FD8E09700F0243F /* WindowTilingService+moveBottomHalf.swift */; };
+		9B3800882FDA1C4200F0243F /* WindowTilingService+moveCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3800872FDA1C4200F0243F /* WindowTilingService+moveCorners.swift */; };
 		9B3BC0982F43A8E300A86E11 /* HighlightFocusedCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */; };
 		9B436CEE2ED7824E00D79941 /* ComfyTile.icon in Resources */ = {isa = PBXBuildFile; fileRef = 9B436CED2ED7824E00D79941 /* ComfyTile.icon */; };
 		9B490C752F0B5FFF00963D05 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B490C742F0B5FFF00963D05 /* LocalShortcuts */; };
@@ -114,6 +115,16 @@
 		9BFE640D2FDA398B00F3D216 /* ActionsGuide.md in Resources */ = {isa = PBXBuildFile; fileRef = 9BFE640C2FDA398B00F3D216 /* ActionsGuide.md */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		9BFE64162FDA4CE000F3D216 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9BF95EC62E9321E000776771 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9BF95ECD2E9321E000776771;
+			remoteInfo = ComfyTile;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		9B9BCEE92F184EAA0020F3AD /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -148,6 +159,7 @@
 		9B3800812FD8E03900F0243F /* WindowTilingService+moveRight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WindowTilingService+moveRight.swift"; sourceTree = "<group>"; };
 		9B3800832FD8E08A00F0243F /* WindowTilingService+moveTopHalf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WindowTilingService+moveTopHalf.swift"; sourceTree = "<group>"; };
 		9B3800852FD8E09700F0243F /* WindowTilingService+moveBottomHalf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WindowTilingService+moveBottomHalf.swift"; sourceTree = "<group>"; };
+		9B3800872FDA1C4200F0243F /* WindowTilingService+moveCorners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WindowTilingService+moveCorners.swift"; sourceTree = "<group>"; };
 		9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightFocusedCoordinator.swift; sourceTree = "<group>"; };
 		9B436CED2ED7824E00D79941 /* ComfyTile.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = ComfyTile.icon; sourceTree = "<group>"; };
 		9B68EE9B2F227711009567DF /* AXSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AXSubscription.swift; sourceTree = "<group>"; };
@@ -229,7 +241,16 @@
 		9BF265092F8C5EC300BAA631 /* ComfyTileDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfyTileDebugView.swift; sourceTree = "<group>"; };
 		9BF95ECE2E9321E000776771 /* ComfyTile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ComfyTile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BFE640C2FDA398B00F3D216 /* ActionsGuide.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ActionsGuide.md; sourceTree = "<group>"; };
+		9BFE64122FDA4CE000F3D216 /* ComfyTileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ComfyTileTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		9BFE64132FDA4CE000F3D216 /* ComfyTileTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ComfyTileTests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		9BF95ECB2E9321E000776771 /* Frameworks */ = {
@@ -244,6 +265,13 @@
 				9B8FBD922F0F033400CBF4B8 /* ComfyLogger in Frameworks */,
 				9B4E04B82E934B05001CF411 /* Defaults in Frameworks */,
 				9BF95F0E2E9326AE00776771 /* KeyboardShortcuts in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BFE640F2FDA4CE000F3D216 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -580,6 +608,7 @@
 				9B38007F2FD8DFF400F0243F /* WindowTilingService+moveLeft.swift */,
 				9B3800832FD8E08A00F0243F /* WindowTilingService+moveTopHalf.swift */,
 				9B3800852FD8E09700F0243F /* WindowTilingService+moveBottomHalf.swift */,
+				9B3800872FDA1C4200F0243F /* WindowTilingService+moveCorners.swift */,
 			);
 			path = Tiling;
 			sourceTree = "<group>";
@@ -641,6 +670,7 @@
 				9B436CED2ED7824E00D79941 /* ComfyTile.icon */,
 				9B8FC05C2F10B80D00CBF4B8 /* ComfyTile */,
 				9B9BCEC12F184D290020F3AD /* ComfyLogger */,
+				9BFE64132FDA4CE000F3D216 /* ComfyTileTests */,
 				9BF95ECF2E9321E000776771 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -649,6 +679,7 @@
 			isa = PBXGroup;
 			children = (
 				9BF95ECE2E9321E000776771 /* ComfyTile.app */,
+				9BFE64122FDA4CE000F3D216 /* ComfyTileTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -684,6 +715,29 @@
 			productReference = 9BF95ECE2E9321E000776771 /* ComfyTile.app */;
 			productType = "com.apple.product-type.application";
 		};
+		9BFE64112FDA4CE000F3D216 /* ComfyTileTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9BFE641A2FDA4CE000F3D216 /* Build configuration list for PBXNativeTarget "ComfyTileTests" */;
+			buildPhases = (
+				9BFE640E2FDA4CE000F3D216 /* Sources */,
+				9BFE640F2FDA4CE000F3D216 /* Frameworks */,
+				9BFE64102FDA4CE000F3D216 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9BFE64172FDA4CE000F3D216 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9BFE64132FDA4CE000F3D216 /* ComfyTileTests */,
+			);
+			name = ComfyTileTests;
+			packageProductDependencies = (
+			);
+			productName = ComfyTileTests;
+			productReference = 9BFE64122FDA4CE000F3D216 /* ComfyTileTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -691,11 +745,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2600;
+				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					9BF95ECD2E9321E000776771 = {
 						CreatedOnToolsVersion = 26.0;
+					};
+					9BFE64112FDA4CE000F3D216 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = 9BF95ECD2E9321E000776771;
 					};
 				};
 			};
@@ -721,6 +779,7 @@
 			projectRoot = "";
 			targets = (
 				9BF95ECD2E9321E000776771 /* ComfyTile */,
+				9BFE64112FDA4CE000F3D216 /* ComfyTileTests */,
 			);
 		};
 /* End PBXProject section */
@@ -733,6 +792,13 @@
 				9B8FC08D2F10B80D00CBF4B8 /* Assets.xcassets in Resources */,
 				9BFE640D2FDA398B00F3D216 /* ActionsGuide.md in Resources */,
 				9B436CEE2ED7824E00D79941 /* ComfyTile.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BFE64102FDA4CE000F3D216 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -779,6 +845,7 @@
 				9B8FC0D72F130E7500CBF4B8 /* ShortcutEditableRow.swift in Sources */,
 				9B68EE9C2F227716009567DF /* AXSubscription.swift in Sources */,
 				9B3800862FD8E0A000F0243F /* WindowTilingService+moveBottomHalf.swift in Sources */,
+				9B3800882FDA1C4200F0243F /* WindowTilingService+moveCorners.swift in Sources */,
 				9B9BCFEA2F1973CB0020F3AD /* WindowServerBridge.swift in Sources */,
 				9BC6E8592FD8DB1B0058A41D /* TilingMode.swift in Sources */,
 				9B8FC0692F10B80D00CBF4B8 /* FocusablePanel.swift in Sources */,
@@ -840,7 +907,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9BFE640E2FDA4CE000F3D216 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9BFE64172FDA4CE000F3D216 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9BF95ECD2E9321E000776771 /* ComfyTile */;
+			targetProxy = 9BFE64162FDA4CE000F3D216 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		9BF95ED72E9321E200776771 /* Debug */ = {
@@ -1065,6 +1147,48 @@
 			};
 			name = Release;
 		};
+		9BFE64182FDA4CE000F3D216 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B9P888266K;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aryanrogye.ComfyTileTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ComfyTile.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ComfyTile";
+			};
+			name = Debug;
+		};
+		9BFE64192FDA4CE000F3D216 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B9P888266K;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aryanrogye.ComfyTileTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ComfyTile.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ComfyTile";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1082,6 +1206,15 @@
 			buildConfigurations = (
 				9BF95EDA2E9321E200776771 /* Debug */,
 				9BF95EDB2E9321E200776771 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9BFE641A2FDA4CE000F3D216 /* Build configuration list for PBXNativeTarget "ComfyTileTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9BFE64182FDA4CE000F3D216 /* Debug */,
+				9BFE64192FDA4CE000F3D216 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
