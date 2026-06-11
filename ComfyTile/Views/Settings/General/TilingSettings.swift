@@ -30,7 +30,7 @@ struct CenterTilingGeneralView: View {
 
             /// This allows us to not lag while opening
             if menuBarVM.showSettings {
-                Slider(value: $defaultsManager.centerTilingPadding, in: 10...100, step: 1) {
+                Slider(value: $defaultsManager.centerTilingPadding, in: 10...300, step: 1) {
                     EmptyView()
                 } minimumValueLabel: {
                     Text("10")
@@ -207,7 +207,7 @@ struct DisplayCard: View {
         Slider(value: Binding(
             get: { displayManager.displayInfo(for: key)?.padding ?? 0 },
             set: { displayManager.updatePadding(for: key, padding: $0) }
-        ), in: 10...100, step: 1) {
+        ), in: 10...300, step: 1) {
             EmptyView()
         }
         .labelsHidden()

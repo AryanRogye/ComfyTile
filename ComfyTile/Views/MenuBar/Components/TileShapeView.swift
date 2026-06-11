@@ -8,25 +8,27 @@
 import SwiftUI
 
 enum TileShape {
-    case center,
-         full,
-         left,
-         right,
-         nudgeTopUp,
-         nudgeTopDown,
-         nudgeBottomUp,
-         nudgeBottomDown
+    case
+    topHalf,
+    bottomHalf,
+    center,
+    full,
+    left,
+    right,
+    nudgeTopUp,
+    nudgeTopDown,
+    nudgeBottomUp,
+    nudgeBottomDown
     
     
     @ViewBuilder
     func view(color: Color) -> some View {
         switch self {
-        case .left, .right:
-            HorizontalTileSideView(side: self,  color: color)
-        case .center, .full:
-            CenterTileView(side: self,  color: color)
-        case .nudgeTopUp, .nudgeTopDown, .nudgeBottomUp, .nudgeBottomDown:
-            NudgeTileView(side: self, color: color)
+        case .left, .right:                     HorizontalTileSideView(side: self,  color: color)
+        case .topHalf, .bottomHalf:             VerticalTileSideView(side: self, color: color)
+        case .center, .full:                    CenterTileView(side: self,  color: color)
+        case .nudgeTopUp, .nudgeTopDown,
+             .nudgeBottomUp, .nudgeBottomDown:  NudgeTileView(side: self, color: color)
         }
     }
 }
@@ -179,6 +181,47 @@ struct HorizontalTileSideView: View {
             var rightCtx = ctx
             rightCtx.clip(to: Path(CGRect(x: halfWidth, y: 0, width: halfWidth, height: size.height)))
             rightCtx.fill(fullPath, with: .color(color.opacity(side == .right ? 1.0 : 0.2)))
+        }
+        .aspectRatio(1, contentMode: .fit)
+    }
+}
+
+struct VerticalTileSideView: View {
+    var side: TileShape
+    var color: Color
+    
+    var body: some View {
+        Canvas { ctx, size in
+            let cornerRadius = min(size.width, size.height) * 0.16
+            let halfHeight = size.height / 2
+            let rect = CGRect(origin: .zero, size: size)
+            let fullPath = RoundedRectangle(cornerRadius: cornerRadius).path(in: rect)
+            
+            // Top half
+            var topCtx = ctx
+            topCtx.clip(to: Path(CGRect(
+                x: 0,
+                y: 0,
+                width: size.width,
+                height: halfHeight
+            )))
+            topCtx.fill(
+                fullPath,
+                with: .color(color.opacity(side == .topHalf ? 1.0 : 0.2))
+            )
+            
+            // Bottom half
+            var bottomCtx = ctx
+            bottomCtx.clip(to: Path(CGRect(
+                x: 0,
+                y: halfHeight,
+                width: size.width,
+                height: halfHeight
+            )))
+            bottomCtx.fill(
+                fullPath,
+                with: .color(color.opacity(side == .bottomHalf ? 1.0 : 0.2))
+            )
         }
         .aspectRatio(1, contentMode: .fit)
     }

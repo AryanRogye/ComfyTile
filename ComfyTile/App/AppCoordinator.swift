@@ -185,6 +185,20 @@ class AppCoordinator {
 //                self.windowCore.isHoldingModifier = false
 //            },
             
+            // MARK: - Top Half
+            onTopHalfDown:  {
+                self.windowSpatialEngine.tileTopHalfPressed()
+            },
+            onTopHalfUp:  {
+                self.windowSpatialEngine.tileTopHalf()
+            },
+            // MARK: - Bottom Half
+            onBottomHalfDown:  {
+                self.windowSpatialEngine.tileBottomHalfPressed()
+            },
+            onBottomHalfUp:  {
+                self.windowSpatialEngine.tileBottomHalf()
+            },
             // MARK: - Right Half
             onRightHalfDown: {
                 self.windowSpatialEngine.tileRightPressed()

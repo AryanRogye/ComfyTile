@@ -8,77 +8,6 @@
 import KeyboardShortcuts
 import Cocoa
 
-
-enum TilingMode: String, CaseIterable {
-    case rightHalf
-    case leftHalf
-    case center
-    case fullscreen
-    case nudgeBottomUp
-    case nudgeBottomDown
-    case nudgeTopDown
-    case nudgeTopUp
-    
-    var hotkey: KeyboardShortcuts.Name {
-        switch self {
-        case .rightHalf:
-            KeyboardShortcuts.Name.RightHalf
-        case .leftHalf:
-            KeyboardShortcuts.Name.LeftHalf
-        case .center:
-            KeyboardShortcuts.Name.Center
-        case .fullscreen:
-            KeyboardShortcuts.Name.Maximize
-        case .nudgeBottomUp:
-            KeyboardShortcuts.Name.NudgeBottomUp
-        case .nudgeBottomDown:
-            KeyboardShortcuts.Name.NudgeBottomDown
-        case .nudgeTopDown:
-            KeyboardShortcuts.Name.NudgeTopDown
-        case .nudgeTopUp:
-            KeyboardShortcuts.Name.NudgeTopUp
-        }
-    }
-    
-    var tileShape: TileShape {
-        switch self {
-        case .rightHalf:
-                .right
-        case .leftHalf:
-                .left
-        case .center:
-                .center
-        case .fullscreen:
-                .full
-        case .nudgeBottomUp:
-                .nudgeBottomUp
-        case .nudgeBottomDown:
-                .nudgeBottomDown
-        case .nudgeTopDown:
-                .nudgeTopDown
-        case .nudgeTopUp:
-                .nudgeTopUp
-        }
-    }
-}
-
-enum LayoutMode: String, CaseIterable {
-    case primaryOnly
-    case primaryLeftStackedHorizontally
-    case primaryRightStackedHorizontally
-    
-    var hotkey: KeyboardShortcuts.Name {
-        switch self {
-        case .primaryOnly:
-            KeyboardShortcuts.Name.primaryTile
-        case .primaryLeftStackedHorizontally:
-            KeyboardShortcuts.Name.primaryLeftStackedHorizontallyTile
-        case .primaryRightStackedHorizontally:
-            KeyboardShortcuts.Name.primaryRightStackedHorizontallyTile
-        }
-    }
-}
-
 final class WindowSpatialEngine {
     
     let windowCore : WindowCore
@@ -126,6 +55,12 @@ final class WindowSpatialEngine {
                                     withAnimation: self.defaultsManager.showTilingAnimations,
                                     isLayoutCycling: self.defaultsManager.enableLayoutCycling,
                                     enableSmartTiling: self.defaultsManager.enableSmartTiling
+                                )
+        case .bottomHalf:       self.windowTilingService.moveBottomHalf(
+                                    withAnimation: self.defaultsManager.showTilingAnimations
+                                )
+        case .topHalf:          self.windowTilingService.moveTopHalf(
+                                    withAnimation: self.defaultsManager.showTilingAnimations
                                 )
         case .center:          self.windowTilingService.center(
                                     withAnimation: self.defaultsManager.showTilingAnimations,
@@ -214,6 +149,51 @@ extension WindowSpatialEngine {
     }
 }
 
+// MARK: - Tile Top Half
+extension WindowSpatialEngine {
+    public func tileTopHalf() {
+        tileWithAnimation {
+            self.windowTilingService.moveTopHalf(
+                withAnimation: self.defaultsManager.showTilingAnimations
+            )
+        }
+    }
+    
+    public func tileTopHalfPressed() {
+        if !defaultsManager.showTilingAnimations {
+            self.windowTilingService.moveTopHalf(
+                withAnimation: self.defaultsManager.showTilingAnimations,
+            )
+            return
+        }
+        tileDownWithAnimation {
+            self.windowTilingService.getTopHalfDimensions()
+        }
+    }
+}
+
+// MARK: - Tile Bottom Half
+extension WindowSpatialEngine {
+    public func tileBottomHalf() {
+        tileWithAnimation {
+            self.windowTilingService.moveBottomHalf(
+                withAnimation: self.defaultsManager.showTilingAnimations
+            )
+        }
+    }
+    
+    public func tileBottomHalfPressed() {
+        if !defaultsManager.showTilingAnimations {
+            self.windowTilingService.moveBottomHalf(
+                withAnimation: self.defaultsManager.showTilingAnimations,
+            )
+            return
+        }
+        tileDownWithAnimation {
+            self.windowTilingService.getBottomHalfDimensions()
+        }
+    }
+}
 
 
 // MARK: - Tile Right

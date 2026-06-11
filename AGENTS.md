@@ -14,6 +14,23 @@ Source code lives in `ComfyTile/` and is organized by feature flow.
 - `ComfyLogger/` and `LocalShortcuts/` are local Swift packages used by the app.
 - `updates/appcast.xml` stores the Sparkle appcast metadata for releases.
 
+## Window Actions Guide
+
+When adding or modifying window actions, follow the dedicated guide:
+
+* [ActionsGuide.md](./ComfyTile/Features/Windows/ActionsGuide.md)
+
+
+Use this guide for:
+
+* adding new tiling actions
+* adding new nudge actions
+* adding new layout actions
+* wiring hotkeys through `HotKeyCoordinator`
+* connecting actions through `AppCoordinator` and `WindowSpatialEngine`
+
+Do not add new window actions by guessing the file flow. Follow `ActionsGuide.md` first, then update it if the architecture changes.
+
 ## Build, Test, and Development Commands
 - `open ComfyTile.xcworkspace` opens the workspace with local packages wired in.
 - `xcodebuild -project ComfyTile.xcodeproj -scheme ComfyTileApp -configuration Debug build` builds the app for local/CI debug validation.
@@ -31,14 +48,6 @@ There is currently no committed XCTest target. For new test coverage:
 - Name files `<Feature>Tests.swift` and test methods `test_<Scenario>_<Expectation>()`.
 - Isolate AX/CGS and other macOS integrations behind protocols so unit tests stay deterministic.
 - After adding tests, run `xcodebuild test -project ComfyTile.xcodeproj -scheme ComfyTileApp -destination 'platform=macOS'`.
-
-## Commit & Pull Request Guidelines
-Prefer concise, imperative commit subjects (for example: `fix tiling cover flicker`). Keep subject lines short and add detail in the body when behavior changes. For pull requests:
-- Explain what changed and why in plain language.
-- List impacted directories.
-- Include validation steps you ran (`build`, `test`, manual scenarios).
-- Attach screenshots or recordings for visible UI/menu bar changes.
-- Link related issues or follow-ups.
 
 ## Security & Configuration Notes
 `ComfyTile/ComfyTile.entitlements` and `ComfyTile/Features/Common/Permission/PermissionService.swift` control accessibility and automation capabilities. Re-verify permissions in System Settings after entitlement or AX behavior changes. Do not commit signing certificates, private keys, or machine-specific bundle/signing overrides.

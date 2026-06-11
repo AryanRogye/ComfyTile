@@ -20,10 +20,13 @@ protocol WindowTilingProviding {
     func getCenterDimensions(padding: Double, isLayoutCycling: Bool, isUsingAdvancedPadding: Bool) -> CGRect?
     func getRightDimensions(isLayoutCycling: Bool, enableSmartTiling: Bool) -> CGRect?
     func getLeftDimensions(isLayoutCycling: Bool, enableSmartTiling: Bool) -> CGRect?
+    func getTopHalfDimensions() -> CGRect?
+    func getBottomHalfDimensions() -> CGRect?
     
     func fullScreen(withAnimation: Bool)
     func center(withAnimation: Bool, padding: Double, isLayoutCycling: Bool, isUsingAdvancedPadding: Bool)
     func moveRight(withAnimation: Bool, isLayoutCycling: Bool, enableSmartTiling: Bool)
     func moveLeft(withAnimation: Bool, isLayoutCycling: Bool, enableSmartTiling: Bool)
-    
+    func moveTopHalf(withAnimation: Bool)
+    func moveBottomHalf(withAnimation: Bool)
 }

@@ -12,6 +12,8 @@ extension KeyboardShortcuts.Name {
     static let RightHalf = Self("RightHalf")
     static let LeftHalf = Self("LeftHalf")
     static let Center   = Self("Center")
+    static let TopHalf  = Self("Top Half")
+    static let BottomHalf = Self("Bottom Half")
     static let Maximize = Self("Maximize")
     static let NudgeBottomDown = Self("NudgeBottomDown")
     static let NudgeBottomUp = Self("NudgeBottomUp")
@@ -99,14 +101,21 @@ final class HotKeyCoordinator {
         onCtrlDoubleTapDown: @escaping () -> Void = {},
         onCtrlDoubleTapUp:   @escaping () -> Void = {},
         
-        onRightHalfDown: @escaping () -> Void,
-        onRightHalfUp  : @escaping () -> Void,
         
-        onLeftHalfDown: @escaping () -> Void,
-        onLeftHalfUp  : @escaping () -> Void,
+        onTopHalfDown       : @escaping () -> Void,
+        onTopHalfUp         : @escaping () -> Void,
         
-        onCenterDown: @escaping () -> Void = {},
-        onCenterUp  : @escaping () -> Void = {},
+        onBottomHalfDown    : @escaping () -> Void,
+        onBottomHalfUp      : @escaping () -> Void,
+        
+        onRightHalfDown     : @escaping () -> Void,
+        onRightHalfUp       : @escaping () -> Void,
+        
+        onLeftHalfDown      : @escaping () -> Void,
+        onLeftHalfUp        : @escaping () -> Void,
+        
+        onCenterDown        : @escaping () -> Void = {},
+        onCenterUp          : @escaping () -> Void = {},
         
         onMaximizeDown: @escaping () -> Void = {},
         onMaximizeUp  : @escaping () -> Void = {},
@@ -167,6 +176,23 @@ final class HotKeyCoordinator {
         KeyboardShortcuts.onKeyUp(for: .LeftHalf) {
             onLeftHalfUp()
         }
+        
+        // MARK: - Top Half
+        KeyboardShortcuts.onKeyDown(for: .BottomHalf) {
+            onBottomHalfDown()
+        }
+        KeyboardShortcuts.onKeyUp(for: .BottomHalf) {
+            onBottomHalfUp()
+        }
+        
+        // MARK: - Bottom Half
+        KeyboardShortcuts.onKeyDown(for: .TopHalf) {
+            onTopHalfDown()
+        }
+        KeyboardShortcuts.onKeyUp(for: .TopHalf) {
+            onTopHalfUp()
+        }
+
         
         // MARK: - Center
         KeyboardShortcuts.onKeyDown(for: .Center) {
