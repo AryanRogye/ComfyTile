@@ -27,6 +27,7 @@ class AppCoordinator {
     let tilingCoverCoordinator      : TilingCoverCoordinator
     let windowViewerCoordinator     : WindowViewerCoordinator
     let highLightFocusedCoordinator : HighlightFocusedCoordinator
+    let tileRingCoordinator         : TileRingCoordinator
     
     /// ==============================================================================
     /// View Models
@@ -36,6 +37,7 @@ class AppCoordinator {
     let tilingCoverVM      = TilingCoverViewModel()
     let windowViewerVM     = WindowViewerViewModel()
     let highlightVM        = HighlightFocusedViewModel()
+    let tileRingVM         = TileRingViewModel()
     
     /// ==============================================================================
     /// Controllers
@@ -47,7 +49,7 @@ class AppCoordinator {
     private let defaultsManager     = DefaultsManager()
     private let displayManager      : DisplayManager
     private let windowSpatialEngine : WindowSpatialEngine
-    private var permissionService : PermissionService
+    private var permissionService   : PermissionService
 
     init(appEnv: AppEnv) {
         self.permissionService = PermissionService()
@@ -58,6 +60,7 @@ class AppCoordinator {
         self.tilingCoverCoordinator = TilingCoverCoordinator(
             tilingCoverVM: tilingCoverVM
         )
+        self.tileRingCoordinator = TileRingCoordinator(vm: tileRingVM)
         self.highLightFocusedCoordinator = HighlightFocusedCoordinator(
             windowCore: windowCore,
             highlightVM: highlightVM,
@@ -185,6 +188,13 @@ class AppCoordinator {
 //                self.windowCore.isHoldingModifier = false
 //            },
             
+            // MARK: - Tile Ring
+            onTileRingDown: {
+                self.tileRingCoordinator.show()
+            },
+            onTileRingUp: {
+                self.tileRingCoordinator.hide()
+            },
             // MARK: - Top Half
             onTopHalfDown:  {
                 self.windowSpatialEngine.tileTopHalfPressed()

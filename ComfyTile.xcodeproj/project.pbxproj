@@ -81,6 +81,10 @@
 		9B8FC0CA2F12EF5C00CBF4B8 /* MenuBarModeContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0C92F12EF5900CBF4B8 /* MenuBarModeContainer.swift */; };
 		9B8FC0D52F130B7700CBF4B8 /* HotKeyOrClose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */; };
 		9B8FC0D72F130E7500CBF4B8 /* ShortcutEditableRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */; };
+		9B969A9C2FDB8C3F0080C3CD /* TileRingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969A9B2FDB8C380080C3CD /* TileRingCoordinator.swift */; };
+		9B969A9E2FDB93150080C3CD /* CirclePiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969A9D2FDB93150080C3CD /* CirclePiece.swift */; };
+		9B969AA02FDB93430080C3CD /* TileRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969A9F2FDB93430080C3CD /* TileRingView.swift */; };
+		9B969AA22FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA12FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift */; };
 		9B9BCED32F184DE00020F3AD /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED22F184DE00020F3AD /* LocalShortcuts */; };
 		9B9BCED62F184DEC0020F3AD /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED52F184DEC0020F3AD /* ComfyLogger */; };
 		9B9BCFC72F1971ED0020F3AD /* CheckForUpdatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCFC12F1971ED0020F3AD /* CheckForUpdatesView.swift */; };
@@ -211,6 +215,10 @@
 		9B8FC0C92F12EF5900CBF4B8 /* MenuBarModeContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarModeContainer.swift; sourceTree = "<group>"; };
 		9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyOrClose.swift; sourceTree = "<group>"; };
 		9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutEditableRow.swift; sourceTree = "<group>"; };
+		9B969A9B2FDB8C380080C3CD /* TileRingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileRingCoordinator.swift; sourceTree = "<group>"; };
+		9B969A9D2FDB93150080C3CD /* CirclePiece.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclePiece.swift; sourceTree = "<group>"; };
+		9B969A9F2FDB93430080C3CD /* TileRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileRingView.swift; sourceTree = "<group>"; };
+		9B969AA12FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessInfo+isSwiftUIPreview.swift"; sourceTree = "<group>"; };
 		9B9BCEC12F184D290020F3AD /* ComfyLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ComfyLogger; sourceTree = "<group>"; };
 		9B9BCFBE2F1971ED0020F3AD /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		9B9BCFBF2F1971ED0020F3AD /* UpdateUserDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateUserDriver.swift; sourceTree = "<group>"; };
@@ -338,6 +346,7 @@
 		9B8FC0192F10B80D00CBF4B8 /* Coordinators */ = {
 			isa = PBXGroup;
 			children = (
+				9B969A9B2FDB8C380080C3CD /* TileRingCoordinator.swift */,
 				9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */,
 				9B8FC0A82F11AB9A00CBF4B8 /* MenuBarCoordinator.swift */,
 				9B8FC0122F10B80D00CBF4B8 /* HotKeyCoordinator.swift */,
@@ -351,6 +360,7 @@
 		9B8FC0222F10B80D00CBF4B8 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9B969AA12FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift */,
 				9B794D1B2FC43C98009C8A46 /* Color+opposite.swift */,
 				9B3121602FC3B60200C9D7B5 /* NSScreen+displayID.swift */,
 				9BF1F5AF2F904962000C29C9 /* View+if.swift */,
@@ -428,6 +438,7 @@
 				9B8FC04E2F10B80D00CBF4B8 /* Settings */,
 				9B8FC0542F10B80D00CBF4B8 /* TilingCover */,
 				9B8FC0562F10B80D00CBF4B8 /* WindowViewer */,
+				9B969A9A2FDB8C160080C3CD /* TileRing */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -494,6 +505,15 @@
 				9B8FC0C72F12ECFA00CBF4B8 /* MenuBarModeRow.swift */,
 			);
 			path = Component;
+			sourceTree = "<group>";
+		};
+		9B969A9A2FDB8C160080C3CD /* TileRing */ = {
+			isa = PBXGroup;
+			children = (
+				9B969A9D2FDB93150080C3CD /* CirclePiece.swift */,
+				9B969A9F2FDB93430080C3CD /* TileRingView.swift */,
+			);
+			path = TileRing;
 			sourceTree = "<group>";
 		};
 		9B9BCFBD2F1971EB0020F3AD /* Features */ = {
@@ -811,6 +831,7 @@
 			files = (
 				9B8FC0B22F11EEF300CBF4B8 /* ComfyTileTabPlacement.swift in Sources */,
 				9B23AB8B2F9023B30028C510 /* MarqueeText.swift in Sources */,
+				9B969AA02FDB93430080C3CD /* TileRingView.swift in Sources */,
 				9B8FC05D2F10B80D00CBF4B8 /* AppCoordinator.swift in Sources */,
 				9B8FC05E2F10B80D00CBF4B8 /* AppDelegate.swift in Sources */,
 				9B8FC05F2F10B80D00CBF4B8 /* HotKeyCoordinator.swift in Sources */,
@@ -831,7 +852,9 @@
 				9B8FC0AD2F11D7BE00CBF4B8 /* ComfyTileTabBar.swift in Sources */,
 				9B8FC0642F10B80D00CBF4B8 /* WindowSpatialEngine.swift in Sources */,
 				9B8FC0C12F12306D00CBF4B8 /* TileModeView.swift in Sources */,
+				9B969A9C2FDB8C3F0080C3CD /* TileRingCoordinator.swift in Sources */,
 				9B9BCFE72F19738D0020F3AD /* WindowElement.swift in Sources */,
+				9B969AA22FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift in Sources */,
 				9B3800842FD8E09700F0243F /* WindowTilingService+moveTopHalf.swift in Sources */,
 				9B8FC0652F10B80D00CBF4B8 /* WindowViewerCoordinator.swift in Sources */,
 				9B1FE3D02FC7EF5900C68CBB /* PrivateSCWindowFactory.swift in Sources */,
@@ -903,6 +926,7 @@
 				9B8FC08B2F10B80D00CBF4B8 /* WindowViewer.swift in Sources */,
 				9B9BCFD02F1972190020F3AD /* PermissionService.swift in Sources */,
 				9B3121532FC3952D00C9D7B5 /* CenterTileLayout.swift in Sources */,
+				9B969A9E2FDB93150080C3CD /* CirclePiece.swift in Sources */,
 				9B8FC08C2F10B80D00CBF4B8 /* ComfyTileApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

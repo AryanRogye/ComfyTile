@@ -14,6 +14,12 @@ class DefaultsManager {
     var nudgeStep: Int = Defaults[.nudgeStep]
     var modiferKey: ModifierGroup = ModifierGroup(rawValue: Defaults[.modiferKey]) ?? .control
     
+    var enableTileRing: Bool = Defaults[.enableTileRing] {
+        didSet {
+            Defaults[.enableTileRing] = enableTileRing
+        }
+    }
+    
     var enableSmartTiling: Bool = Defaults[.enableSmartTiling] {
         didSet {
             Defaults[.enableSmartTiling] = enableSmartTiling

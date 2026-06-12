@@ -19,6 +19,8 @@ struct GeneralSettings: View {
                 CenterTilingAdvancedGeneralView(defaultsManager: defaultsManager, menuBarVM: menuBarVM)
                 TilingSnapBehavior(defaultsManager: defaultsManager)
                 SmartTilingBehavior(defaultsManager: defaultsManager)
+                TileRingGeneralView(defaultsManager: defaultsManager)
+                TileRingHotKey(defaultsManager: defaultsManager)
             }
 
             Section("Window Switching") {

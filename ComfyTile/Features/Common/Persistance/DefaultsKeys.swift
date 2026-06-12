@@ -44,9 +44,9 @@ extension Defaults.Keys {
     
     /// usually min of 10, and high of 100 is nice
     static let centerTilingPadding = Key<Double>("CenterTilingPadding", default: 40.0)
-
+    
     static let advancedCenterTilingPadding = Key<Bool>("AdvancedCenterTilingPadding", default: false)
-
+    
     /// This allows us to focus a apps window on the window switcher
     static let allowFocusAppWindowOnWindowSwitcher = Key<Bool>("AllowFocusAppWindowOnWindowSwitcher", default: true)
     
@@ -55,4 +55,7 @@ extension Defaults.Keys {
     
     /// This allows us to do smart tiling, for example if we just did 1/3 left then the next right would be 2/3
     static let enableSmartTiling = Key<Bool>("enableSmartTiling", default: false)
+    
+    /// This would show a ring that can be used for tiling to a side, with just 1 hotkey
+    static let enableTileRing = Key<Bool>("enableTileRing", default: false)
 }

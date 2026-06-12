@@ -24,6 +24,7 @@ extension KeyboardShortcuts.Name {
     static let NudgeTopUp = Self("NudgeTopUp")
     static let NudgeTopDown = Self("NudgeTopDown")
     static let toggleSuperFocus = Self("Toggle Super Focus")
+    static let toggleTileRing = Self("Toggle Tile Ring")
     static let windowViewerBack = Self("WindowViewerBack", default: Shortcut(
         .backtick,
         modifiers: .option
@@ -105,6 +106,8 @@ final class HotKeyCoordinator {
         onCtrlDoubleTapDown: @escaping () -> Void = {},
         onCtrlDoubleTapUp:   @escaping () -> Void = {},
         
+        onTileRingDown : @escaping () -> Void,
+        onTileRingUp   : @escaping () -> Void,
         
         onTopHalfDown       : @escaping () -> Void,
         onTopHalfUp         : @escaping () -> Void,
@@ -174,6 +177,14 @@ final class HotKeyCoordinator {
             onWindowViewerEscapeEarly()
         }
         
+        // MARK: - Tile Ring
+        KeyboardShortcuts.onKeyDown(for: .toggleTileRing) {
+            onTileRingDown()
+        }
+        KeyboardShortcuts.onKeyUp(for: .toggleTileRing) {
+            onTileRingUp()
+        }
+        
         // MARK: - Right Half
         KeyboardShortcuts.onKeyDown(for: .RightHalf) {
             onRightHalfDown()
@@ -231,7 +242,6 @@ final class HotKeyCoordinator {
         KeyboardShortcuts.onKeyUp(for: .BottomRight) {
             onBottomRightUp()
         }
-
         
         // MARK: - Center
         KeyboardShortcuts.onKeyDown(for: .Center) {

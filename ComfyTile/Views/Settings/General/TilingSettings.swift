@@ -264,3 +264,24 @@ struct SmartTilingBehavior: View {
         }
     }
 }
+
+// MARK: - Tile Ring General View
+struct TileRingGeneralView: View {
+    @Bindable var defaultsManager : DefaultsManager
+    
+    var body: some View {
+        Toggle("Enable Tile Ring", isOn: $defaultsManager.enableTileRing)
+    }
+}
+
+// MARK: - Tile Ring Hotkey
+struct TileRingHotKey: View {
+    @Bindable var defaultsManager : DefaultsManager
+    
+    var body: some View {
+        if defaultsManager.enableTileRing {
+            ShortcutRecorder(label: "Toggle Tile Ring", type: .toggleTileRing)
+                .padding(.horizontal, -16)
+        }
+    }
+}
