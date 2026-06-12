@@ -8,31 +8,14 @@
 import AppKit
 import SwiftUI
 
-private class WindowDelegate: NSObject, NSWindowDelegate {
-    let id: String
-    weak var coordinator: WindowCoordinator?
-    
-    init(id: String, coordinator: WindowCoordinator) {
-        self.id = id
-        self.coordinator = coordinator
-    }
-    
-    func windowDidResignKey(_ notification: Notification) {
-        coordinator?.handleWindowBlur(id: id)
-    }
-    
-    func windowDidBecomeKey(_ notification: Notification) {
-        coordinator?.handleWindowOpen(id: id)
-    }
-    
-    func windowWillClose(_ notification: Notification) {
-        coordinator?.handleWindowClose(id: id)
-    }
-}
-
-
-// MARK: - OOP
 /// Window Coordinator manages the lifecycle of multiple windows in the application.
+/// - Parameters:
+///   - windows: windowID -> NSWindow, each ids NSWindow
+///   - onOpenAction: windowID -> action(), when the window opens this function is called
+///   - onCloseAction: windowID -> action(), when the window is closed this function is called
+///   - onBlueAction: windowID -> action(), when the window is not in focus function is called
+///   - onResizeAction: windowID -> action(isResizing), called continuously while the window is being resized; `isResizing` is `true` when a resize is in progress and `false` when it has ended
+///   - delegates: windowID -> WindowDelegates, each ids WindowDelegate
 class WindowCoordinator {
     
     private var windows : [String: NSWindow] = [:]
@@ -40,6 +23,7 @@ class WindowCoordinator {
     private var onOpenAction : [String: (() -> Void)] = [:]
     private var onCloseAction : [String: (() -> Void)] = [:]
     private var onBlurAction: [String: (() -> Void)] = [:]
+    private var onResizeAction: [String: ((Bool) -> Void)] = [:]
     
     private var delegates: [String: WindowDelegate] = [:]
     
@@ -52,7 +36,73 @@ class WindowCoordinator {
         }
         windows.removeAll()
     }
+}
+
+/// A per-window delegate that forwards `NSWindowDelegate` lifecycle events to the `WindowCoordinator`.
+///
+/// Each managed window owns one `WindowDelegate`. The delegate holds a weak reference to the
+/// coordinator to avoid a retain cycle, since the coordinator owns the delegates dictionary.
+fileprivate class WindowDelegate: NSObject, NSWindowDelegate {
     
+    /// The ID of the window this delegate is managing, used to route events in the coordinator.
+    let id: String
+    
+    /// Weak reference to the owning coordinator to avoid a retain cycle.
+    weak var coordinator: WindowCoordinator?
+    
+    init(id: String, coordinator: WindowCoordinator) {
+        self.id = id
+        self.coordinator = coordinator
+    }
+    
+    /// Fires when the window loses key status — maps to `onBlur`.
+    func windowDidResignKey(_ notification: Notification) {
+        coordinator?.handleWindowBlur(id: id)
+    }
+    
+    /// Fires when the window becomes key — maps to `onOpen`.
+    func windowDidBecomeKey(_ notification: Notification) {
+        coordinator?.handleWindowOpen(id: id)
+    }
+    
+    /// Fires just before the window closes — maps to `onClose`.
+    func windowWillClose(_ notification: Notification) {
+        coordinator?.handleWindowClose(id: id)
+    }
+    
+    /// Fires when the user begins a live resize — maps to `onResize(true)`.
+    func windowWillStartLiveResize(_ notification: Notification) {
+        coordinator?.handleWindowResize(id: id, isResizing: true)
+    }
+    
+    /// Fires when the live resize ends — maps to `onResize(false)`.
+    func windowDidEndLiveResize(_ notification: Notification) {
+        coordinator?.handleWindowResize(id: id, isResizing: false)
+    }
+}
+
+extension WindowCoordinator {
+    
+    /// Presents a managed window for the given ID, creating it if it doesn't exist or bringing it
+    /// to the front if it's already open.
+    ///
+    /// Subsequent calls with the same `id` will skip creation and simply re-focus the existing
+    /// window — none of the other parameters will have any effect on that call.
+    ///
+    /// - Parameters:
+    ///   - id: A unique identifier for the window. Used to track and deduplicate instances.
+    ///   - title: The window's title. Hidden from the titlebar but used by the system (e.g. Mission Control).
+    ///   - content: The SwiftUI view to embed as the window's content.
+    ///   - size: The initial size of the window. Defaults to 600×400. Ignored if the window already exists.
+    ///   - origin: The window's initial screen position. If `nil`, the window is centered on screen.
+    ///   - makeGlass: If `true`, applies a vibrancy/glass effect and clears the background. Defaults to `false`.
+    ///   - onOpen: Called when the window first becomes key.
+    ///   - onClose: Called when the window is closed.
+    ///   - onBlur: Called when the window loses focus.
+    ///   - onResize: Called when a resize event occurs. The `Bool` parameter indicates whether
+    ///     the window's frame actually changed.
+    ///
+    /// - Returns: The managed `NSWindow` instance, whether newly created or already existing.
     @discardableResult
     func showWindow(
         id: String,
@@ -63,9 +113,9 @@ class WindowCoordinator {
         makeGlass: Bool = false,
         onOpen: (() -> Void)? = nil,
         onClose: (() -> Void)? = nil,
-        onBlur: (() -> Void)? = nil
+        onBlur: (() -> Void)? = nil,
+        onResize: ((Bool) -> Void)? = nil
     ) -> NSWindow {
-        // MARK: - Imperative Style
         if let window = windows[id] {
             // Re-activate app and bring the existing window up
             NSRunningApplication.current.activate(options: [.activateAllWindows])
@@ -113,6 +163,9 @@ class WindowCoordinator {
         if let action = onBlur {
             onBlurAction[id] = action
         }
+        if let action = onResize {
+            onResizeAction[id] = action
+        }
         
         window.center()
         window.makeKeyAndOrderFront(nil)
@@ -155,10 +208,16 @@ class WindowCoordinator {
         // Container becomes the window's content view
         window.contentView = containerView
     }
-    
+}
+
+extension WindowCoordinator {
     func closeWindow(id: String) {
         windows[id]?.close()
         /// windowWillClose will be called automatically
+    }
+    
+    fileprivate func handleWindowResize(id: String, isResizing: Bool) {
+        onResizeAction[id]?(isResizing)
     }
     
     fileprivate func handleWindowBlur(id: String) {
@@ -180,6 +239,7 @@ class WindowCoordinator {
         delegates[id] = nil
         onOpenAction[id] = nil
         onBlurAction[id] = nil
+        onResizeAction[id] = nil
         
         if let action = onCloseAction[id] {
             action()
@@ -188,6 +248,7 @@ class WindowCoordinator {
     }
 }
 
+// MARK: - Rename
 extension WindowCoordinator {
     /// Renames an existing window's identifier and (optionally) its title.
     /// - Parameters:
@@ -217,6 +278,9 @@ extension WindowCoordinator {
         }
         if let blur = onBlurAction.removeValue(forKey: oldId) {
             onBlurAction[newId] = blur
+        }
+        if let resize = onResizeAction.removeValue(forKey: oldId) {
+            onResizeAction[newId] = resize
         }
         
         // refresh delegate with the new id (simplest is to swap in a new one)
@@ -257,6 +321,6 @@ extension WindowCoordinator {
     
     public func bringAppFront() {
         NSRunningApplication.current.activate(options: [.activateAllWindows])
-        NSApp.activate(ignoringOtherApps: true) // harmless double-tap; one of these usually “sticks”
+        NSApp.activate(ignoringOtherApps: true)
     }
 }

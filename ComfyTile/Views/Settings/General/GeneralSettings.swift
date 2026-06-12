@@ -21,7 +21,7 @@ struct GeneralSettings: View {
                 SmartTilingBehavior(defaultsManager: defaultsManager)
                 TileRingGeneralView(defaultsManager: defaultsManager)
                 TileRingHotKey(defaultsManager: defaultsManager)
-                TileRingDiameter(defaultsManager: defaultsManager, menuBarVM: menuBarVM)
+                TileRingActivationDiameter(defaultsManager: defaultsManager, menuBarVM: menuBarVM)
             }
 
             Section("Window Switching") {

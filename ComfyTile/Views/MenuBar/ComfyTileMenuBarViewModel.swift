@@ -21,6 +21,8 @@ final class ComfyTileMenuBarViewModel {
     var width: CGFloat = 350
     var height: CGFloat = 300
     
+    var isResizing: Bool = false
+    
     /// trigger
     var showSettings = false
     private var showSettingsRevealWorkItem: DispatchWorkItem?

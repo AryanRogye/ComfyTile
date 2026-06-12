@@ -46,7 +46,10 @@ class ComfyTileWindowCoordinator {
                 width: comfyTileMenuBarVM.width,
                 height: comfyTileMenuBarVM.height
             ),
-            makeGlass: true
+            makeGlass: true,
+            onResize: { resizing in
+                comfyTileMenuBarVM.isResizing = resizing
+            }
         )
         comfyTileMenuBarVM.panel = window
     }

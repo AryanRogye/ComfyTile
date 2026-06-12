@@ -87,6 +87,8 @@
 		9B969AA22FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA12FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift */; };
 		9B969AA62FDCB60B0080C3CD /* ConvertToWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA52FDCB60A0080C3CD /* ConvertToWindow.swift */; };
 		9B969AA82FDCB6F90080C3CD /* ComfyTileWindowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA72FDCB6F60080C3CD /* ComfyTileWindowCoordinator.swift */; };
+		9B969AAA2FDCC6860080C3CD /* SettingsSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA92FDCC6840080C3CD /* SettingsSlider.swift */; };
+		9B969AAD2FDCCDF70080C3CD /* DisplayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AAC2FDCCDF70080C3CD /* DisplayCard.swift */; };
 		9B9BCED32F184DE00020F3AD /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED22F184DE00020F3AD /* LocalShortcuts */; };
 		9B9BCED62F184DEC0020F3AD /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED52F184DEC0020F3AD /* ComfyLogger */; };
 		9B9BCFC72F1971ED0020F3AD /* CheckForUpdatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCFC12F1971ED0020F3AD /* CheckForUpdatesView.swift */; };
@@ -223,6 +225,8 @@
 		9B969AA12FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessInfo+isSwiftUIPreview.swift"; sourceTree = "<group>"; };
 		9B969AA52FDCB60A0080C3CD /* ConvertToWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertToWindow.swift; sourceTree = "<group>"; };
 		9B969AA72FDCB6F60080C3CD /* ComfyTileWindowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfyTileWindowCoordinator.swift; sourceTree = "<group>"; };
+		9B969AA92FDCC6840080C3CD /* SettingsSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSlider.swift; sourceTree = "<group>"; };
+		9B969AAC2FDCCDF70080C3CD /* DisplayCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayCard.swift; sourceTree = "<group>"; };
 		9B9BCEC12F184D290020F3AD /* ComfyLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ComfyLogger; sourceTree = "<group>"; };
 		9B9BCFBE2F1971ED0020F3AD /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		9B9BCFBF2F1971ED0020F3AD /* UpdateUserDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateUserDriver.swift; sourceTree = "<group>"; };
@@ -504,11 +508,13 @@
 		9B8FC0C42F12ECF000CBF4B8 /* Component */ = {
 			isa = PBXGroup;
 			children = (
+				9B969AAC2FDCCDF70080C3CD /* DisplayCard.swift */,
 				9B23AB8A2F9023B30028C510 /* MarqueeText.swift */,
 				9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */,
 				9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */,
 				9B8FC0C92F12EF5900CBF4B8 /* MenuBarModeContainer.swift */,
 				9B8FC0C72F12ECFA00CBF4B8 /* MenuBarModeRow.swift */,
+				9B969AA92FDCC6840080C3CD /* SettingsSlider.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -906,6 +912,7 @@
 				9B8FC0AB2F11B08400CBF4B8 /* SettingsViewModel.swift in Sources */,
 				9B8FC0952F119FB400CBF4B8 /* NSRect+axPosition.swift in Sources */,
 				9B9BCFF62F19748C0020F3AD /* WindowCore.swift in Sources */,
+				9B969AAD2FDCCDF70080C3CD /* DisplayCard.swift in Sources */,
 				9B8FC0822F10B80D00CBF4B8 /* ShortcutRecorder.swift in Sources */,
 				9B794CBE2FC42F68009C8A46 /* DisplayInfo.swift in Sources */,
 				9B794D1E2FC4DD42009C8A46 /* ProfileWithPointOfInterestView.swift in Sources */,
@@ -934,6 +941,7 @@
 				9B8FC08B2F10B80D00CBF4B8 /* WindowViewer.swift in Sources */,
 				9B9BCFD02F1972190020F3AD /* PermissionService.swift in Sources */,
 				9B3121532FC3952D00C9D7B5 /* CenterTileLayout.swift in Sources */,
+				9B969AAA2FDCC6860080C3CD /* SettingsSlider.swift in Sources */,
 				9B969A9E2FDB93150080C3CD /* CirclePiece.swift in Sources */,
 				9B8FC08C2F10B80D00CBF4B8 /* ComfyTileApp.swift in Sources */,
 			);
