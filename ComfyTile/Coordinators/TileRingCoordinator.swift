@@ -13,6 +13,7 @@ final class TileRingViewModel {
     var isShown: Bool = false
     var currentTile: TileRingSide = .none
     
+    var tileRingOuterPadding: Double = 100
     var diameter: CGFloat = 10
     var debugBox: CGRect?
     var debugMousePoint: CGPoint?
@@ -126,8 +127,12 @@ extension TileRingCoordinator {
             lastScreen = screen
         }
         
+        /// update anything from defaultsManager here
         vm.diameter = defaultsManager.tileRingActivationDiameter
+        vm.tileRingOuterPadding = defaultsManager.tileRingOuterPadding
+        
         vm.isShown = true
+        
         panel.makeKeyAndOrderFront(nil)
         centerMousePosition()
         installKeyMonitors()
@@ -219,7 +224,17 @@ extension TileRingCoordinator {
         vm.debugBox = center
         vm.debugMousePoint = localMouse
         
-        if distance < radius {
+        /// QOL if we hover over fullscreen then we allow a bit more padding
+        let hoverPadding: CGFloat = vm.currentTile == .fullscreen ? 10 : 0
+        let outerHitRadius = radius + hoverPadding
+        let innerHitRadius = radius - 10
+        
+        if distance < outerHitRadius {
+            /// see if distance is < radius - 10, cuz thats full screen
+            if distance > innerHitRadius {
+                vm.currentTile = .fullscreen
+                return
+            }
             vm.currentTile = .none
             return
         }

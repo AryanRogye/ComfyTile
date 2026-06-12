@@ -1,6 +1,5 @@
 //
 //  WindowCoordinator.swift
-//  Homework6
 //
 //  Copyright (c) 2024–2025 Aryan Rogye
 //  Licensed under the MIT License
@@ -9,7 +8,6 @@
 import AppKit
 import SwiftUI
 
-
 private class WindowDelegate: NSObject, NSWindowDelegate {
     let id: String
     weak var coordinator: WindowCoordinator?
@@ -17,6 +15,10 @@ private class WindowDelegate: NSObject, NSWindowDelegate {
     init(id: String, coordinator: WindowCoordinator) {
         self.id = id
         self.coordinator = coordinator
+    }
+    
+    func windowDidResignKey(_ notification: Notification) {
+        coordinator?.handleWindowBlur(id: id)
     }
     
     func windowDidBecomeKey(_ notification: Notification) {
@@ -37,6 +39,7 @@ class WindowCoordinator {
     
     private var onOpenAction : [String: (() -> Void)] = [:]
     private var onCloseAction : [String: (() -> Void)] = [:]
+    private var onBlurAction: [String: (() -> Void)] = [:]
     
     private var delegates: [String: WindowDelegate] = [:]
     
@@ -50,22 +53,25 @@ class WindowCoordinator {
         windows.removeAll()
     }
     
+    @discardableResult
     func showWindow(
         id: String,
         title: String,
         content: some View,
         size: NSSize = .init(width: 600, height: 400),
         origin: CGPoint? = nil,
+        makeGlass: Bool = false,
         onOpen: (() -> Void)? = nil,
-        onClose: (() -> Void)? = nil
-    ) {
+        onClose: (() -> Void)? = nil,
+        onBlur: (() -> Void)? = nil
+    ) -> NSWindow {
         // MARK: - Imperative Style
         if let window = windows[id] {
             // Re-activate app and bring the existing window up
             NSRunningApplication.current.activate(options: [.activateAllWindows])
             window.makeKeyAndOrderFront(nil)
             window.makeFirstResponder(window.contentView)
-            return
+            return window
         }
         
         let windowOrigin = origin ?? .zero
@@ -86,7 +92,11 @@ class WindowCoordinator {
         
         let hostingView = NSHostingView(rootView: content)
         hostingView.wantsLayer = true
-        hostingView.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
+        if makeGlass {
+            hostingView.layer?.backgroundColor = NSColor.clear.cgColor
+        } else {
+            hostingView.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
+        }
         window.contentView = hostingView
         
         /// Assign A Window Delegate
@@ -100,17 +110,62 @@ class WindowCoordinator {
         if let action = onOpen {
             onOpenAction[id] = action
         }
+        if let action = onBlur {
+            onBlurAction[id] = action
+        }
         
         window.center()
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         
         windows[id] = window
+        
+        if makeGlass {
+            makeWindowGlass(window)
+        }
+        
+        return window
+    }
+    
+    func makeWindowGlass(_ window: NSWindow) {
+        window.isOpaque = false
+        window.backgroundColor = .clear
+        window.hasShadow = true
+        
+        // Get the existing hosting view
+        guard let hostingView = window.contentView else { return }
+        
+        // Make a container view to hold both
+        let containerView = NSView(frame: hostingView.frame)
+        containerView.autoresizingMask = [.width, .height]
+        
+        // Glass goes in the container as the base
+        let glassView = NSGlassEffectView()
+        glassView.style = .regular
+        glassView.frame = containerView.bounds
+        glassView.autoresizingMask = [.width, .height]
+        containerView.addSubview(glassView)
+        
+        // Hosting view goes on top inside the container
+        hostingView.removeFromSuperview()
+        hostingView.frame = containerView.bounds
+        hostingView.autoresizingMask = [.width, .height]
+        containerView.addSubview(hostingView)
+        
+        // Container becomes the window's content view
+        window.contentView = containerView
     }
     
     func closeWindow(id: String) {
         windows[id]?.close()
         /// windowWillClose will be called automatically
+    }
+    
+    fileprivate func handleWindowBlur(id: String) {
+        if let action = onBlurAction[id] {
+            action()
+            onBlurAction[id] = nil
+        }
     }
     
     fileprivate func handleWindowOpen(id: String) {
@@ -123,6 +178,9 @@ class WindowCoordinator {
     fileprivate func handleWindowClose(id: String) {
         windows[id] = nil
         delegates[id] = nil
+        onOpenAction[id] = nil
+        onBlurAction[id] = nil
+        
         if let action = onCloseAction[id] {
             action()
             onCloseAction[id] = nil
@@ -156,6 +214,9 @@ extension WindowCoordinator {
         }
         if let close = onCloseAction.removeValue(forKey: oldId) {
             onCloseAction[newId] = close
+        }
+        if let blur = onBlurAction.removeValue(forKey: oldId) {
+            onBlurAction[newId] = blur
         }
         
         // refresh delegate with the new id (simplest is to swap in a new one)

@@ -38,6 +38,9 @@ final class WindowSpatialEngine {
     public func action(for side: TileRingSide) {
         guard side != .none else { return }
         switch side {
+        case .fullscreen:   self.windowTilingService.fullScreen(
+                                withAnimation: self.defaultsManager.showTilingAnimations
+                            )
         case .bottom:       self.windowTilingService.moveBottomHalf(
                                 withAnimation: self.defaultsManager.showTilingAnimations
                             )

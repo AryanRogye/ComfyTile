@@ -37,6 +37,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
         appCoordinator = AppCoordinator(appEnv: AppEnv())
     }
+    
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+        appCoordinator?.showNeeded()
+        return true
+    }
 
     public func applicationWillTerminate(_ notification: Notification) {
     }

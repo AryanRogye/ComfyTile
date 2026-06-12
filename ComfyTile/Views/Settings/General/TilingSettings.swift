@@ -285,3 +285,47 @@ struct TileRingHotKey: View {
         }
     }
 }
+
+struct TileRingDiameter: View {
+    
+    @Bindable var defaultsManager: DefaultsManager
+    @Bindable var menuBarVM: ComfyTileMenuBarViewModel
+    
+    var body: some View {
+        if defaultsManager.enableTileRing {
+            
+            LazyVStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Activation Diameter")
+                    Spacer()
+                    Text("\(Int(defaultsManager.tileRingActivationDiameter)) px")
+                        .font(.subheadline.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+                .redacted(reason: menuBarVM.showSettings == false ? .placeholder : [])
+                
+                /// This allows us to not lag while opening
+                if menuBarVM.showSettings {
+                    Slider(
+                        value: $defaultsManager.tileRingActivationDiameter,
+                        in: 5...300,
+                        step: 1
+                    ) {
+                        EmptyView()
+                    } minimumValueLabel: {
+                        Text("5")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } maximumValueLabel: {
+                        Text("300")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .labelsHidden()
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .animation(.spring, value: menuBarVM.showSettings)
+        }
+    }
+}

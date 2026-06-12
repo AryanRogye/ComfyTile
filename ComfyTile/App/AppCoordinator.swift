@@ -22,12 +22,14 @@ class AppCoordinator {
     /// ==============================================================================
     /// Coordinators
     /// ==============================================================================
-    let menuBarCoordinator          = MenuBarCoordinator()
-    let hotKeyCoordinator           : HotKeyCoordinator
-    let tilingCoverCoordinator      : TilingCoverCoordinator
-    let windowViewerCoordinator     : WindowViewerCoordinator
-    let highLightFocusedCoordinator : HighlightFocusedCoordinator
-    let tileRingCoordinator         : TileRingCoordinator
+    let windowCoordinator                   = WindowCoordinator()
+    lazy var menuBarCoordinator             = MenuBarCoordinator()
+    lazy var comfyTileWindowCoordinator     = ComfyTileWindowCoordinator(windowCoordinator: windowCoordinator)
+    let hotKeyCoordinator                   : HotKeyCoordinator
+    let tilingCoverCoordinator              : TilingCoverCoordinator
+    let windowViewerCoordinator             : WindowViewerCoordinator
+    let highLightFocusedCoordinator         : HighlightFocusedCoordinator
+    let tileRingCoordinator                 : TileRingCoordinator
     
     /// ==============================================================================
     /// View Models
@@ -85,21 +87,31 @@ class AppCoordinator {
         )
 
         self.displayManager.start()
-
-        self.menuBarCoordinator.start(
-            comfyTileMenuBarVM: comfyTileMenuBarVM,
-            settingsVM: settingsVM,
-            defaultsManager: defaultsManager,
-            windowCore: appEnv.windowCore,
-            updateController: updateController,
-            displayManager: displayManager
-        )
-        
         self.windowViewerCoordinator = WindowViewerCoordinator(
             windowViewerVM: windowViewerVM,
             windowCore: appEnv.windowCore
         )
         self.hotKeyCoordinator = HotKeyCoordinator()
+        
+        if defaultsManager.useWindowInsteadOfMenuBar {
+            self.comfyTileWindowCoordinator.start(
+                comfyTileMenuBarVM: comfyTileMenuBarVM,
+                settingsVM: settingsVM,
+                defaultsManager: defaultsManager,
+                windowCore: appEnv.windowCore,
+                updateController: updateController,
+                displayManager: displayManager
+            )
+        } else {
+            self.menuBarCoordinator.start(
+                comfyTileMenuBarVM: comfyTileMenuBarVM,
+                settingsVM: settingsVM,
+                defaultsManager: defaultsManager,
+                windowCore: appEnv.windowCore,
+                updateController: updateController,
+                displayManager: displayManager
+            )
+        }
 
         self.windowTilingService.setPaddingForScreen { screen in
             guard let id = screen.displayID else { return nil }
@@ -109,7 +121,20 @@ class AppCoordinator {
             }
             return nil
         }
+        
+        
         self.startHotKey()
+        
+        self.windowCore.highlightFocusedWindow = defaultsManager.highlightFocusedWindow
+        self.windowCore.superFocusWindow = defaultsManager.superFocusWindow
+        self.observeFocusedWindow()
+        self.observeMenubarChangeRequest()
+        
+#if DEBUG
+        self.hotKeyCoordinator.setDebugCompletion {
+            self.windowCore.debugPress()
+        }
+#endif
         
         ScreenshotHelper.startCacheCleanupLoop()
     }
@@ -284,16 +309,60 @@ class AppCoordinator {
                 self.windowSpatialEngine.nudgeTopDown()
             }
         )
-        
-        self.windowCore.highlightFocusedWindow = defaultsManager.highlightFocusedWindow
-        self.windowCore.superFocusWindow = defaultsManager.superFocusWindow
-        self.observeFocusedWindow()
-        
-#if DEBUG
-        self.hotKeyCoordinator.setDebugCompletion {
-            self.windowCore.debugPress()
+    }
+    
+    public func showNeeded() {
+        if defaultsManager.useWindowInsteadOfMenuBar {
+            self.comfyTileWindowCoordinator.start(
+                comfyTileMenuBarVM: self.comfyTileMenuBarVM,
+                settingsVM: self.settingsVM,
+                defaultsManager: self.defaultsManager,
+                windowCore: self.windowCore,
+                updateController: self.updateController,
+                displayManager: self.displayManager
+            )
         }
-#endif
+    }
+    
+    internal func observeMenubarChangeRequest() {
+        withObservationTracking {
+            _ = defaultsManager.useWindowInsteadOfMenuBar
+        } onChange: { [weak self] in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                /// requested to use window instead of menubar
+                if self.defaultsManager.useWindowInsteadOfMenuBar {
+                    /// stop menubar
+                    self.menuBarCoordinator.stop()
+                    /// show window
+                    self.comfyTileWindowCoordinator.start(
+                        comfyTileMenuBarVM: self.comfyTileMenuBarVM,
+                        settingsVM: self.settingsVM,
+                        defaultsManager: self.defaultsManager,
+                        windowCore: self.windowCore,
+                        updateController: self.updateController,
+                        displayManager: self.displayManager
+                    )
+                }
+                /// requested to use menubar instead of window
+                else {
+                    /// stop window
+                    self.comfyTileWindowCoordinator.stop()
+                    /// show menubar
+                    self.menuBarCoordinator.start(
+                        comfyTileMenuBarVM: self.comfyTileMenuBarVM,
+                        settingsVM: self.settingsVM,
+                        defaultsManager: self.defaultsManager,
+                        windowCore: self.windowCore,
+                        updateController: self.updateController,
+                        displayManager: self.displayManager
+                    )
+                }
+                
+                self.observeMenubarChangeRequest()
+            }
+        }
+
     }
     
     internal func observeFocusedWindow() {

@@ -21,6 +21,7 @@ struct GeneralSettings: View {
                 SmartTilingBehavior(defaultsManager: defaultsManager)
                 TileRingGeneralView(defaultsManager: defaultsManager)
                 TileRingHotKey(defaultsManager: defaultsManager)
+                TileRingDiameter(defaultsManager: defaultsManager, menuBarVM: menuBarVM)
             }
 
             Section("Window Switching") {
@@ -29,6 +30,7 @@ struct GeneralSettings: View {
             /// About Section
             Section("About") {
                 UpdatesGeneralView()
+                ConvertToWindow(defaultsManager: defaultsManager)
                 Button("Quit") {
                     NSApplication.shared.terminate(self)
                 }

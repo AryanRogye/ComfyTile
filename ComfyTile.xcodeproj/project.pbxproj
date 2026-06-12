@@ -85,6 +85,8 @@
 		9B969A9E2FDB93150080C3CD /* CirclePiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969A9D2FDB93150080C3CD /* CirclePiece.swift */; };
 		9B969AA02FDB93430080C3CD /* TileRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969A9F2FDB93430080C3CD /* TileRingView.swift */; };
 		9B969AA22FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA12FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift */; };
+		9B969AA62FDCB60B0080C3CD /* ConvertToWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA52FDCB60A0080C3CD /* ConvertToWindow.swift */; };
+		9B969AA82FDCB6F90080C3CD /* ComfyTileWindowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA72FDCB6F60080C3CD /* ComfyTileWindowCoordinator.swift */; };
 		9B9BCED32F184DE00020F3AD /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED22F184DE00020F3AD /* LocalShortcuts */; };
 		9B9BCED62F184DEC0020F3AD /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED52F184DEC0020F3AD /* ComfyLogger */; };
 		9B9BCFC72F1971ED0020F3AD /* CheckForUpdatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCFC12F1971ED0020F3AD /* CheckForUpdatesView.swift */; };
@@ -219,6 +221,8 @@
 		9B969A9D2FDB93150080C3CD /* CirclePiece.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclePiece.swift; sourceTree = "<group>"; };
 		9B969A9F2FDB93430080C3CD /* TileRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileRingView.swift; sourceTree = "<group>"; };
 		9B969AA12FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessInfo+isSwiftUIPreview.swift"; sourceTree = "<group>"; };
+		9B969AA52FDCB60A0080C3CD /* ConvertToWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertToWindow.swift; sourceTree = "<group>"; };
+		9B969AA72FDCB6F60080C3CD /* ComfyTileWindowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfyTileWindowCoordinator.swift; sourceTree = "<group>"; };
 		9B9BCEC12F184D290020F3AD /* ComfyLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ComfyLogger; sourceTree = "<group>"; };
 		9B9BCFBE2F1971ED0020F3AD /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		9B9BCFBF2F1971ED0020F3AD /* UpdateUserDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateUserDriver.swift; sourceTree = "<group>"; };
@@ -346,6 +350,7 @@
 		9B8FC0192F10B80D00CBF4B8 /* Coordinators */ = {
 			isa = PBXGroup;
 			children = (
+				9B969AA72FDCB6F60080C3CD /* ComfyTileWindowCoordinator.swift */,
 				9B969A9B2FDB8C380080C3CD /* TileRingCoordinator.swift */,
 				9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */,
 				9B8FC0A82F11AB9A00CBF4B8 /* MenuBarCoordinator.swift */,
@@ -471,6 +476,7 @@
 		9B8FC0B52F11FF6500CBF4B8 /* General */ = {
 			isa = PBXGroup;
 			children = (
+				9B969AA52FDCB60A0080C3CD /* ConvertToWindow.swift */,
 				9B8FC0B62F11FF6800CBF4B8 /* GeneralSettings.swift */,
 				9B3121642FC3B90C00C9D7B5 /* TilingSettings.swift */,
 				9B3121662FC3B95500C9D7B5 /* WindowSwitchingSettings.swift */,
@@ -833,6 +839,7 @@
 				9B23AB8B2F9023B30028C510 /* MarqueeText.swift in Sources */,
 				9B969AA02FDB93430080C3CD /* TileRingView.swift in Sources */,
 				9B8FC05D2F10B80D00CBF4B8 /* AppCoordinator.swift in Sources */,
+				9B969AA62FDCB60B0080C3CD /* ConvertToWindow.swift in Sources */,
 				9B8FC05E2F10B80D00CBF4B8 /* AppDelegate.swift in Sources */,
 				9B8FC05F2F10B80D00CBF4B8 /* HotKeyCoordinator.swift in Sources */,
 				9B3800802FD8DFF900F0243F /* WindowTilingService+moveLeft.swift in Sources */,
@@ -862,6 +869,7 @@
 				9B68EEA72F22D124009567DF /* ComfySCWindow.swift in Sources */,
 				9B8FC0CA2F12EF5C00CBF4B8 /* MenuBarModeContainer.swift in Sources */,
 				9B8FC0C32F12307100CBF4B8 /* LayoutModeView.swift in Sources */,
+				9B969AA82FDCB6F90080C3CD /* ComfyTileWindowCoordinator.swift in Sources */,
 				9B8FC0D52F130B7700CBF4B8 /* HotKeyOrClose.swift in Sources */,
 				9B3121692FC3B96D00C9D7B5 /* AboutSettings.swift in Sources */,
 				9B8FC0662F10B80D00CBF4B8 /* Bundle.swift in Sources */,

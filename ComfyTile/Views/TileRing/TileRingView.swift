@@ -17,6 +17,7 @@ enum TileRingSide: Int {
     case bottomLeft = 5
     case left = 6
     case topLeft = 7
+    case fullscreen = 8
     
     public static func tileSide(for normalized: CGFloat) -> TileRingSide {
         switch normalized {
@@ -85,22 +86,27 @@ struct TileRingView: View {
                 }
             }
             .frame(
-                width: vm.diameter + 100,
-                height: vm.diameter + 100
+                width: vm.diameter + vm.tileRingOuterPadding,
+                height: vm.diameter + vm.tileRingOuterPadding
             )
             
             /// Full Screen
             ZStack {
-                Circle()
-                    .stroke(
+                Donut(thickness: 10)
+                    .fill(
                         Color.white.opacity(0.2),
-                        lineWidth: 10
+                        style: FillStyle(eoFill: true)
                     )
             }
             .frame(
-                width: vm.diameter - 10,
-                height: vm.diameter - 10
+                width: vm.currentTile == .fullscreen
+                    ? vm.diameter + 20
+                    : vm.diameter,
+                height: vm.currentTile == .fullscreen
+                    ? vm.diameter + 20
+                    : vm.diameter
             )
+            .animation(.spring, value: vm.currentTile)
         }
     }
 
@@ -133,4 +139,24 @@ struct TileRingView: View {
     TileRingView(vm: TileRingViewModel())
         .frame(width: 320, height: 320)
         .background(.gray)
+}
+
+
+struct Donut: Shape {
+    var thickness: CGFloat
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        path.addEllipse(in: rect)
+        
+        let inner = rect.insetBy(
+            dx: thickness,
+            dy: thickness
+        )
+        
+        path.addEllipse(in: inner)
+        
+        return path
+    }
 }

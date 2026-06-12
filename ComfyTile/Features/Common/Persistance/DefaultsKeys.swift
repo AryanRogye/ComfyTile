@@ -61,4 +61,10 @@ extension Defaults.Keys {
     
     /// How Far mouse needs to be out to trigger a tile
     static let tileRingActivationDiameter = Key<Double>("tileRingActivationDiameter", default: 100.0)
+    
+    /// How Far out from the activationDiameter the pieces are
+    static let tileRingOuterPadding = Key<Double>("tileRingOuterPadding", default: 100)
+    
+    /// toggle to use window instead of menu bar
+    static let useWindowInsteadOfMenuBar = Key<Bool>("UseWindowInsteadOfMenuBar", default: false)
 }
