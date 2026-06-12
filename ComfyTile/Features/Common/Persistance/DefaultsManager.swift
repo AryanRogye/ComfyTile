@@ -20,6 +20,12 @@ class DefaultsManager {
         }
     }
     
+    var tileRingActivationDiameter: Double = Defaults[.tileRingActivationDiameter] {
+        didSet {
+            Defaults[.tileRingActivationDiameter] = tileRingActivationDiameter
+        }
+    }
+    
     var enableSmartTiling: Bool = Defaults[.enableSmartTiling] {
         didSet {
             Defaults[.enableSmartTiling] = enableSmartTiling

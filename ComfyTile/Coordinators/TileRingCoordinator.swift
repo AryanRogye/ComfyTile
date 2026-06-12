@@ -11,12 +11,19 @@ import SwiftUI
 @MainActor
 final class TileRingViewModel {
     var isShown: Bool = false
+    var currentTile: TileRingSide = .none
+    
+    var diameter: CGFloat = 10
+    var debugBox: CGRect?
+    var debugMousePoint: CGPoint?
 }
 
+@MainActor
 final class TileRingCoordinator: NSObject {
     
     var panel: NSPanel!
     let vm: TileRingViewModel
+    let defaultsManager: DefaultsManager
     
     /// Main in-app key monitor.
     /// Handles Escape and modifier state while our app is active.
@@ -47,10 +54,16 @@ final class TileRingCoordinator: NSObject {
     /// Screen used on the panel last
     private var lastScreen: NSScreen?
     
-    init(vm: TileRingViewModel) {
+    init(vm: TileRingViewModel, defaultsManager: DefaultsManager) {
         self.vm = vm
+        self.defaultsManager = defaultsManager
         
         super.init()
+    }
+    
+    @MainActor
+    deinit {
+        removeKeyMonitors()
     }
     
     public func setupPanel() {
@@ -90,7 +103,7 @@ final class TileRingCoordinator: NSObject {
         panel.animationBehavior = .none
         
         let view: NSView = NSHostingView(
-            rootView: TileRingView()
+            rootView: TileRingView(vm: vm)
         )
         
         view.wantsLayer = true
@@ -99,7 +112,10 @@ final class TileRingCoordinator: NSObject {
         panel.contentView = view
         panel.makeKeyAndOrderFront(nil)
     }
-    
+}
+
+// MARK: - Toggles
+extension TileRingCoordinator {
     public func show() {
         if panel == nil { setupPanel() }
         
@@ -110,12 +126,108 @@ final class TileRingCoordinator: NSObject {
             lastScreen = screen
         }
         
+        vm.diameter = defaultsManager.tileRingActivationDiameter
         vm.isShown = true
         panel.makeKeyAndOrderFront(nil)
+        centerMousePosition()
+        installKeyMonitors()
     }
     
-    public func hide() {
+    public func centerMousePosition() {
+        guard let screen = lastScreen,
+              let displayID = screen.displayID
+        else { return }
+        
+        let point = CGPoint(
+            x: screen.frame.width / 2,
+            y: screen.frame.height / 2
+        )
+        
+        CGDisplayMoveCursorToPoint(displayID, point)
+    }
+    
+    public func hide() -> TileRingSide {
         vm.isShown = false
         panel?.orderOut(nil)
+        removeKeyMonitors()
+        let tile = vm.currentTile
+        vm.currentTile = .none
+        return tile
     }
+}
+
+// MARK: - Key Monitors
+extension TileRingCoordinator {
+    public func installKeyMonitors() {
+        localKeyMonitor = NSEvent.addLocalMonitorForEvents(
+            matching: [.mouseMoved]
+        ) { [weak self] e in
+            guard let self else { return e }
+            handleEvent(e)
+            return e
+        }
+        globalFlagsMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.mouseMoved]
+        ) { [weak self] e in
+            guard let self else { return }
+            handleEvent(e)
+        }
+    }
+    
+    private func removeKeyMonitors() {
+        if let g = globalFlagsMonitor {
+            NSEvent.removeMonitor(g)
+            globalFlagsMonitor = nil
+        }
+        if let l = globalFlagsMonitor {
+            NSEvent.removeMonitor(l)
+            localKeyMonitor = nil
+        }
+    }
+    
+    private func handleEvent(_ event: NSEvent) {
+        
+        guard let screen = lastScreen else { return }
+        
+        let diameter = defaultsManager.tileRingActivationDiameter
+        let mouse: NSPoint = NSEvent.mouseLocation
+        
+        let localMouse = CGPoint(
+            x: mouse.x - screen.frame.minX,
+            y: screen.frame.maxY - mouse.y
+        )
+        
+        let screenCenter = CGPoint(
+            x: screen.frame.width / 2,
+            y: screen.frame.height / 2
+        )
+        
+        let center = NSRect(
+            x: screenCenter.x - diameter / 2,
+            y: screenCenter.y - diameter / 2,
+            width: diameter,
+            height: diameter
+        )
+        
+        let cx = screenCenter.x
+        let cy = screenCenter.y
+        let dx = localMouse.x - cx
+        let dy = localMouse.y - cy
+        let distance = sqrt(dx * dx + dy * dy)
+        let radius = diameter / 2
+        
+        vm.debugBox = center
+        vm.debugMousePoint = localMouse
+        
+        if distance < radius {
+            vm.currentTile = .none
+            return
+        }
+        
+        let angle = atan2(dy, dx) * (180 / .pi)
+        let normalized = (angle + 360).truncatingRemainder(dividingBy: 360)
+        
+        vm.currentTile = TileRingSide.tileSide(for: normalized)
+    }
+
 }

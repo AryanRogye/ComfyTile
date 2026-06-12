@@ -35,6 +35,41 @@ final class WindowSpatialEngine {
     
     var numKeysHeld = 0
     
+    public func action(for side: TileRingSide) {
+        guard side != .none else { return }
+        switch side {
+        case .bottom:       self.windowTilingService.moveBottomHalf(
+                                withAnimation: self.defaultsManager.showTilingAnimations
+                            )
+        case .bottomLeft:   self.windowTilingService.moveBottomLeft(
+                                withAnimation: defaultsManager.showTilingAnimations
+                            )
+        case .bottomRight:  self.windowTilingService.moveBottomRight(
+                                withAnimation: defaultsManager.showTilingAnimations
+                            )
+        case .left:         self.windowTilingService.moveLeft(
+                                withAnimation: self.defaultsManager.showTilingAnimations,
+                                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                                enableSmartTiling: self.defaultsManager.enableSmartTiling
+                            )
+        case .right:        self.windowTilingService.moveRight(
+                                withAnimation: self.defaultsManager.showTilingAnimations,
+                                isLayoutCycling: self.defaultsManager.enableLayoutCycling,
+                                enableSmartTiling: self.defaultsManager.enableSmartTiling
+                            )
+        case .top:          self.windowTilingService.moveTopHalf(
+                                withAnimation: self.defaultsManager.showTilingAnimations
+                            )
+        case .topLeft:      self.windowTilingService.moveTopLeft(
+                                withAnimation: self.defaultsManager.showTilingAnimations
+                            )
+        case .topRight:     self.windowTilingService.moveTopRight(
+                                withAnimation: self.defaultsManager.showTilingAnimations
+                            )
+        case .none:         return
+        }
+    }
+    
     /// Actions UI Can Call
     public func action(for layout: LayoutMode) {
         switch layout {

@@ -58,4 +58,7 @@ extension Defaults.Keys {
     
     /// This would show a ring that can be used for tiling to a side, with just 1 hotkey
     static let enableTileRing = Key<Bool>("enableTileRing", default: false)
+    
+    /// How Far mouse needs to be out to trigger a tile
+    static let tileRingActivationDiameter = Key<Double>("tileRingActivationDiameter", default: 100.0)
 }

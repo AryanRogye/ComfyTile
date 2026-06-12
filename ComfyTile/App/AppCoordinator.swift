@@ -60,7 +60,10 @@ class AppCoordinator {
         self.tilingCoverCoordinator = TilingCoverCoordinator(
             tilingCoverVM: tilingCoverVM
         )
-        self.tileRingCoordinator = TileRingCoordinator(vm: tileRingVM)
+        self.tileRingCoordinator = TileRingCoordinator(
+            vm: tileRingVM,
+            defaultsManager: defaultsManager
+        )
         self.highLightFocusedCoordinator = HighlightFocusedCoordinator(
             windowCore: windowCore,
             highlightVM: highlightVM,
@@ -193,7 +196,8 @@ class AppCoordinator {
                 self.tileRingCoordinator.show()
             },
             onTileRingUp: {
-                self.tileRingCoordinator.hide()
+                let tile = self.tileRingCoordinator.hide()
+                self.windowSpatialEngine.action(for: tile)
             },
             // MARK: - Top Half
             onTopHalfDown:  {
