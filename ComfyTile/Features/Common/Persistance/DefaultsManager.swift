@@ -14,6 +14,12 @@ class DefaultsManager {
     var nudgeStep: Int = Defaults[.nudgeStep]
     var modiferKey: ModifierGroup = ModifierGroup(rawValue: Defaults[.modiferKey]) ?? .control
     
+    var comfyTileGlassStyle: ComfyTileGlassStyle = Defaults[.comfyTileGlassStyle] {
+        didSet {
+            Defaults[.comfyTileGlassStyle] = comfyTileGlassStyle
+        }
+    }
+    
     var useWindowInsteadOfMenuBar: Bool = Defaults[.useWindowInsteadOfMenuBar] {
         didSet {
             Defaults[.useWindowInsteadOfMenuBar] = useWindowInsteadOfMenuBar

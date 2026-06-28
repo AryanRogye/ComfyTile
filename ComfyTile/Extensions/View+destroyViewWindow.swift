@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct WindowAccessor: NSViewRepresentable {
+fileprivate struct WindowAccessor: NSViewRepresentable {
     func makeNSView(context: Context) -> NSView {
         /// The NSView Destroys itself
         let v = WindowAccessorView()
@@ -17,7 +17,7 @@ struct WindowAccessor: NSViewRepresentable {
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
-class WindowAccessorView: NSView {
+fileprivate class WindowAccessorView: NSView {
     private var didClose = false
     override func viewDidMoveToWindow() {
         guard !didClose else { return }

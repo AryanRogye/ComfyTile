@@ -37,6 +37,8 @@ struct GeneralSettings: View {
             }
         }
         .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
+        .background(.clear)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

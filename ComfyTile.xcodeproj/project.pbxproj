@@ -89,6 +89,10 @@
 		9B969AA82FDCB6F90080C3CD /* ComfyTileWindowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA72FDCB6F60080C3CD /* ComfyTileWindowCoordinator.swift */; };
 		9B969AAA2FDCC6860080C3CD /* SettingsSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA92FDCC6840080C3CD /* SettingsSlider.swift */; };
 		9B969AAD2FDCCDF70080C3CD /* DisplayCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AAC2FDCCDF70080C3CD /* DisplayCard.swift */; };
+		9B969AAF2FDCD4360080C3CD /* ComfyTileGlassStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AAE2FDCD4290080C3CD /* ComfyTileGlassStyle.swift */; };
+		9B969AB12FDCD5CF0080C3CD /* TilingAnimationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AB02FDCD5CC0080C3CD /* TilingAnimationsView.swift */; };
+		9B969AB32FDCD5F00080C3CD /* SettingsAppearanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AB22FDCD5E70080C3CD /* SettingsAppearanceView.swift */; };
+		9B969AB52FDCD60D0080C3CD /* FocusedWindowAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AB42FDCD6080080C3CD /* FocusedWindowAppearance.swift */; };
 		9B9BCED32F184DE00020F3AD /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED22F184DE00020F3AD /* LocalShortcuts */; };
 		9B9BCED62F184DEC0020F3AD /* ComfyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9BCED52F184DEC0020F3AD /* ComfyLogger */; };
 		9B9BCFC72F1971ED0020F3AD /* CheckForUpdatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9BCFC12F1971ED0020F3AD /* CheckForUpdatesView.swift */; };
@@ -227,6 +231,10 @@
 		9B969AA72FDCB6F60080C3CD /* ComfyTileWindowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfyTileWindowCoordinator.swift; sourceTree = "<group>"; };
 		9B969AA92FDCC6840080C3CD /* SettingsSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSlider.swift; sourceTree = "<group>"; };
 		9B969AAC2FDCCDF70080C3CD /* DisplayCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayCard.swift; sourceTree = "<group>"; };
+		9B969AAE2FDCD4290080C3CD /* ComfyTileGlassStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfyTileGlassStyle.swift; sourceTree = "<group>"; };
+		9B969AB02FDCD5CC0080C3CD /* TilingAnimationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TilingAnimationsView.swift; sourceTree = "<group>"; };
+		9B969AB22FDCD5E70080C3CD /* SettingsAppearanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAppearanceView.swift; sourceTree = "<group>"; };
+		9B969AB42FDCD6080080C3CD /* FocusedWindowAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedWindowAppearance.swift; sourceTree = "<group>"; };
 		9B9BCEC12F184D290020F3AD /* ComfyLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ComfyLogger; sourceTree = "<group>"; };
 		9B9BCFBE2F1971ED0020F3AD /* UpdateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateController.swift; sourceTree = "<group>"; };
 		9B9BCFBF2F1971ED0020F3AD /* UpdateUserDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateUserDriver.swift; sourceTree = "<group>"; };
@@ -328,6 +336,9 @@
 			isa = PBXGroup;
 			children = (
 				9B68EEA22F228C6A009567DF /* AppearanceSettings.swift */,
+				9B969AB42FDCD6080080C3CD /* FocusedWindowAppearance.swift */,
+				9B969AB22FDCD5E70080C3CD /* SettingsAppearanceView.swift */,
+				9B969AB02FDCD5CC0080C3CD /* TilingAnimationsView.swift */,
 			);
 			path = Appearance;
 			sourceTree = "<group>";
@@ -471,6 +482,7 @@
 		9B8FC0B02F11EEEC00CBF4B8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				9B969AAE2FDCD4290080C3CD /* ComfyTileGlassStyle.swift */,
 				9B8FC0B32F11EF1100CBF4B8 /* ComfyTileTabs.swift */,
 				9B8FC0B12F11EEF200CBF4B8 /* ComfyTileTabPlacement.swift */,
 			);
@@ -480,8 +492,8 @@
 		9B8FC0B52F11FF6500CBF4B8 /* General */ = {
 			isa = PBXGroup;
 			children = (
-				9B969AA52FDCB60A0080C3CD /* ConvertToWindow.swift */,
 				9B8FC0B62F11FF6800CBF4B8 /* GeneralSettings.swift */,
+				9B969AA52FDCB60A0080C3CD /* ConvertToWindow.swift */,
 				9B3121642FC3B90C00C9D7B5 /* TilingSettings.swift */,
 				9B3121662FC3B95500C9D7B5 /* WindowSwitchingSettings.swift */,
 				9B3121682FC3B96B00C9D7B5 /* AboutSettings.swift */,
@@ -864,6 +876,7 @@
 				9B8FC0632F10B80D00CBF4B8 /* WindowCoordinator.swift in Sources */,
 				9B8FC0AD2F11D7BE00CBF4B8 /* ComfyTileTabBar.swift in Sources */,
 				9B8FC0642F10B80D00CBF4B8 /* WindowSpatialEngine.swift in Sources */,
+				9B969AB32FDCD5F00080C3CD /* SettingsAppearanceView.swift in Sources */,
 				9B8FC0C12F12306D00CBF4B8 /* TileModeView.swift in Sources */,
 				9B969A9C2FDB8C3F0080C3CD /* TileRingCoordinator.swift in Sources */,
 				9B9BCFE72F19738D0020F3AD /* WindowElement.swift in Sources */,
@@ -873,6 +886,7 @@
 				9B1FE3D02FC7EF5900C68CBB /* PrivateSCWindowFactory.swift in Sources */,
 				9B3121632FC3B70200C9D7B5 /* AppServices.swift in Sources */,
 				9B68EEA72F22D124009567DF /* ComfySCWindow.swift in Sources */,
+				9B969AB12FDCD5CF0080C3CD /* TilingAnimationsView.swift in Sources */,
 				9B8FC0CA2F12EF5C00CBF4B8 /* MenuBarModeContainer.swift in Sources */,
 				9B8FC0C32F12307100CBF4B8 /* LayoutModeView.swift in Sources */,
 				9B969AA82FDCB6F90080C3CD /* ComfyTileWindowCoordinator.swift in Sources */,
@@ -898,6 +912,7 @@
 				9B8FC0A92F11AB9E00CBF4B8 /* MenuBarCoordinator.swift in Sources */,
 				9B8FC06C2F10B80D00CBF4B8 /* View+destroyViewWindow.swift in Sources */,
 				9B794D212FC4E4CD009C8A46 /* ProfileWithInterests.swift in Sources */,
+				9B969AB52FDCD60D0080C3CD /* FocusedWindowAppearance.swift in Sources */,
 				9BC6E85B2FD8DB300058A41D /* LayoutMode.swift in Sources */,
 				9B9BCFC72F1971ED0020F3AD /* CheckForUpdatesView.swift in Sources */,
 				9B9BCFC82F1971ED0020F3AD /* UpdateUserDriver.swift in Sources */,
@@ -940,6 +955,7 @@
 				9B8FC08A2F10B80D00CBF4B8 /* TilingCover.swift in Sources */,
 				9B8FC08B2F10B80D00CBF4B8 /* WindowViewer.swift in Sources */,
 				9B9BCFD02F1972190020F3AD /* PermissionService.swift in Sources */,
+				9B969AAF2FDCD4360080C3CD /* ComfyTileGlassStyle.swift in Sources */,
 				9B3121532FC3952D00C9D7B5 /* CenterTileLayout.swift in Sources */,
 				9B969AAA2FDCC6860080C3CD /* SettingsSlider.swift in Sources */,
 				9B969A9E2FDB93150080C3CD /* CirclePiece.swift in Sources */,

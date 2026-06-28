@@ -35,7 +35,12 @@ public struct ComfyTileMenuBarRootView: View {
                 )
             }
         }
-        .glassEffect(.regular.interactive(), in: shape)
+        .if(!defaultsManager.useWindowInsteadOfMenuBar) {
+            $0.glassEffect(
+                defaultsManager.comfyTileGlassStyle.style.tint(.opposite.opacity(0.8)),
+                in: shape
+            )
+        }
         .clipShape(shape)
     }
 }

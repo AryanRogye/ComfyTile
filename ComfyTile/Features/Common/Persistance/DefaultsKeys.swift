@@ -20,6 +20,9 @@ extension Defaults.Keys {
     /// placement of where the tabs are in the menu bar
     static let comfyTileTabPlacement = Key<ComfyTileTabPlacement>("ComfyTileTabPlacement", default: .bottom)
     
+    /// glass style of comfytile
+    static let comfyTileGlassStyle = Key<ComfyTileGlassStyle>("ComfyTileGlassStyle", default: .glass)
+    
     /// -------------------------------------------------------------------------------------------------
     /// HighlightWindow
     /// -------------------------------------------------------------------------------------------------
