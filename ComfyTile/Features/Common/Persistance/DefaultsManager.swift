@@ -14,6 +14,36 @@ class DefaultsManager {
     var nudgeStep: Int = Defaults[.nudgeStep]
     var modiferKey: ModifierGroup = ModifierGroup(rawValue: Defaults[.modiferKey]) ?? .control
     
+    var comfyTileGlassStyle: ComfyTileGlassStyle = Defaults[.comfyTileGlassStyle] {
+        didSet {
+            Defaults[.comfyTileGlassStyle] = comfyTileGlassStyle
+        }
+    }
+    
+    var useWindowInsteadOfMenuBar: Bool = Defaults[.useWindowInsteadOfMenuBar] {
+        didSet {
+            Defaults[.useWindowInsteadOfMenuBar] = useWindowInsteadOfMenuBar
+        }
+    }
+    
+    var enableTileRing: Bool = Defaults[.enableTileRing] {
+        didSet {
+            Defaults[.enableTileRing] = enableTileRing
+        }
+    }
+    
+    var tileRingActivationDiameter: Double = Defaults[.tileRingActivationDiameter] {
+        didSet {
+            Defaults[.tileRingActivationDiameter] = tileRingActivationDiameter
+        }
+    }
+    
+    var tileRingOuterPadding: Double = Defaults[.tileRingOuterPadding] {
+        didSet {
+            Defaults[.tileRingOuterPadding] = tileRingOuterPadding
+        }
+    }
+    
     var enableSmartTiling: Bool = Defaults[.enableSmartTiling] {
         didSet {
             Defaults[.enableSmartTiling] = enableSmartTiling

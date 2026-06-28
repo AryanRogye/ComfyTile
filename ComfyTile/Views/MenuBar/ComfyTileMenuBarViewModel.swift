@@ -21,13 +21,15 @@ final class ComfyTileMenuBarViewModel {
     var width: CGFloat = 350
     var height: CGFloat = 300
     
+    var isResizing: Bool = false
+    
     /// trigger
     var showSettings = false
     private var showSettingsRevealWorkItem: DispatchWorkItem?
     
     var selectedTab: ComfyTileTabs = .tile
     
-    var panel: NSPanel?
+    @ObservationIgnored weak var panel: NSWindow?
     
     var closePanel: () -> Void = { }
     
@@ -80,7 +82,6 @@ extension ComfyTileMenuBarViewModel {
         } onChange: { [weak self] in
             DispatchQueue.main.async {
                 guard let self else { return }
-                guard let panel = self.panel else { return }
                 self.showSettingsRevealWorkItem?.cancel()
                 if self.selectedTab == .settings {
 
@@ -116,15 +117,17 @@ extension ComfyTileMenuBarViewModel {
                     }
                 }
                 
-                let old = panel.frame
-                let newFrame = NSRect(
-                    x: old.midX - self.width / 2,     // keep center X
-                    y: old.maxY - self.height,        // keep top Y fixed
-                    width: self.width,
-                    height: self.height
-                )
-                
-                panel.setFrame(newFrame, display: true, animate: true)
+                if let panel = self.panel {
+                    let old = panel.frame
+                    let newFrame = NSRect(
+                        x: old.midX - self.width / 2,     // keep center X
+                        y: old.maxY - self.height,        // keep top Y fixed
+                        width: self.width,
+                        height: self.height
+                    )
+                    
+                    panel.setFrame(newFrame, display: true, animate: true)
+                }
                 
                 self.observeTabs()
             }

@@ -37,7 +37,25 @@ class MenuBarCoordinator: NSObject {
     }
 
     // MARK: - Public Methods
-
+    public func stop() {
+        // close panel if open
+        hidePanel()
+        
+        // remove menu bar icon
+        if let statusItem {
+            NSStatusBar.system.removeStatusItem(statusItem)
+            self.statusItem = nil
+        }
+        
+        // cleanup panel
+        panel?.close()
+        panel = nil
+        comfyTileMenuBarVM?.panel = nil
+        
+        // release SwiftUI tree
+        hostingController = nil
+    }
+    
     /// Start the menu bar coordinator with required dependencies
     public func start(
         comfyTileMenuBarVM      : ComfyTileMenuBarViewModel,

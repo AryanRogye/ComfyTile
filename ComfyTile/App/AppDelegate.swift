@@ -28,21 +28,24 @@ class AppEnv {
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    
-    var appCoordinator : AppCoordinator
-    
-    @MainActor
-    override init() {
+
+    private var appCoordinator: AppCoordinator?
+
+    public func applicationDidFinishLaunching(_ notification: Notification) {
+        guard !ProcessInfo.isSwiftUIPreview else { return }
+
         NSApp.setActivationPolicy(.accessory)
         appCoordinator = AppCoordinator(appEnv: AppEnv())
     }
     
-    public func applicationDidFinishLaunching(_ notification: Notification) {
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+        appCoordinator?.showNeeded()
+        return true
     }
-    
+
     public func applicationWillTerminate(_ notification: Notification) {
     }
-    
+
     public func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return false
     }

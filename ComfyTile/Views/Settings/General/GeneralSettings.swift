@@ -19,6 +19,9 @@ struct GeneralSettings: View {
                 CenterTilingAdvancedGeneralView(defaultsManager: defaultsManager, menuBarVM: menuBarVM)
                 TilingSnapBehavior(defaultsManager: defaultsManager)
                 SmartTilingBehavior(defaultsManager: defaultsManager)
+                TileRingGeneralView(defaultsManager: defaultsManager)
+                TileRingHotKey(defaultsManager: defaultsManager)
+                TileRingActivationDiameter(defaultsManager: defaultsManager, menuBarVM: menuBarVM)
             }
 
             Section("Window Switching") {
@@ -27,12 +30,15 @@ struct GeneralSettings: View {
             /// About Section
             Section("About") {
                 UpdatesGeneralView()
+                ConvertToWindow(defaultsManager: defaultsManager)
                 Button("Quit") {
                     NSApplication.shared.terminate(self)
                 }
             }
         }
         .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
+        .background(.clear)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
