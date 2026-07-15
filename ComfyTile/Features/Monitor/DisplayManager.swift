@@ -38,11 +38,11 @@ final class DisplayManager {
     }
 
     public func start() {
-        updateScreenInformation()
+        updateScreenSnapshots()
         syncDisplayInfos()
         watcher = DisplayObserver(completionHandler: { _, _ in
             Task { @MainActor in
-                self.updateScreenInformation()
+                self.updateScreenSnapshots()
                 self.syncDisplayInfos()
             }
         })
@@ -97,7 +97,7 @@ final class DisplayManager {
         guard let id = screen.displayID else { return }
         guard !displayInfos.contains(where: { $0.screenID == id }) else { return }
         let info = DisplayInfo(
-            name: displayName(for: id),
+            name: monitorName(for: id),
             screenID: id,
             padding: defaultPadding,
             width: screen.frame.width,
@@ -140,7 +140,7 @@ final class DisplayManager {
 
         //        runtimeInfo.padding = padding
         let info = DisplayInfo(
-            name: displayName(for: id),
+            name: monitorName(for: id),
             screenID: id,
             padding: padding,
             width: screen.frame.width,
@@ -157,39 +157,19 @@ final class DisplayManager {
     ///
     /// we use screenSnapshots instead of displayInfos because
     /// screenSnapshots is always up to date
-    public func snapshot(for id: CGDirectDisplayID) -> NSImage? {
+    public func wallpaper(for id: CGDirectDisplayID) -> NSImage? {
         let info = screenSnapshots.keys.first(where: { $0 == id })
         guard let info else { return nil }
         return screenSnapshots[info] ?? nil
     }
 
     /// Function to get the name of the screen
-    public func displayName(for displayID: CGDirectDisplayID) -> String {
+    public func monitorName(for displayID: CGDirectDisplayID) -> String {
         if let screen = NSScreen.screens.first(where: { $0.displayID == displayID }) {
             return screen.localizedName
         }
         return "Unknown Name"
     }
-
-    private func updateScreenInformation() {
-        let currentIDs = Set(NSScreen.screens.compactMap(\.displayID))
-
-        for screen in NSScreen.screens {
-            guard let id = screen.displayID else { continue }
-
-            screenSnapshots[id] = getWallpaperImage(size: screen.frame.size, for: id)
-        }
-
-        /// check current snapshots for the monitor
-        for info in Array(screenSnapshots.keys) {
-            let isCurrentlyConnected = currentIDs.contains(info)
-            if !isCurrentlyConnected {
-                screenSnapshots.removeValue(forKey: info)
-            }
-        }
-    }
-
-
 
     private func getWallpaperImage(size: CGSize, for displayID: CGDirectDisplayID) -> NSImage {
 
@@ -213,5 +193,35 @@ final class DisplayManager {
         }
 
         return makePlaceholderImage(size: size)
+    }
+}
+
+extension DisplayManager {
+    /// Function is triggered by any change to a display
+    /// this allows us to always make sure `screenSnapshots` is up to date
+    /// with the users current monitor setup
+    internal func updateScreenSnapshots() {
+        
+        // collect Screen displayID's in a set
+        let currentIDs = Set(NSScreen.screens.compactMap(\.displayID))
+        
+        for screen in NSScreen.screens {
+            guard let id = screen.displayID else { continue }
+            
+            screenSnapshots[id] = getWallpaperImage(size: screen.frame.size, for: id)
+        }
+        
+        // remove any disconnected screens
+        removeDisconnectedScreens(from: currentIDs)
+    }
+    
+    private func removeDisconnectedScreens(from currentIDs: Set<CGDirectDisplayID>) {
+        // check current snapshots for the monitor
+        for info in Array(screenSnapshots.keys) {
+            let isMonitorConnected = currentIDs.contains(info)
+            if !isMonitorConnected {
+                screenSnapshots.removeValue(forKey: info)
+            }
+        }
     }
 }

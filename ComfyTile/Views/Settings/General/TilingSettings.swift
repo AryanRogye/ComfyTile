@@ -72,7 +72,7 @@ struct CenterTilingAdvancedGeneralView: View {
                 if !hideAdvancedCenterTilingPadding {
                     LazyVGrid(columns: columns, spacing: 16) {
                         ForEach(Array(displayManager.screenSnapshots.keys), id: \.self) { key in
-                            if let image = displayManager.snapshot(for: key) {
+                            if let image = displayManager.wallpaper(for: key) {
                                 DisplayCard(
                                     key: key,
                                     image: image,

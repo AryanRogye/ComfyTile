@@ -119,12 +119,19 @@ extension ComfyTileMenuBarViewModel {
                 
                 if let panel = self.panel {
                     let old = panel.frame
-                    let newFrame = NSRect(
+                    var newFrame = NSRect(
                         x: old.midX - self.width / 2,     // keep center X
                         y: old.maxY - self.height,        // keep top Y fixed
                         width: self.width,
                         height: self.height
                     )
+
+                    if let screen = panel.screen
+                        ?? NSScreen.screens.first(where: { $0.frame.intersects(old) })
+                        ?? NSScreen.main
+                    {
+                        newFrame = Self.constrainPanelFrame(newFrame, to: screen)
+                    }
                     
                     panel.setFrame(newFrame, display: true, animate: true)
                 }
@@ -132,5 +139,27 @@ extension ComfyTileMenuBarViewModel {
                 self.observeTabs()
             }
         }
+    }
+
+    static func constrainPanelFrame(
+        _ frame: NSRect,
+        to screen: NSScreen,
+        padding: CGFloat = 8
+    ) -> NSRect {
+        let visibleFrame = screen.visibleFrame.insetBy(dx: padding, dy: padding)
+        var constrainedFrame = frame
+
+        constrainedFrame.size.width = min(constrainedFrame.width, visibleFrame.width)
+        constrainedFrame.size.height = min(constrainedFrame.height, visibleFrame.height)
+        constrainedFrame.origin.x = min(
+            max(constrainedFrame.minX, visibleFrame.minX),
+            visibleFrame.maxX - constrainedFrame.width
+        )
+        constrainedFrame.origin.y = min(
+            max(constrainedFrame.minY, visibleFrame.minY),
+            visibleFrame.maxY - constrainedFrame.height
+        )
+
+        return constrainedFrame
     }
 }

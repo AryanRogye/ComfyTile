@@ -54,7 +54,7 @@ class AppCoordinator {
     private var permissionService   : PermissionService
 
     init(appEnv: AppEnv) {
-        self.permissionService = PermissionService()
+        self.permissionService = appEnv.permissionService
         self.displayManager = DisplayManager(ctx: appEnv.appServices.context)
         self.windowCore = appEnv.windowCore
         self.windowTilingService = appEnv.windowTilingService

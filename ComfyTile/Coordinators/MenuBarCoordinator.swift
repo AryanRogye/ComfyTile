@@ -235,18 +235,17 @@ class MenuBarCoordinator: NSObject {
             y: buttonRect.minY - panelSize.height - 4
         )
 
-        // Make sure panel doesn't go off screen
-        if let screen = NSScreen.main {
-            var adjustedOrigin = panelOrigin
-
-            // Keep within horizontal bounds
-            if adjustedOrigin.x < screen.visibleFrame.minX {
-                adjustedOrigin.x = screen.visibleFrame.minX + 8
-            } else if adjustedOrigin.x + panelSize.width > screen.visibleFrame.maxX {
-                adjustedOrigin.x = screen.visibleFrame.maxX - panelSize.width - 8
-            }
-
-            panel.setFrameOrigin(adjustedOrigin)
+        // Keep the panel on the display that owns the status item.
+        if let screen = button.window?.screen
+            ?? NSScreen.screens.first(where: { $0.frame.intersects(buttonRect) })
+            ?? NSScreen.main
+        {
+            let proposedFrame = NSRect(origin: panelOrigin, size: panelSize)
+            let constrainedFrame = ComfyTileMenuBarViewModel.constrainPanelFrame(
+                proposedFrame,
+                to: screen
+            )
+            panel.setFrame(constrainedFrame, display: false)
         } else {
             panel.setFrameOrigin(panelOrigin)
         }

@@ -79,7 +79,7 @@ struct DisplayCard: View {
             .frame(maxWidth: .infinity)
             .frame(height: 90)
             .overlay(alignment: .center) {
-                Text(displayManager.displayName(for: key))
+                Text(displayManager.monitorName(for: key))
                     .font(.system(size: 11, weight: .regular, design: .rounded))
                     .foregroundStyle(.primary)
                     .padding(.horizontal, 8)
