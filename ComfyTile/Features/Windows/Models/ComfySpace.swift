@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import CoreGraphics
 
 struct ComfySpace {
-    
+    var spaceID: CGSSpaceID
+    var windows: [CGWindowID] = []
 }

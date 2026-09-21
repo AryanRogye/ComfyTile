@@ -35,6 +35,7 @@ public final class ComfyWindow: Sendable, Equatable {
     public let bundleIdentifier: String?
     public let screenshot : CGImage?
     public var isInSpace  : Bool
+    public var spaces: [CGSSpaceID]
 
     public var screen: NSScreen? {
         NSScreen.screens.first(where: { $0.persistentUUIDString == self.screenID })
@@ -87,6 +88,7 @@ public final class ComfyWindow: Sendable, Equatable {
         self.pid = pid
         self.screenshot = screenshot
         self.isInSpace = isInSpace
+        self.spaces = Self.spacesForWindow(window.windowID)
     }
     
     public init(
@@ -109,6 +111,11 @@ public final class ComfyWindow: Sendable, Equatable {
         self.pid = pid
         self.screenshot = screenshot
         self.isInSpace = isInSpace
+        if let windowID {
+            self.spaces = Self.spacesForWindow(windowID)
+        } else {
+            self.spaces = []
+        }
     }
     
     public func focusWindow() {
@@ -235,7 +242,7 @@ extension ComfyWindow {
         let cid = CGSMainConnectionID()
         let ids: CFArray = [NSNumber(value: Int(windowID))] as CFArray
         
-        guard let unmanaged = CGSCopySpacesForWindows(cid, kCGSAllSpacesMask, ids) else {
+        guard let unmanaged = CGSCopySpacesForWindows(cid, 0b111, ids) else {
             return []
         }
         

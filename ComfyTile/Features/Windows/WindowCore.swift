@@ -579,10 +579,9 @@ extension WindowCore {
             print("Error Converting display to [NSDictionary]")
             return
         }
-        let result = CGSCopyActiveMenuBarDisplayIdentifier(CGSConnectionID()) as String
-
         print("Display Count: \(displays.count)")
 
+        var comfySpaces: [ComfySpace] = []
         for display in displays {
 
             guard let spaces = display["Spaces"] as? [[String: Any]] else {
@@ -597,7 +596,19 @@ extension WindowCore {
             let activeSpaceID = (display["Current Space"] as? [String: Any])?["ManagedSpaceID"] as? Int
 
             for space in spaces {
-                print("Space: \(space)")
+//                print("Space: \(space)")
+//
+                if let ManagedSpaceID = space["ManagedSpaceID"] as? UInt64 {
+                    comfySpaces.append(.init(spaceID: ManagedSpaceID))
+                }
+            }
+        }
+
+        for i in comfySpaces.indices {
+            for window in self.windows {
+                if window.spaces.contains(comfySpaces[i].spaceID), let windowID = window.windowID {
+                    comfySpaces[i].windows.append(windowID)
+                }
             }
         }
 

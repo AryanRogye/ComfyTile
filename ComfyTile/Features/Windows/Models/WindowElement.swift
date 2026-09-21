@@ -7,7 +7,7 @@
 
 import Cocoa
 
-public class WindowElement {
+public class WindowElement: Sendable {
     public var element: AXUIElement?
     
     public init(element: AXUIElement?) {

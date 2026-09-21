@@ -27,6 +27,12 @@ func CGSCopyActiveMenuBarDisplayIdentifier(_ cid: CGSConnectionID) -> CFString
 @_silgen_name("CGSCopyManagedDisplaySpaces")
 func CGSCopyManagedDisplaySpaces(_ cid: CGSConnectionID) -> CFArray
 
+@_silgen_name("CGSSpaceDestroy")
+func CGSSpaceDestroy(
+    _ connection: CGSConnectionID,
+    _ spaceID: CGSSpaceID
+)
+
 @_silgen_name("CGSMainConnectionID")
 func CGSMainConnectionID() -> CGSConnectionID
 
