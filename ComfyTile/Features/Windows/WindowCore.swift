@@ -26,8 +26,6 @@ public final class WindowCore {
      */
     private var elementCache: [CGWindowID: WindowElement] = [:]
     
-    var bootTask : Task<Void, Never>?
-    
     /**
      * This is the task that holds a run of the loadTask in a non async function
      */
@@ -74,7 +72,7 @@ public final class WindowCore {
     private var observers: [NSObjectProtocol] = []
     
     public init() {
-        bootTask = Task { [weak self] in
+        Task { [weak self] in
             guard let self else { return }
             /// Initial Load of all windows
             await self.loadWindows()
@@ -290,22 +288,27 @@ extension WindowCore {
         unAsyncLoadWindowTask?.cancel()
         unAsyncLoadWindowTask = Task {
             await loadWindows()
+            guard !Task.isCancelled else { return }
             completion()
         }
     }
 
     @discardableResult
     public func loadWindows() async -> [ComfyWindow] {
+        loadWindowTask?.cancel()
         loadWindowTask = Task.detached(priority: .userInitiated) { [weak self] in
             guard let self else { return [] }
             var userWindows: [ComfyWindow] = []
 
             let cscWindows: [ComfySCWindow] = await SCWindowFactory.getComfyWindowsPrivately(onScreenWindowsOnly: false)
+            guard !Task.isCancelled else { return [] }
 
             for w in cscWindows {
+                guard !Task.isCancelled else { return [] }
                 /// Create a ComfyWindow Object
                 if let cw = await ComfyWindow(window: w) {
-                    
+                    guard !Task.isCancelled else { return [] }
+
                     await MainActor.run {
                         if let windowID = cw.windowID {
                             /// if the element in ComfyWindow is a valid AXUIElement?, we can update cache
@@ -335,6 +338,9 @@ extension WindowCore {
                             windowID: cw.windowID
                         )
                     }
+
+                    guard !Task.isCancelled else { return [] }
+
                     /// Add Window into userWindows
                     userWindows.append(cw)
                     

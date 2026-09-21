@@ -26,8 +26,8 @@ actor ScreenshotHelper {
             self.time = .now
         }
         
-        public func hasBeen2Mins(now: Date = .now) -> Bool {
-            return now.timeIntervalSince(time) > 120
+        public func hasBeen(mins: Double) -> Bool {
+            return Date.now.timeIntervalSince(time) > 60 * mins
         }
     }
 
@@ -51,9 +51,9 @@ actor ScreenshotHelper {
         cleanupTask = nil
     }
     
-    static func clearExpiredCache(now: Date = .now) async {
+    private static func clearExpiredCache() async {
         cache = cache.filter { _, info in
-            !info.hasBeen2Mins(now: now)
+            !info.hasBeen(mins: 5)
         }
         print("Screenshot cache size after cleanup:", cache.count)
     }
@@ -69,7 +69,7 @@ actor ScreenshotHelper {
         
         if let info = cache[windowID] {
             /// if < 2 mins ago, just return the same image
-            if !info.hasBeen2Mins() {
+            if !info.hasBeen(mins: 5) {
                 return info.image
             }
         }
@@ -141,13 +141,13 @@ actor ScreenshotHelper {
         let collector = FrameCollector()
         let stream = SCStream(filter: filter, configuration: cfg, delegate: nil)
         
-        try await stream.addStreamOutput(collector, type: .screen, sampleHandlerQueue: .global(qos: .userInitiated))
+        try stream.addStreamOutput(collector, type: .screen, sampleHandlerQueue: .global(qos: .userInitiated))
         try await stream.startCapture()
         
         defer {
             Task {
                 try? await stream.stopCapture()
-                try? await stream.removeStreamOutput(collector, type: .screen)
+                try? stream.removeStreamOutput(collector, type: .screen)
             }
         }
         
