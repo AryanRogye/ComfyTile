@@ -120,6 +120,8 @@
 		9BC6E8592FD8DB1B0058A41D /* TilingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC6E8582FD8DB1B0058A41D /* TilingMode.swift */; };
 		9BC6E85B2FD8DB300058A41D /* LayoutMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC6E85A2FD8DB300058A41D /* LayoutMode.swift */; };
 		9BE82E802F91699100A1C7F0 /* WindowViewerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE82E7F2F91699100A1C7F0 /* WindowViewerViewModel.swift */; };
+		9BEFF5D73060F65800F3F787 /* ComfySpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BEFF5D63060F65700F3F787 /* ComfySpace.swift */; };
+		9BEFF5D93060F77300F3F787 /* NSScreen+persistantUUIDString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BEFF5D83060F76B00F3F787 /* NSScreen+persistantUUIDString.swift */; };
 		9BF1F5B02F904964000C29C9 /* View+if.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF1F5AF2F904962000C29C9 /* View+if.swift */; };
 		9BF1F5B32F9050EA000C29C9 /* LocalShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 9BF1F5B22F9050EA000C29C9 /* LocalShortcuts */; };
 		9BF2650A2F8C5EC400BAA631 /* ComfyTileDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF265092F8C5EC300BAA631 /* ComfyTileDebugView.swift */; };
@@ -261,6 +263,8 @@
 		9BC6E8582FD8DB1B0058A41D /* TilingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TilingMode.swift; sourceTree = "<group>"; };
 		9BC6E85A2FD8DB300058A41D /* LayoutMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutMode.swift; sourceTree = "<group>"; };
 		9BE82E7F2F91699100A1C7F0 /* WindowViewerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowViewerViewModel.swift; sourceTree = "<group>"; };
+		9BEFF5D63060F65700F3F787 /* ComfySpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfySpace.swift; sourceTree = "<group>"; };
+		9BEFF5D83060F76B00F3F787 /* NSScreen+persistantUUIDString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSScreen+persistantUUIDString.swift"; sourceTree = "<group>"; };
 		9BF1F5AF2F904962000C29C9 /* View+if.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+if.swift"; sourceTree = "<group>"; };
 		9BF265092F8C5EC300BAA631 /* ComfyTileDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfyTileDebugView.swift; sourceTree = "<group>"; };
 		9BF95ECE2E9321E000776771 /* ComfyTile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ComfyTile.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -380,6 +384,7 @@
 		9B8FC0222F10B80D00CBF4B8 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9BEFF5D83060F76B00F3F787 /* NSScreen+persistantUUIDString.swift */,
 				9B969AA12FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift */,
 				9B794D1B2FC43C98009C8A46 /* Color+opposite.swift */,
 				9B3121602FC3B60200C9D7B5 /* NSScreen+displayID.swift */,
@@ -660,6 +665,7 @@
 		9B9BCFE32F1973660020F3AD /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				9BEFF5D63060F65700F3F787 /* ComfySpace.swift */,
 				9BC6E85A2FD8DB300058A41D /* LayoutMode.swift */,
 				9BC6E8582FD8DB1B0058A41D /* TilingMode.swift */,
 				9B68EEA62F22D123009567DF /* ComfySCWindow.swift */,
@@ -886,6 +892,7 @@
 				9B1FE3D02FC7EF5900C68CBB /* PrivateSCWindowFactory.swift in Sources */,
 				9B3121632FC3B70200C9D7B5 /* AppServices.swift in Sources */,
 				9B68EEA72F22D124009567DF /* ComfySCWindow.swift in Sources */,
+				9BEFF5D73060F65800F3F787 /* ComfySpace.swift in Sources */,
 				9B969AB12FDCD5CF0080C3CD /* TilingAnimationsView.swift in Sources */,
 				9B8FC0CA2F12EF5C00CBF4B8 /* MenuBarModeContainer.swift in Sources */,
 				9B8FC0C32F12307100CBF4B8 /* LayoutModeView.swift in Sources */,
@@ -941,6 +948,7 @@
 				9B9BCFD72F1972C30020F3AD /* Modifiers.swift in Sources */,
 				9B68EEA32F228C6C009567DF /* AppearanceSettings.swift in Sources */,
 				9B9BCFD32F1972350020F3AD /* DefaultsManager.swift in Sources */,
+				9BEFF5D93060F77300F3F787 /* NSScreen+persistantUUIDString.swift in Sources */,
 				9B3BC0982F43A8E300A86E11 /* HighlightFocusedCoordinator.swift in Sources */,
 				9B9BCFD42F1972350020F3AD /* DefaultsKeys.swift in Sources */,
 				9B3121512FC3952500C9D7B5 /* HorizontalTileLayout.swift in Sources */,

@@ -21,6 +21,15 @@
 
 import CoreGraphics
 
+
+//CFStringRef CGSCopyActiveMenuBarDisplayIdentifier(int conn);
+
+@_silgen_name("CGSCopyActiveMenuBarDisplayIdentifier")
+func CGSCopyActiveMenuBarDisplayIdentifier(_ cid: CGSConnectionID) -> CFString
+
+@_silgen_name("CGSCopyManagedDisplaySpaces")
+func CGSCopyManagedDisplaySpaces(_ cid: CGSConnectionID) -> CFArray
+
 @_silgen_name("CGSMainConnectionID")
 func CGSMainConnectionID() -> CGSConnectionID
 

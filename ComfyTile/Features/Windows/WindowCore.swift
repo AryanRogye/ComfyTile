@@ -550,6 +550,49 @@ extension WindowCore {
 #if DEBUG
 extension WindowCore {
     public func debugPress() {
+
+        var displayIDs: [String: CGDirectDisplayID] = [:]
+
+        for screen in NSScreen.screens {
+            if let persistantUUIDString = screen.persistentUUIDString {
+                if let displayID = screen.displayID {
+                    displayIDs[persistantUUIDString] = displayID
+                }
+            }
+        }
+
+        for (persistantUUIDString, displayID) in displayIDs {
+            print("\(persistantUUIDString)")
+        }
+
+        let displays = CGSCopyManagedDisplaySpaces(CGSMainConnectionID())
+
+        guard let displays = displays as? [NSDictionary] else {
+            print("Error Converting display to [NSDictionary]")
+            return
+        }
+        let result = CGSCopyActiveMenuBarDisplayIdentifier(CGSConnectionID()) as String
+
+        print("Display Count: \(displays.count)")
+
+        for display in displays {
+
+            guard let spaces = display["Spaces"] as? [[String: Any]] else {
+                continue
+            }
+            guard let displayID = display["Display Identifier"] as? String else {
+                continue
+            }
+
+            print("DisplayID: \(displayID)")
+
+            let activeSpaceID = (display["Current Space"] as? [String: Any])?["ManagedSpaceID"] as? Int
+
+            for space in spaces {
+                print("Space: \(space)")
+            }
+        }
+
         print()
         print("✅ =================DEBUG START=================")
 
