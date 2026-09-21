@@ -8,7 +8,7 @@
 import AppKit
 
 extension NSScreen {
-    var persistentUUIDString: String? {
+    nonisolated var persistentUUIDString: String? {
         guard let displayID = self.displayID else { return nil }
 
         guard let cfuuidRef = CGDisplayCreateUUIDFromDisplayID(displayID) else { return nil }

@@ -30,12 +30,16 @@ public final class ComfyWindow: Sendable, Equatable {
     
     /// More stronger element
     public var element: WindowElement
-    public var screen: NSScreen?
+    public var screenID: String?
     public let pid: pid_t
     public let bundleIdentifier: String?
     public let screenshot : CGImage?
     public var isInSpace  : Bool
-    
+
+    public var screen: NSScreen? {
+        NSScreen.screens.first(where: { $0.persistentUUIDString == self.screenID })
+    }
+
     public init?(
         window: ComfySCWindow
     ) async {
@@ -78,7 +82,7 @@ public final class ComfyWindow: Sendable, Equatable {
         self.windowID = window.windowID
         self.windowTitle = windowTitle
         self.element = windowElement
-        self.screen = screen
+        self.screenID = screen?.persistentUUIDString
         self.bundleIdentifier = app.bundleIdentifier
         self.pid = pid
         self.screenshot = screenshot
@@ -100,7 +104,7 @@ public final class ComfyWindow: Sendable, Equatable {
         self.windowID = windowID
         self.windowTitle = windowTitle
         self.element = element
-        self.screen = screen
+        self.screenID = screen?.persistentUUIDString
         self.bundleIdentifier = bundleIdentifier
         self.pid = pid
         self.screenshot = screenshot
@@ -158,7 +162,7 @@ extension ComfyWindow {
         
         self.element.setPosition(x: position.x, y: position.y)
         self.element.setSize(width: frame.width, height: frame.height)
-        self.screen = screen
+        self.screenID = screen.persistentUUIDString
     }
 }
 
