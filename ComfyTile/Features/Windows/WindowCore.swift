@@ -550,6 +550,8 @@ extension WindowCore {
 #if DEBUG
 extension WindowCore {
     public func debugPress() {
+        print()
+        print("✅ =================DEBUG START=================")
 
         var displayIDs: [String: CGDirectDisplayID] = [:]
 
@@ -592,9 +594,6 @@ extension WindowCore {
                 print("Space: \(space)")
             }
         }
-
-        print()
-        print("✅ =================DEBUG START=================")
 
         print("✅ ==================DEBUG END==================")
         print()

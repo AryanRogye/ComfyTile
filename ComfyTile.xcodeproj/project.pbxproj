@@ -81,9 +81,6 @@
 		9B8FC0CA2F12EF5C00CBF4B8 /* MenuBarModeContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0C92F12EF5900CBF4B8 /* MenuBarModeContainer.swift */; };
 		9B8FC0D52F130B7700CBF4B8 /* HotKeyOrClose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */; };
 		9B8FC0D72F130E7500CBF4B8 /* ShortcutEditableRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */; };
-		9B969A9C2FDB8C3F0080C3CD /* TileRingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969A9B2FDB8C380080C3CD /* TileRingCoordinator.swift */; };
-		9B969A9E2FDB93150080C3CD /* CirclePiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969A9D2FDB93150080C3CD /* CirclePiece.swift */; };
-		9B969AA02FDB93430080C3CD /* TileRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969A9F2FDB93430080C3CD /* TileRingView.swift */; };
 		9B969AA22FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA12FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift */; };
 		9B969AA62FDCB60B0080C3CD /* ConvertToWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA52FDCB60A0080C3CD /* ConvertToWindow.swift */; };
 		9B969AA82FDCB6F90080C3CD /* ComfyTileWindowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B969AA72FDCB6F60080C3CD /* ComfyTileWindowCoordinator.swift */; };
@@ -225,9 +222,6 @@
 		9B8FC0C92F12EF5900CBF4B8 /* MenuBarModeContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarModeContainer.swift; sourceTree = "<group>"; };
 		9B8FC0D42F130B7400CBF4B8 /* HotKeyOrClose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyOrClose.swift; sourceTree = "<group>"; };
 		9B8FC0D62F130E7100CBF4B8 /* ShortcutEditableRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutEditableRow.swift; sourceTree = "<group>"; };
-		9B969A9B2FDB8C380080C3CD /* TileRingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileRingCoordinator.swift; sourceTree = "<group>"; };
-		9B969A9D2FDB93150080C3CD /* CirclePiece.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclePiece.swift; sourceTree = "<group>"; };
-		9B969A9F2FDB93430080C3CD /* TileRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileRingView.swift; sourceTree = "<group>"; };
 		9B969AA12FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessInfo+isSwiftUIPreview.swift"; sourceTree = "<group>"; };
 		9B969AA52FDCB60A0080C3CD /* ConvertToWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertToWindow.swift; sourceTree = "<group>"; };
 		9B969AA72FDCB6F60080C3CD /* ComfyTileWindowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfyTileWindowCoordinator.swift; sourceTree = "<group>"; };
@@ -370,7 +364,6 @@
 			isa = PBXGroup;
 			children = (
 				9B969AA72FDCB6F60080C3CD /* ComfyTileWindowCoordinator.swift */,
-				9B969A9B2FDB8C380080C3CD /* TileRingCoordinator.swift */,
 				9B3BC0972F43A8D800A86E11 /* HighlightFocusedCoordinator.swift */,
 				9B8FC0A82F11AB9A00CBF4B8 /* MenuBarCoordinator.swift */,
 				9B8FC0122F10B80D00CBF4B8 /* HotKeyCoordinator.swift */,
@@ -463,7 +456,6 @@
 				9B8FC04E2F10B80D00CBF4B8 /* Settings */,
 				9B8FC0542F10B80D00CBF4B8 /* TilingCover */,
 				9B8FC0562F10B80D00CBF4B8 /* WindowViewer */,
-				9B969A9A2FDB8C160080C3CD /* TileRing */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -534,15 +526,6 @@
 				9B969AA92FDCC6840080C3CD /* SettingsSlider.swift */,
 			);
 			path = Component;
-			sourceTree = "<group>";
-		};
-		9B969A9A2FDB8C160080C3CD /* TileRing */ = {
-			isa = PBXGroup;
-			children = (
-				9B969A9D2FDB93150080C3CD /* CirclePiece.swift */,
-				9B969A9F2FDB93430080C3CD /* TileRingView.swift */,
-			);
-			path = TileRing;
 			sourceTree = "<group>";
 		};
 		9B9BCFBD2F1971EB0020F3AD /* Features */ = {
@@ -861,7 +844,6 @@
 			files = (
 				9B8FC0B22F11EEF300CBF4B8 /* ComfyTileTabPlacement.swift in Sources */,
 				9B23AB8B2F9023B30028C510 /* MarqueeText.swift in Sources */,
-				9B969AA02FDB93430080C3CD /* TileRingView.swift in Sources */,
 				9B8FC05D2F10B80D00CBF4B8 /* AppCoordinator.swift in Sources */,
 				9B969AA62FDCB60B0080C3CD /* ConvertToWindow.swift in Sources */,
 				9B8FC05E2F10B80D00CBF4B8 /* AppDelegate.swift in Sources */,
@@ -884,7 +866,6 @@
 				9B8FC0642F10B80D00CBF4B8 /* WindowSpatialEngine.swift in Sources */,
 				9B969AB32FDCD5F00080C3CD /* SettingsAppearanceView.swift in Sources */,
 				9B8FC0C12F12306D00CBF4B8 /* TileModeView.swift in Sources */,
-				9B969A9C2FDB8C3F0080C3CD /* TileRingCoordinator.swift in Sources */,
 				9B9BCFE72F19738D0020F3AD /* WindowElement.swift in Sources */,
 				9B969AA22FDB95250080C3CD /* ProcessInfo+isSwiftUIPreview.swift in Sources */,
 				9B3800842FD8E09700F0243F /* WindowTilingService+moveTopHalf.swift in Sources */,
@@ -966,7 +947,6 @@
 				9B969AAF2FDCD4360080C3CD /* ComfyTileGlassStyle.swift in Sources */,
 				9B3121532FC3952D00C9D7B5 /* CenterTileLayout.swift in Sources */,
 				9B969AAA2FDCC6860080C3CD /* SettingsSlider.swift in Sources */,
-				9B969A9E2FDB93150080C3CD /* CirclePiece.swift in Sources */,
 				9B8FC08C2F10B80D00CBF4B8 /* ComfyTileApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

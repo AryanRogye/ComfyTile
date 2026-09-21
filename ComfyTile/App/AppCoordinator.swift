@@ -29,7 +29,6 @@ class AppCoordinator {
     let tilingCoverCoordinator              : TilingCoverCoordinator
     let windowViewerCoordinator             : WindowViewerCoordinator
     let highLightFocusedCoordinator         : HighlightFocusedCoordinator
-    let tileRingCoordinator                 : TileRingCoordinator
     
     /// ==============================================================================
     /// View Models
@@ -39,7 +38,6 @@ class AppCoordinator {
     let tilingCoverVM      = TilingCoverViewModel()
     let windowViewerVM     = WindowViewerViewModel()
     let highlightVM        = HighlightFocusedViewModel()
-    let tileRingVM         = TileRingViewModel()
     
     /// ==============================================================================
     /// Controllers
@@ -61,10 +59,6 @@ class AppCoordinator {
         self.windowLayoutService = appEnv.windowLayoutService
         self.tilingCoverCoordinator = TilingCoverCoordinator(
             tilingCoverVM: tilingCoverVM
-        )
-        self.tileRingCoordinator = TileRingCoordinator(
-            vm: tileRingVM,
-            defaultsManager: defaultsManager
         )
         self.highLightFocusedCoordinator = HighlightFocusedCoordinator(
             windowCore: windowCore,
@@ -216,14 +210,6 @@ class AppCoordinator {
 //                self.windowCore.isHoldingModifier = false
 //            },
             
-            // MARK: - Tile Ring
-            onTileRingDown: {
-                self.tileRingCoordinator.show()
-            },
-            onTileRingUp: {
-                let tile = self.tileRingCoordinator.hide()
-                self.windowSpatialEngine.action(for: tile)
-            },
             // MARK: - Top Half
             onTopHalfDown:  {
                 self.windowSpatialEngine.tileTopHalfPressed()

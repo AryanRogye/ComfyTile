@@ -59,15 +59,6 @@ extension Defaults.Keys {
     /// This allows us to do smart tiling, for example if we just did 1/3 left then the next right would be 2/3
     static let enableSmartTiling = Key<Bool>("enableSmartTiling", default: false)
     
-    /// This would show a ring that can be used for tiling to a side, with just 1 hotkey
-    static let enableTileRing = Key<Bool>("enableTileRing", default: false)
-    
-    /// How Far mouse needs to be out to trigger a tile
-    static let tileRingActivationDiameter = Key<Double>("tileRingActivationDiameter", default: 100.0)
-    
-    /// How Far out from the activationDiameter the pieces are
-    static let tileRingOuterPadding = Key<Double>("tileRingOuterPadding", default: 100)
-    
     /// toggle to use window instead of menu bar
     static let useWindowInsteadOfMenuBar = Key<Bool>("UseWindowInsteadOfMenuBar", default: false)
 }
